@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Logo Comparison</title>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
+
+    <style>
+      img {
+        max-height: 200px;
+        max-width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <table id="example" class="display" cellspacing="0" width="100%">
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Name</th>
+          <th>Catalog API Image</th>
+          <th>Organizations API Image</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ANUx</td>
+          <td>Australian National University</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/banner/anu_logo_200x101_0.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-anux.png"/></td>
+        </tr>
+        <tr>
+          <td>ASUx</td>
+          <td>Arizona State University</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/asux-200x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-asux.png"/></td>
+        </tr>
+        <tr>
+          <td>BabsonX</td>
+          <td>Babson College</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/babson_logo_200x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/Babson_2C_1.png"/></td>
+        </tr>
+        <tr>
+          <td>BerkeleyX</td>
+          <td>University of California, Berkeley</td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-berkeleyx.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-berkeleyx.png"/></td>
+        </tr>
+        <tr>
+          <td>CatalystX</td>
+          <td>Catalyst</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/catalyst-x.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-catalystx.png"/></td>
+        </tr>
+        <tr>
+          <td>ColumbiaX</td>
+          <td>Columbia University</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/columbiau200x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-columbiax.png"/></td>
+        </tr>
+        <tr>
+          <td>CurtinX</td>
+          <td>Curtin University</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/curtin-university-200x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-curtinx.png"/></td>
+        </tr>
+        <tr>
+          <td>DelftX</td>
+          <td>Delft University of Technology (TU Delft)</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/banner/delft_logo_200x101_0.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-delftx.png"/></td>
+        </tr>
+        <tr>
+          <td>edX</td>
+          <td>edX</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/edx-200x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/edx_logo.png"/></td>
+        </tr>
+        <tr>
+          <td>ETHx</td>
+          <td>ETH Zurich</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/eth_200x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/eth_logo_kurz.png"/></td>
+        </tr>
+        <tr>
+          <td>FullbridgeX</td>
+          <td>Fullbridge</td>
+          <td><img
+            src="https://www.edx.org/sites/default/files/school/image/logo/fullbridgex-logo12022015-200x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/fb_logo_RGB.png"/></td>
+        </tr>
+        <tr>
+          <td>GalileoX</td>
+          <td>Galileo University</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/galileox-logo-200x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo_universidad_galileo-1_thumb.png"/>
+          </td>
+        </tr>
+        <tr>
+          <td>HarvardX</td>
+          <td>Harvard University</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/banner/harvard_logo_200x101_0.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-harvardx.png"/></td>
+        </tr>
+        <tr>
+          <td>HKPolyUx</td>
+          <td>The Hong Kong Polytechnic University</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/hkpolyu-logo12022015-200x101.png"/>
+          </td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/Corporate_Logo_CMYK_transparent.png"/>
+          </td>
+        </tr>
+        <tr>
+          <td>HKUSTx</td>
+          <td>Hong Kong University of Science and Technology</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/banner/hkust-logo-200x201_0.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-hkustx.png"/></td>
+        </tr>
+        <tr>
+          <td>IIMBx</td>
+          <td>Indian Institute of Management, Bangalore</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/iimb-200x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-iimbx.png"/></td>
+        </tr>
+        <tr>
+          <td>IITBombayX</td>
+          <td>IITBombay</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/banner/iitbombay_rev_200x101_0.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-iitbombayx.png"/></td>
+        </tr>
+        <tr>
+          <td>ImperialBusinessX</td>
+          <td>Imperial College Business School</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/imperialbusinesslogo_200x101.png"/>
+          </td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/IMPERIALX_LOGO_RGB_LIGHT.png"/></td>
+        </tr>
+        <tr>
+          <td>LouvainX</td>
+          <td>Université catholique de Louvain</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/banner/ucl-logo_200x101_0.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-louvainx.png"/></td>
+        </tr>
+        <tr>
+          <td>MichiganX</td>
+          <td>The University of Michigan</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/michiganx-logo12012015-200x101.png"/>
+          </td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/umlogo_edx_092815.png"/></td>
+        </tr>
+        <tr>
+          <td>Microsoft</td>
+          <td>Microsoft</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/microsoft201x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-microsoft.png"/></td>
+        </tr>
+        <tr>
+          <td>MITx</td>
+          <td>Massachusetts Institute of Technology</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/banner/mit_logo_200x101_0.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-mitx.png"/></td>
+        </tr>
+        <tr>
+          <td>NYIF</td>
+          <td>New York Institute of Finance</td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-nyif.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-nyif.png"/></td>
+        </tr>
+        <tr>
+          <td>RITx</td>
+          <td>Rochester Institute of Technology</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/ritx-logo-200x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/rit_orange.jpg"/></td>
+        </tr>
+        <tr>
+          <td>ThunderbirdX</td>
+          <td>Thunderbird School of Global Management</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/thunderbirdx.png"/></td>
+          <td><img src="#N/A"/></td>
+        </tr>
+        <tr>
+          <td>UBCx</td>
+          <td>University of British Columbia</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/ubcx-200x101_0.jpg"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-ubcx.png"/></td>
+        </tr>
+        <tr>
+          <td>UC3Mx</td>
+          <td>Universidad Carlos III de Madrid</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/uc3mx_logo200x101.jpg"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/Logo_2.png"/></td>
+        </tr>
+        <tr>
+          <td>UPValenciaX</td>
+          <td>Universitat Politècnica de Valencia</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/upv_200x101.jpg"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-upvalenciax_1.png"/></td>
+        </tr>
+        <tr>
+          <td>UQx</td>
+          <td>The University of Queensland</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/banner/queensland_logo_200x101_0_0.png"/>
+          </td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-uqx.png"/></td>
+        </tr>
+        <tr>
+          <td>VJx</td>
+          <td>HarvardX, MITx, UTokyoX</td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-vjx.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-vjx.png"/></td>
+        </tr>
+        <tr>
+          <td>W3Cx</td>
+          <td>The World Wide Web Consortium (W3C)</td>
+          <td><img src="https://www.edx.org/sites/default/files/school/image/logo/w3c-200x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/logo-w3cx.png"/></td>
+        </tr>
+        <tr>
+          <td>WageningenX</td>
+          <td>Wageningen University & Research</td>
+          <td><img
+            src="https://www.edx.org/sites/default/files/school/image/logo/wageningenx-logo12022015-200x101.png"/></td>
+          <td><img src="https://edxuploads.s3.amazonaws.com/organization_logos/WUR_RGB_standard.png"/></td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr>
+          <th>Key</th>
+          <th>Name</th>
+          <th>Catalog API Image</th>
+          <th>Organizations API Image</th>
+        </tr>
+      </tfoot>
+    </table>
+
+  </body>
+</html>
