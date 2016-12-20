@@ -586,26 +586,33 @@ class CredentialViewSetTests(APITestCase):
         response = self.client.get(self.list_path, data)
         self.assertEqual(response.status_code, 403)
 
-    def assert_list_without_id_filter(self, path, expected):
+    def assert_list_without_id_filter(self, path, expected, data=None):
         """Helper method used for making request and assertions. """
-        response = self.client.get(path)
+        response = self.client.get(path, data)
+
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, expected)
 
-    def assert_list_with_id_filter(self, data):
+    def assert_list_with_id_filter(self, data=None, should_exist=True):
         """Helper method used for making request and assertions. """
-        expected = {'count': 1, 'next': None, 'previous': None,
-                    'results': [UserCredentialSerializer(self.user_credential, context={'request': self.request}).data]}
+        expected = self._generate_results(should_exist)
         response = self.client.get(self.list_path, data)
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected)
 
-    def assert_list_with_status_filter(self, data):
+    def assert_list_with_status_filter(self, data, should_exist=True):
         """Helper method for making request and assertions. """
-        expected = {'count': 1, 'next': None, 'previous': None,
-                    'results': [UserCredentialSerializer(self.user_credential, context={'request': self.request}).data]}
+        expected = self._generate_results(should_exist)
         response = self.client.get(self.list_path, data, expected)
         self.assertEqual(json.loads(response.content), expected)
+
+    def _generate_results(self, exists=True):
+        if exists:
+            return {'count': 1, 'next': None, 'previous': None,
+                    'results': [UserCredentialSerializer(self.user_credential, context={'request': self.request}).data]}
+
+        return {'count': 0, 'next': None, 'previous': None, 'results': []}
 
 
 class ProgramCredentialViewSetTests(CredentialViewSetTests):
@@ -629,20 +636,112 @@ class ProgramCredentialViewSetTests(CredentialViewSetTests):
             'error': 'A program_id query string parameter is required for filtering program credentials.'
         })
 
+    def test_list_with_uuid_but_not_id(self):
+        """ Verify a list end point of program credentials will work with
+        program_uuid filter.
+        """
+        self.assert_list_without_id_filter(path=self.list_path, data={'program_uuid': self.program_id}, expected={
+            'error': 'A program_id query string parameter is required for filtering program credentials.'
+        })
+
+    def test_list_with_both_uuid_and_id(self):
+        """ Verify a list end point of program credentials will work with
+        program_uuid filter.
+        """
+        error_message = {'error': 'A program_uuid query string parameter should not appear in V1 queries.'}
+        self.assert_list_without_id_filter(path=self.list_path,
+                                           data={'program_uuid': self.program_id,
+                                                 'program_id': self.program_id},
+                                           expected=error_message)
+
     def test_list_with_program_id_filter(self):
         """ Verify the list endpoint supports filter data by program_id."""
         program_cert = factories.ProgramCertificateFactory(program_id=001)
         factories.UserCredentialFactory.create(credential=program_cert)
         self.assert_list_with_id_filter(data={'program_id': self.program_id})
 
+    def test_list_with_program_invalid_id_filter(self):
+        """ Verify the list endpoint supports filter data by program_id."""
+        program_cert = factories.ProgramCertificateFactory(program_id=001)
+        factories.UserCredentialFactory.create(credential=program_cert)
+        self.assert_list_with_id_filter(data={'program_id': 50}, should_exist=False)
+
     def test_list_with_status_filter(self):
         """ Verify the list endpoint supports filtering by status."""
         factories.UserCredentialFactory.create_batch(2, status="revoked", username=self.user_credential.username)
-        self.assert_list_with_status_filter(data={'program_id': self.program_id, 'status': UserCredential.AWARDED}, )
+        self.assert_list_with_status_filter(data={'program_id': self.program_id, 'status': UserCredential.AWARDED})
+
+    def test_list_with_bad_status_filter(self):
+        """ Verify the list endpoint supports filtering by status."""
+        self.assert_list_with_status_filter(data={'program_id': self.program_id, 'status': UserCredential.REVOKED},
+                                            should_exist=False)
 
     def test_permission_required(self):
         """ Verify that requests require explicit model permissions. """
         self.assert_permission_required({'program_id': self.program_id, 'status': UserCredential.AWARDED})
+
+
+class ProgramCredentialViewSetTestsV2(CredentialViewSetTests):
+    """ Tests for ProgramCredentialViewSetTests. """
+
+    list_path = reverse("api:v2:programcredential-list")
+
+    def setUp(self):
+        super(ProgramCredentialViewSetTestsV2, self).setUp()
+
+        self.program_certificate = factories.ProgramCertificateFactory()
+        self.program_id = self.program_certificate.program_id
+        self.program_uuid = self.program_certificate.program_uuid
+        self.user_credential = factories.UserCredentialFactory.create(credential=self.program_certificate)
+        self.request = APIRequestFactory().get('/')
+
+    def test_list_without_uuid(self):
+        """ Verify a list end point of program credentials will work with
+        program_uuid filter.
+        """
+        error_message = {'error': 'A UUID query string parameter is required for filtering program credentials.'}
+        self.assert_list_without_id_filter(path=self.list_path, expected=error_message)
+
+    def test_list_without_uuid_but_with_id(self):
+        """ Verify a list end point of program credentials will work with
+        program_uuid filter.
+        """
+        error_message = {'error': 'A UUID query string parameter is required for filtering program credentials.'}
+        self.assert_list_without_id_filter(path=self.list_path,
+                                           data={'program_id': self.program_id},
+                                           expected=error_message)
+
+    def test_list_with_uuid_and_id(self):
+        """ Verify a list end point of program credentials will not work with
+        program_id filter.
+        """
+        error_message = {'error': 'A program_id query string parameter was found in a V2 API request.'}
+        self.assert_list_without_id_filter(path=self.list_path,
+                                           data={'program_uuid': self.program_uuid, 'program_id': self.program_id},
+                                           expected=error_message)
+
+    def test_list_with_program_uuid_filter(self):
+        """ Verify the list endpoint supports filter data by program_uuid."""
+        self.assert_list_with_id_filter(data={'program_uuid': self.program_uuid})
+
+    def test_list_with_invalid_uuid(self):
+        """ Verify the list endpoint will fail if given a bad uuid."""
+        self.program_uuid = '12345678=0DAC-CAD0-ABCD-fedcba987654'
+        self.assert_list_with_id_filter(data={'program_uuid': self.program_uuid}, should_exist=False)
+
+    def test_list_with_status_filter(self):
+        """ Verify the list endpoint supports filtering by status."""
+        factories.UserCredentialFactory.create_batch(2, status="revoked", username=self.user_credential.username)
+        self.assert_list_with_status_filter(data={'program_uuid': self.program_uuid, 'status': UserCredential.AWARDED})
+
+    def test_list_with_bad_status_filter(self):
+        """ Verify the list endpoint supports filtering by status when there isn't anything available."""
+        self.assert_list_with_status_filter(data={'program_uuid': self.program_uuid, 'status': UserCredential.REVOKED},
+                                            should_exist=False)
+
+    def test_permission_required(self):
+        """ Verify that requests require explicit model permissions. """
+        self.assert_permission_required({'program_uuid': self.program_uuid, 'status': UserCredential.AWARDED})
 
 
 class CourseCredentialViewSetTests(CredentialViewSetTests):

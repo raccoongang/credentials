@@ -54,6 +54,10 @@ class ProgramsCredentialsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet)
             raise ValidationError(
                 {'error': 'A program_id query string parameter is required for filtering program credentials.'})
 
+        if self.request.query_params.get('program_uuid'):
+            raise ValidationError(
+                {'error': 'A program_uuid query string parameter should not appear in V1 queries.'})
+
         # pylint: disable=maybe-no-member
         return super(ProgramsCredentialsViewSet, self).list(request, *args, **kwargs)
 
