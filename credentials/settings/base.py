@@ -9,6 +9,8 @@ PROJECT_ROOT = here("..")
 root = lambda *x: join(abspath(PROJECT_ROOT), *x)
 
 
+LMS_BASE_URL = os.environ.get('CREDENTIALS_LMS_BASE_URL', 'PLEASE-SET-CREDENTIALS_LMS_BASE_URL')
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('CREDENTIALS_SECRET_KEY', 'insecure-secret-key')
 

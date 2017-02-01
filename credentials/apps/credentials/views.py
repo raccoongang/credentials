@@ -3,6 +3,8 @@ Credentials rendering views.
 """
 import logging
 
+from django.conf import settings
+
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
@@ -33,6 +35,7 @@ class RenderCredential(TemplateView):
             raise Http404
 
         context.update({
+            'lms_base_url': settings.LMS_BASE_URL,
             'user_credential': user_credential,
             'certificate_context': self.get_program_certificate_context(user_credential),
         })
