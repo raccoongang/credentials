@@ -36,6 +36,7 @@ class RenderCredential(TemplateView):
 
         context.update({
             'lms_base_url': settings.LMS_BASE_URL,
+            'current_certificate_context_username': user_credential.username,
             'user_credential': user_credential,
             'certificate_context': self.get_program_certificate_context(user_credential),
         })
