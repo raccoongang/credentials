@@ -2,11 +2,16 @@
 Serializers for data manipulated by the credentials service APIs.
 """
 import logging
+from pathlib import Path
+from typing import Dict, Generator, List, Union
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils.datastructures import MultiValueDict
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.reverse import reverse
+from rest_framework.utils import json
 
 from credentials.apps.api.accreditors import Accreditor
 from credentials.apps.catalog.models import CourseRun
@@ -14,6 +19,7 @@ from credentials.apps.credentials.constants import UserCredentialStatus
 from credentials.apps.credentials.models import (
     CourseCertificate,
     ProgramCertificate,
+    Signatory,
     UserCredential,
     UserCredentialAttribute,
     UserCredentialDateOverride,
@@ -285,8 +291,34 @@ class UserGradeSerializer(serializers.ModelSerializer):
         return grade
 
 
+class SignatorySerializer(serializers.ModelSerializer):
+    """Serializer for Signatory objects."""
+
+    class Meta:
+        model = Signatory
+        fields = (
+            "image",
+            "name",
+            "organization_name_override",
+            "title",
+        )
+
+    def validate_image(self, value):
+        if value:
+            extension = Path(value.name).suffix[1:].lower()
+            if extension != "png":
+                raise ValidationError("Only PNG files can be uploaded. Please select a file ending in .png to upload.")
+        return value
+
+
 class CourseCertificateSerializer(serializers.ModelSerializer):
     course_run = CourseRunField(read_only=True)
+    certificate_available_date = serializers.DateTimeField(
+        required=False,
+        allow_null=True,
+    )
+    signatories = SignatorySerializer(many=True, required=False)
+    title = serializers.CharField(required=False, allow_null=True)
 
     class Meta:
         model = CourseCertificate
@@ -298,10 +330,12 @@ class CourseCertificateSerializer(serializers.ModelSerializer):
             "certificate_type",
             "certificate_available_date",
             "is_active",
+            "signatories",
+            "title",
         )
         read_only_fields = ("id", "course_run", "site")
 
-    def create(self, validated_data):
+    def create(self, validated_data) -> CourseCertificate:
         site = self.context["request"].site
         # A course run may not exist, but if it does, we want to find it. There may be times where course
         # staff will change the date on a newly created course before credentials has pulled it from the catalog.
@@ -322,7 +356,43 @@ class CourseCertificateSerializer(serializers.ModelSerializer):
             defaults={
                 "is_active": validated_data["is_active"],
                 "course_run": course_run,
-                "certificate_available_date": validated_data["certificate_available_date"],
+                "certificate_available_date": validated_data.get("certificate_available_date"),
+                "title": validated_data.get("title"),
             },
         )
+
+        cert.signatories.clear()
+        self.save_related_signatories(cert)
+
         return cert
+
+    def save_related_signatories(self, certificate: CourseCertificate) -> None:
+        """
+        Creates new signatures and relates them to the certificate.
+        """
+        signatories_data = self.context["request"].data.get("signatories")  # pylint: disable=no-member
+        files = self.context["request"].FILES  # pylint: disable=no-member
+
+        if signatories_data and files:
+            signatories_populated_data = self.populate_signatories(signatories_data, files)
+            signatories = self.create_signatories(list(signatories_populated_data))
+            certificate.signatories.set(signatories)
+
+    @staticmethod
+    def create_signatories(signatories_data: List[Dict[str, Union[str, InMemoryUploadedFile]]]) -> List[Signatory]:
+        serializer = SignatorySerializer(data=signatories_data, many=True)
+        serializer.is_valid(raise_exception=True)
+        return serializer.save()
+
+    @staticmethod
+    def populate_signatories(
+        signatories_data: str,
+        files: MultiValueDict,
+    ) -> Generator[Dict[str, Union[str, InMemoryUploadedFile]], None, None]:
+        """
+        Populates a list of signature data with files.
+        """
+        for signatory in json.loads(signatories_data):
+            if signatory_file := files.get(signatory.get("image"), None):
+                signatory["image"] = signatory_file
+                yield signatory
