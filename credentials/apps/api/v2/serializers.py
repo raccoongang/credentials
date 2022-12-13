@@ -3,9 +3,8 @@ Serializers for data manipulated by the credentials service APIs.
 """
 import ast
 import logging
-from operator import attrgetter
 from pathlib import Path
-from typing import Dict, Generator, Union
+from typing import Dict, List, Generator, Union
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -292,27 +291,44 @@ class UserGradeSerializer(serializers.ModelSerializer):
         return grade
 
 
+class SignatorySerializer(serializers.ModelSerializer):
+    """Serializer for Signatory objects."""
+
+    organization = serializers.CharField(max_length=255, source="organization_name_override", required=False)
+
+    class Meta:
+        model = Signatory
+        fields = (
+            "image",
+            "name",
+            "title",
+            "organization",
+        )
+
+    def validate_image(self, value):
+        if value:
+            extension = Path(value.name).suffix[1:].lower()
+            if extension != "png":
+                raise ValidationError("Only PNG files can be uploaded. Please select a file ending in .png to upload.")
+        return value
+
+
 class SignatoryListField(serializers.ListField):
     """
     Read a docstring to exaplin this need.
     Please see the ref https://code.djangoproject.com/ticket/30735
     """
 
-    image = serializers.ImageField()
-    organization = serializers.CharField(max_length=255, source="organization_name_override", required=False)
-    name = serializers.CharField(max_length=255)
-    title = serializers.CharField(max_length=255)
-
     def to_internal_value(self, data: str) -> Dict[str, Union[str, InMemoryUploadedFile]]:
         """
         List of dicts of native values <- List of dicts of primitive datatypes.
         """
-        data_ = self.populate_signatories(data, self.context["request"].FILES)
+        data_ = self.populate_signatories(data, self.context["request"].FILES)  # pylint: disable=no-member
         return super().to_internal_value(data_)
 
     @staticmethod
     def populate_signatories(
-        signatories_data: str,
+        signatories_data: List[str],
         files: MultiValueDict,
     ) -> Generator[Dict[str, Union[str, InMemoryUploadedFile]], None, None]:
         """
@@ -324,32 +340,14 @@ class SignatoryListField(serializers.ListField):
                 signatory["image"] = signatory_file
                 yield signatory
 
-    def validate_image(self, value: InMemoryUploadedFile) -> InMemoryUploadedFile:
-        if value:
-            extension = Path(value.name).suffix[1:].lower()
-            if extension != "png":
-                raise ValidationError("Only PNG files can be uploaded. Please select a file ending in .png to upload.")
-        return value
-
     def to_representation(self, data):
-        return [self.serialize_instance(obj) for obj in data.all()]
-
-    def serialize_instance(self, instance):
-        return {
-            "name": instance.name,
-            "title": instance.title,
-            "organization_name_override": instance.organization_name_override,
-            "image": self.context["request"].build_absolute_uri(instance.image.url),
-        }
+        return super().to_representation(data.all())
 
 
 class CourseCertificateSerializer(serializers.ModelSerializer):
     course_run = CourseRunField(read_only=True)
-    certificate_available_date = serializers.DateTimeField(
-        required=False,
-        allow_null=True,
-    )
-    signatories = SignatoryListField(required=False)
+    certificate_available_date = serializers.DateTimeField(required=False, allow_null=True)
+    signatories = SignatoryListField(child=SignatorySerializer(), required=False)
     title = serializers.CharField(required=False, allow_null=True)
 
     class Meta:
@@ -394,13 +392,8 @@ class CourseCertificateSerializer(serializers.ModelSerializer):
         )
 
         cert.signatories.clear()
-        for sign in validated_data["signatories"]:
-            sign_obj = Signatory.objects.create(
-                image=sign["image"],
-                name=sign["name"],
-                organization_name_override=sign["organization"],
-                title=sign["title"],
-            )
-            cert.signatories.add(sign_obj)
+        for signatory_data in validated_data.get("signatories", []):
+            signatory = Signatory.objects.create(**signatory_data)
+            cert.signatories.add(signatory)
 
         return cert
