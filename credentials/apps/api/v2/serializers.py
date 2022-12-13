@@ -4,7 +4,7 @@ Serializers for data manipulated by the credentials service APIs.
 import ast
 import logging
 from pathlib import Path
-from typing import Dict, List, Generator, Union
+from typing import Dict, Generator, List, Union
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.uploadedfile import InMemoryUploadedFile
