@@ -315,13 +315,14 @@ class SignatorySerializer(serializers.ModelSerializer):
 
 class SignatoryListField(serializers.ListField):
     """
-    Read a docstring to exaplin this need.
-    Please see the ref https://code.djangoproject.com/ticket/30735
+    Serializes a list of strings into a list of dicts.
+
+    Populate signatories images in dict files instead of strings with their filenames.
     """
 
     def to_internal_value(self, data: str) -> Dict[str, Union[str, InMemoryUploadedFile]]:
         """
-        List of dicts of native values <- List of dicts of primitive datatypes.
+        Converts a list of dict that is a string to a list of dict.
         """
         data_ = self.populate_signatories(data, self.context["request"].FILES)  # pylint: disable=no-member
         return super().to_internal_value(data_)
