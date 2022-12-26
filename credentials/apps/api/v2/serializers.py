@@ -326,7 +326,7 @@ class SignatoryListField(serializers.ListField):
     def to_representation(self, data):
         return super().to_representation(data.all())
 
-    def to_internal_value(self, data: str) -> List[Optional[Dict[str, Union[str, InMemoryUploadedFile]]]]:
+    def to_internal_value(self, data: List[str]) -> List[Optional[Dict[str, Union[str, InMemoryUploadedFile]]]]:
         """
         Converts a list of dict that is a string to a list of dict.
         """
