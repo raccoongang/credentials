@@ -780,7 +780,7 @@ class CourseCertificateViewSetTests(SiteMixin, APITestCase):
             "signatories": ["image", "name", "organization", "title"],
             "is_active": True,
         }
-        response = self.client.post(self.url, data=data, files=dict())
+        response = self.client.post(self.url, data=data, files={})
         self.assertEqual(response.status_code, 201)
 
     def test_delete_for_anonymous(self):

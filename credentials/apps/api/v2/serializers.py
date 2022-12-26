@@ -2,8 +2,8 @@
 Serializers for data manipulated by the credentials service APIs.
 """
 import ast
-from copy import copy
 import logging
+from copy import copy
 from pathlib import Path
 from typing import Dict, Generator, List, Optional, Union
 
@@ -336,15 +336,14 @@ class SignatoryListField(serializers.ListField):
             return []
         else:
             data_ = self.populate_signatories(
-                jsonified_data,
-                self.context["request"].FILES  # pylint: disable=no-member
+                jsonified_data, self.context["request"].FILES  # pylint: disable=no-member
             )
             return super().to_internal_value(data_)
 
     @staticmethod
     def populate_signatories(
-            signatories_data: List[Dict[str, str]],
-            files: MultiValueDict,
+        signatories_data: List[Dict[str, str]],
+        files: MultiValueDict,
     ) -> Generator[Dict[str, Union[str, InMemoryUploadedFile]], None, None]:
         """
         Populates a list of signature data with files.
