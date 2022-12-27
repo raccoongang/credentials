@@ -328,17 +328,17 @@ class SignatoryListField(serializers.ListField):
 
     def to_internal_value(self, data: List[str]) -> List[Optional[Dict[str, Union[str, InMemoryUploadedFile]]]]:
         """
-        Converts a list of dict that is a string to a list of dict.
+        Converts a list of dict that are a string to a list of dicts.
         """
         try:
             jsonified_data = list(map(ast.literal_eval, copy(data)))
         except ValueError:
             return []
         else:
-            data_ = self.populate_signatories(
+            _data = self.populate_signatories(
                 jsonified_data, self.context["request"].FILES  # pylint: disable=no-member
             )
-            return super().to_internal_value(data_)
+            return super().to_internal_value(_data)
 
     @staticmethod
     def populate_signatories(
