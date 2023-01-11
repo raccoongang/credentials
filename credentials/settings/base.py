@@ -5,8 +5,10 @@ from os.path import abspath, dirname, join
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.conf.global_settings import LANGUAGES_BIDI
 from edx_toggles.toggles import WaffleSwitch
+from edx_django_utils.plugins import get_plugin_apps, add_plugins
 
 from credentials.settings.utils import get_logger_config
+from credentials.apps.plugins.constants import PROJECT_TYPE, SettingsType
 
 
 # PATH vars
@@ -549,3 +551,7 @@ LOGO_POWERED_BY_OPEN_EDX_URL = "https://edx-cdn.org/v3/prod/open-edx-tag.svg"
 # .. toggle_creation_date: 2021-08-10
 USE_LEARNER_RECORD_MFE = False
 LEARNER_RECORD_MFE_RECORDS_PAGE_URL = ""
+
+# Plugin Django Apps
+INSTALLED_APPS.extend(get_plugin_apps(PROJECT_TYPE))
+add_plugins(__name__, PROJECT_TYPE, SettingsType.BASE)
