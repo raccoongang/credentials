@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dcc.master ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, dcc.master ]
 
 jobs:
   quality_and_translations_tests:
