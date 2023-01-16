@@ -18,8 +18,6 @@ class PluginsConfig(AppConfig):
 
     name = "credentials.apps.plugins"
 
-    plugin_app = {}
-
     def ready(self):
         """
         Connect plugin receivers to their signals.
