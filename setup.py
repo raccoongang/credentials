@@ -14,8 +14,6 @@ setup(
     packages=["credentials"],
     package_data={},
     entry_points={
-        PROJECT_TYPE: [
-            "plugins = credentials.apps.plugins.apps:PluginsConfig",
-        ],
+        PROJECT_TYPE: [],
     },
 )
