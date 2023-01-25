@@ -64,6 +64,13 @@ urlpatterns = oauth2_urlpatterns + [
     re_path(r"^favicon\.ico$", FaviconView.as_view(permanent=True)),
     re_path(r"^mock-toggles$", MockToggleStateView.as_view()),
     re_path(r"^hijack/", include("hijack.urls", namespace="hijack")),
+    re_path(
+        r"^verifiable-credentials/",
+        include(
+            ("credentials.apps.verifiable_credentials.urls", "verifiable_credentials"),
+            namespace="verifiable_credentials",
+        ),
+    ),
 ]
 
 # edx-drf-extensions csrf app
