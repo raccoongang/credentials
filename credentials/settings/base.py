@@ -63,6 +63,7 @@ THIRD_PARTY_APPS = [
     "drf_yasg",
     "hijack",
     "xss_utils",
+    "config_models",
 ]
 
 PROJECT_APPS = [
@@ -557,6 +558,8 @@ LEARNER_RECORD_MFE_RECORDS_PAGE_URL = ""
 # Plugin Django Apps
 INSTALLED_APPS.extend(get_plugin_apps(PROJECT_TYPE))
 add_plugins(__name__, PROJECT_TYPE, SettingsType.BASE)
+
+# Verifiable credentials settings
 
 # .. toggle_name: ENABLE_VERIFIABLE_CREDENTIALS
 # .. toggle_implementation: DjangoSetting
