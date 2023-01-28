@@ -69,7 +69,7 @@ urlpatterns = oauth2_urlpatterns + [
 if settings.ENABLE_VERIFIABLE_CREDENTIALS:
     urlpatterns += [
         re_path(
-            r"^verifiable-credentials/",
+            r"^verifiable_credentials/",
             include(
                 ("credentials.apps.verifiable_credentials.urls", "verifiable_credentials"),
                 namespace="verifiable_credentials",
