@@ -99,6 +99,8 @@ SEND_EMAIL_ON_PROGRAM_COMPLETION = True
 USE_LEARNER_RECORD_MFE = False
 LEARNER_RECORD_MFE_RECORDS_PAGE_URL = "http://localhost:1990/"
 
+ENABLE_VERIFIABLE_CREDENTIALS = False
+
 add_plugins(__name__, PROJECT_TYPE, SettingsType.DEVSTACK)
 
 #####################################################################
