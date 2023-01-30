@@ -14,7 +14,7 @@ from credentials.apps.credentials.tests.factories import (
     ProgramCertificateFactory,
     UserCredentialFactory,
 )
-from credentials.apps.verifiable_credentials.utils import get_user_program_certificates_data
+from credentials.apps.verifiable_credentials.utils import get_user_program_credentials_data
 
 
 class GetProgramCertificatesTests(SiteMixin, TestCase):
@@ -60,20 +60,20 @@ class GetProgramCertificatesTests(SiteMixin, TestCase):
         self.program_cert2 = None
         self.program_user_credential2 = None
 
-    def test_get_user_program_certificates_data_not_completed(self):
+    def test_get_user_program_credentials_data_not_completed(self):
         self.program_user_credential.delete()
-        result = get_user_program_certificates_data(self.user.username)
+        result = get_user_program_credentials_data(self.user.username)
         assert result == []
 
-    def test_get_user_program_certificates_data_zero_programs(self):
+    def test_get_user_program_credentials_data_zero_programs(self):
         self.program_cert.delete()
         self.program.delete()
         self.program_user_credential.delete()
-        result = get_user_program_certificates_data(self.user.username)
+        result = get_user_program_credentials_data(self.user.username)
         assert result == []
 
-    def test_get_user_program_certificates_data_one_program(self):
-        result = get_user_program_certificates_data(self.user.username)
+    def test_get_user_program_credentials_data_one_program(self):
+        result = get_user_program_credentials_data(self.user.username)
         assert result[0]["uuid"] == str(self.program_user_credential.uuid).replace("-", "")
         assert result[0]["status"] == self.program_user_credential.status
         assert result[0]["username"] == self.program_user_credential.username
@@ -82,7 +82,7 @@ class GetProgramCertificatesTests(SiteMixin, TestCase):
         assert result[0]["program_uuid"] == str(self.program_user_credential.credential.program_uuid).replace("-", "")
         assert result[0]["program_title"] == self.program_user_credential.credential.program.title
 
-    def test_get_user_program_certificates_data_multiple_programs(self):
+    def test_get_user_program_credentials_data_multiple_programs(self):
         self.program2 = ProgramFactory(
             title="TestProgram2", course_runs=self.course_runs, authoring_organizations=self.orgs, site=self.site
         )
@@ -94,7 +94,7 @@ class GetProgramCertificatesTests(SiteMixin, TestCase):
             credential_content_type=self.program_credential_content_type,
             credential=self.program_cert2,
         )
-        result = get_user_program_certificates_data(self.user.username)
+        result = get_user_program_credentials_data(self.user.username)
         assert result[0]["uuid"] == str(self.program_user_credential.uuid).replace("-", "")
         assert result[0]["status"] == self.program_user_credential.status
         assert result[0]["username"] == self.program_user_credential.username

@@ -4,7 +4,7 @@ from credentials.apps.credentials.api import get_user_credentials_by_content_typ
 from credentials.apps.credentials.data import UserCredentialStatus
 
 
-def get_user_program_certificates_data(username):
+def get_user_program_credentials_data(username):
     """
     Translates a list of UserCredentials (for programs) into context data.
 

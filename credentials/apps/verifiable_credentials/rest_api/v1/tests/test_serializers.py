@@ -15,8 +15,8 @@ from credentials.apps.credentials.tests.factories import (
     ProgramCertificateFactory,
     UserCredentialFactory,
 )
-from credentials.apps.verifiable_credentials.rest_api.v1.serializers import ProgramCertificateSerializer
-from credentials.apps.verifiable_credentials.utils import get_user_program_certificates_data
+from credentials.apps.verifiable_credentials.rest_api.v1.serializers import ProgramCredentialSerializer
+from credentials.apps.verifiable_credentials.utils import get_user_program_credentials_data
 
 
 class ProgramCertificatesSerializerTests(SiteMixin, TestCase):
@@ -59,10 +59,10 @@ class ProgramCertificatesSerializerTests(SiteMixin, TestCase):
             credential=self.program_cert,
         )
 
-    def serialize_program_certificates(self):
+    def serialize_program_credentials(self):
         request = APIRequestFactory(SERVER_NAME=self.site.domain).get("/")
-        return ProgramCertificateSerializer(
-            get_user_program_certificates_data(self.user.username),
+        return ProgramCredentialSerializer(
+            get_user_program_credentials_data(self.user.username),
             context={"request": request},
             many=True,
         ).data
@@ -70,19 +70,19 @@ class ProgramCertificatesSerializerTests(SiteMixin, TestCase):
     def test_valid_data_zero_programs(self):
         self.program_cert.delete()
         self.program.delete()
-        serializer = self.serialize_program_certificates()
+        serializer = self.serialize_program_credentials()
         expected = []
         self.assertEqual(serializer, expected)
 
     def test_valid_data_no_program_cert(self):
         """Verify the endpoint connects if program completion is in-progress."""
         self.program_cert.delete()
-        serializer = self.serialize_program_certificates()
+        serializer = self.serialize_program_credentials()
         expected = []
         self.assertEqual(serializer, expected)
 
     def test_valid_data(self):
-        serializer = self.serialize_program_certificates()
+        serializer = self.serialize_program_credentials()
         expected = {
             "uuid": self.program_user_credential.uuid,
             "status": self.program_user_credential.status,

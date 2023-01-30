@@ -15,12 +15,12 @@ from credentials.apps.credentials.tests.factories import (
     ProgramCertificateFactory,
     UserCredentialFactory,
 )
-from credentials.apps.verifiable_credentials.rest_api.v1.serializers import ProgramCertificateSerializer
-from credentials.apps.verifiable_credentials.utils import get_user_program_certificates_data
+from credentials.apps.verifiable_credentials.rest_api.v1.serializers import ProgramCredentialSerializer
+from credentials.apps.verifiable_credentials.utils import get_user_program_credentials_data
 
 
 @override_settings(ENABLE_VERIFIABLE_CREDENTIALS=True)
-class ProgramCertificatesViewTests(SiteMixin, TestCase):
+class ProgramCredentialsViewTests(SiteMixin, TestCase):
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
@@ -62,10 +62,10 @@ class ProgramCertificatesViewTests(SiteMixin, TestCase):
             credential=self.program_cert,
         )
 
-    def serialize_program_certificates(self):
+    def serialize_program_credentials(self):
         request = APIRequestFactory(SERVER_NAME=self.site.domain).get("/")
-        return ProgramCertificateSerializer(
-            get_user_program_certificates_data(self.user.username),
+        return ProgramCredentialSerializer(
+            get_user_program_credentials_data(self.user.username),
             context={"request": request},
             many=True,
         ).data
@@ -86,4 +86,4 @@ class ProgramCertificatesViewTests(SiteMixin, TestCase):
         self.client.login(username=self.user.username, password=USER_PASSWORD)
         response = self.client.get("/verifiable_credentials/api/v1/program_certificates/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["program_certificates"], self.serialize_program_certificates())
+        self.assertEqual(response.data["program_certificates"], self.serialize_program_credentials())

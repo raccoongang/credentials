@@ -7,16 +7,16 @@ from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
-from credentials.apps.verifiable_credentials.utils import get_user_program_certificates_data
+from credentials.apps.verifiable_credentials.utils import get_user_program_credentials_data
 
-from .serializers import ProgramCertificateSerializer
+from .serializers import ProgramCredentialSerializer
 
 
 User = get_user_model()
 log = logging.getLogger(__name__)
 
 
-class ProgramCertificatesViewSet(viewsets.ViewSet):
+class ProgramCredentialsViewSet(viewsets.ViewSet):
 
     authentication_classes = (
         JwtAuthentication,
@@ -27,18 +27,16 @@ class ProgramCertificatesViewSet(viewsets.ViewSet):
 
     def list(self, request, *args, **kwargs):
         """
-        List data for all the user's issued program certificates.
+        List data for all the user's issued program credentials.
         GET: /verifiable_credentials/api/v1/program_certificates/
 
         Arguments:
             request: A request to control data returned in endpoint response
 
         Returns:
-            response(dict): Information about the user's program certificates
+            response(dict): Information about the user's program credentials
         """
-        # TODO: check naming. Do I get `program certificate` data or `program credential` data?
-        # TODO: request.user works improperly, why edx?
-        program_certificates = get_user_program_certificates_data(request.user.username)
+        program_credentials = get_user_program_credentials_data(request.user.username)
 
-        serializer = ProgramCertificateSerializer(program_certificates, many=True)
+        serializer = ProgramCredentialSerializer(program_credentials, many=True)
         return Response({"program_certificates": serializer.data})
