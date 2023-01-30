@@ -1,9 +1,7 @@
 """verifiable_credentials API v1 views."""
-import logging
-
 from django.contrib.auth import get_user_model
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from rest_framework import viewsets
+from rest_framework import mixins, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
@@ -13,11 +11,11 @@ from .serializers import ProgramCredentialSerializer
 
 
 User = get_user_model()
-log = logging.getLogger(__name__)
 
 
-class ProgramCredentialsViewSet(viewsets.ViewSet):
+class ProgramCredentialsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
+    # FIXME: for some reasons authentication not working
     authentication_classes = (
         JwtAuthentication,
         SessionAuthentication,
