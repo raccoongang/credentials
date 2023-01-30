@@ -28,7 +28,7 @@ class ProgramCredentialsViewSet(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         """
         List data for all the user's issued program credentials.
-        GET: /verifiable_credentials/api/v1/program_certificates/
+        GET: /verifiable_credentials/api/v1/program_credentials/
 
         Arguments:
             request: A request to control data returned in endpoint response
@@ -39,4 +39,4 @@ class ProgramCredentialsViewSet(viewsets.ViewSet):
         program_credentials = get_user_program_credentials_data(request.user.username)
 
         serializer = ProgramCredentialSerializer(program_credentials, many=True)
-        return Response({"program_certificates": serializer.data})
+        return Response({"program_credentials": serializer.data})
