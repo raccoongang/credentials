@@ -49,4 +49,5 @@ JWT_AUTH.update(
     }
 )
 STATICFILES_STORAGE = None
+ENABLE_VERIFIABLE_CREDENTIALS = True
 add_plugins(__name__, PROJECT_TYPE, SettingsType.TEST)

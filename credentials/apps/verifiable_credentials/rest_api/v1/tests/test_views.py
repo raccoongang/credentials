@@ -1,5 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 
 from credentials.apps.catalog.tests.factories import (
@@ -19,7 +19,6 @@ from credentials.apps.verifiable_credentials.rest_api.v1.serializers import Prog
 from credentials.apps.verifiable_credentials.utils import get_user_program_credentials_data
 
 
-@override_settings(ENABLE_VERIFIABLE_CREDENTIALS=True)
 class ProgramCredentialsViewTests(SiteMixin, TestCase):
     def setUp(self):
         super().setUp()
