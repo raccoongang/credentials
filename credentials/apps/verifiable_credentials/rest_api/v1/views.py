@@ -16,7 +16,6 @@ User = get_user_model()
 
 class ProgramCredentialsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
-    # FIXME: for some reasons authentication not working
     authentication_classes = (
         JwtAuthentication,
         SessionAuthentication,
