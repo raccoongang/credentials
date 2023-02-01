@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import mixins, viewsets
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from credentials.apps.verifiable_credentials.utils import get_user_program_credentials_data
@@ -15,13 +16,12 @@ User = get_user_model()
 
 class ProgramCredentialsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
-    # FIXME: for some reasons authentication not working
     authentication_classes = (
         JwtAuthentication,
         SessionAuthentication,
     )
 
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     def list(self, request, *args, **kwargs):
         """

@@ -70,11 +70,10 @@ class ProgramCredentialsViewTests(SiteMixin, TestCase):
             many=True,
         ).data
 
-    # FIXME: authentication_classes don't work properly
-    # def test_deny_unauthenticated_user(self):
-    #     self.client.logout()
-    #     response = self.client.get("/verifiable_credentials/api/v1/program_credentials/")
-    #     self.assertEqual(response.status_code, 401)
+    def test_deny_unauthenticated_user(self):
+        self.client.logout()
+        response = self.client.get("/verifiable_credentials/api/v1/program_credentials/")
+        self.assertEqual(response.status_code, 401)
 
     def test_allow_authenticated_user(self):
         """Verify the endpoint requires an authenticated user."""
