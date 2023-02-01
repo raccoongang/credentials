@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-from rest_framework.test import APIRequestFactory
+from rest_framework import status
+from rest_framework.test import APIRequestFactory, override_settings
 
 from credentials.apps.catalog.tests.factories import (
     CourseFactory,
@@ -88,18 +89,17 @@ class ProgramCredentialsViewTests(SiteMixin, TestCase):
         self.assertEqual(response.data["program_credentials"], self.serialize_program_credentials())
 
 
-@override_settings(ENABLE_VERIFIABLE_CREDENTIALS=True)
 class VCIssuanceQRCodeViewTestCase(SiteMixin, TestCase):
     def setUp(self):
+        super().setUp()
         self.user = UserFactory()
         self.url = "/verifiable_credentials/api/v1/qrcode/"
 
-    # FIXME: authentication_classes don't work properly
-    # def test_post_unauthenticated_user(self):
-    #     data = {"uuid": "123456789"}
-    #     response = self.client.post(self.url, data)
+    def test_post_unauthenticated_user(self):
+        data = {"uuid": "123456789"}
+        response = self.client.post(self.url, data)
 
-    #     self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_post_with_valid_uuid_authenticated(self):
         self.client.login(username=self.user.username, password=USER_PASSWORD)
@@ -119,18 +119,17 @@ class VCIssuanceQRCodeViewTestCase(SiteMixin, TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-@override_settings(ENABLE_VERIFIABLE_CREDENTIALS=True)
 class VCIssuanceDeeplinkViewTestCase(SiteMixin, TestCase):
     def setUp(self):
+        super().setUp()
         self.user = UserFactory()
         self.url = "/verifiable_credentials/api/v1/deeplink/"
 
-    # FIXME: authentication_classes don't work properly
-    # def test_post_unauthenticated_user(self):
-    #     data = {"uuid": "123456789"}
-    #     response = self.client.post(self.url, data)
+    def test_post_unauthenticated_user(self):
+        data = {"uuid": "123456789"}
+        response = self.client.post(self.url, data)
 
-    #     self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_post_with_valid_uuid_authenticated(self):
         self.client.login(username=self.user.username, password=USER_PASSWORD)
@@ -150,18 +149,18 @@ class VCIssuanceDeeplinkViewTestCase(SiteMixin, TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-@override_settings(ENABLE_VERIFIABLE_CREDENTIALS=True, VC_DEFAULT_STANDARD="test_vc_format")
 class VCIssuanceWalletViewTestCase(SiteMixin, TestCase):
     def setUp(self):
+        super().setUp()
         self.user = UserFactory()
         self.url = "/verifiable_credentials/api/v1/wallet/"
 
-    # FIXME: authentication_classes don't work properly
-    # def test_get_deny_unauthenticated_user(self):
-    #     response = self.client.get(self.url)
+    def test_get_deny_unauthenticated_user(self):
+        response = self.client.get(self.url)
 
-    #     self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    @override_settings(VC_DEFAULT_STANDARD="test_vc_format")
     def test_get_allow_authenticated_user(self):
         self.client.login(username=self.user.username, password=USER_PASSWORD)
 

@@ -59,7 +59,7 @@ class VCIssuanceQRCodeView(APIView):
         SessionAuthentication,
     )
 
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         credential_uuid = request.data.get("uuid")
@@ -87,7 +87,7 @@ class VCIssuanceDeeplinkView(APIView):
         SessionAuthentication,
     )
 
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         credential_uuid = request.data.get("uuid")
@@ -115,7 +115,7 @@ class VCIssuanceWalletView(APIView):
         SessionAuthentication,
     )
 
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         return Response({"document_format": settings.VC_DEFAULT_STANDARD})
