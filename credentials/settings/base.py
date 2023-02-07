@@ -112,6 +112,8 @@ CORS_ORIGIN_WHITELIST = []
 
 ROOT_URLCONF = "credentials.urls"
 
+ROOT_URL = "https://localhost:18150"
+
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = "credentials.wsgi.application"
 
