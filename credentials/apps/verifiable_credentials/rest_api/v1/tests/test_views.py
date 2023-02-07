@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-from rest_framework.test import APIRequestFactory
+from rest_framework import status
+from rest_framework.test import APIRequestFactory, override_settings
 
 from credentials.apps.catalog.tests.factories import (
     CourseFactory,
@@ -86,3 +87,84 @@ class ProgramCredentialsViewTests(SiteMixin, TestCase):
         response = self.client.get("/verifiable_credentials/api/v1/program_credentials/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["program_credentials"], self.serialize_program_credentials())
+
+
+class VCIssuanceQRCodeViewTestCase(SiteMixin, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.url = "/verifiable_credentials/api/v1/qrcode/"
+
+    def test_post_unauthenticated_user(self):
+        data = {"uuid": "123456789"}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_post_with_valid_uuid_authenticated(self):
+        self.client.login(username=self.user.username, password=USER_PASSWORD)
+
+        data = {"uuid": "123456789"}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {"qrcode": "<base64-encoded-content>"})
+
+    def test_post_with_invalid_uuid(self):
+        self.client.login(username=self.user.username, password=USER_PASSWORD)
+
+        data = {}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class VCIssuanceDeeplinkViewTestCase(SiteMixin, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.url = "/verifiable_credentials/api/v1/deeplink/"
+
+    def test_post_unauthenticated_user(self):
+        data = {"uuid": "123456789"}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_post_with_valid_uuid_authenticated(self):
+        self.client.login(username=self.user.username, password=USER_PASSWORD)
+
+        data = {"uuid": "123456789"}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {"deeplink": "<parametrized-deep-link>"})
+
+    def test_post_with_invalid_uuid(self):
+        self.client.login(username=self.user.username, password=USER_PASSWORD)
+
+        data = {}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class VCIssuanceWalletViewTestCase(SiteMixin, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.url = "/verifiable_credentials/api/v1/wallet/"
+
+    def test_get_deny_unauthenticated_user(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    @override_settings(VC_DEFAULT_STANDARD="test_vc_format")
+    def test_get_allow_authenticated_user(self):
+        self.client.login(username=self.user.username, password=USER_PASSWORD)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {"document_format": "test_vc_format"})
