@@ -15,26 +15,29 @@ from django.conf import settings
 from django.core.signals import setting_changed
 from django.utils.module_loading import import_string
 
+from .constants import OPEN_BADGES_V3_KEY
+
+
 DEFAULTS = {
-    'SUPPORTED_DATA_MODELS': [
-        'OBv3',
+    "SUPPORTED_DATA_MODELS": [
+        OPEN_BADGES_V3_KEY,
         # 'VC',
     ],
-    'DEFAULT_DATA_MODEL': 'OBv3',
-    'DEFAULT_WALLET': 'credentials.apps.verifiable_credentials.wallets.LCWallet',
-    'DEFAULT_ISSUER_DID': 'SET-ME-PLEASE',
-    'DEFAULT_ISSUER_KEY': 'SET-ME-PLEASE',
+    "DEFAULT_DATA_MODEL": OPEN_BADGES_V3_KEY,
+    "DEFAULT_WALLET": "credentials.apps.verifiable_credentials.wallets.LCWallet",
+    "DEFAULT_ISSUER_DID": "SET-ME-PLEASE",
+    "DEFAULT_ISSUER_KEY": "SET-ME-PLEASE",
 }
 
 # List of settings that may be in string import notation:
 IMPORT_STRINGS = [
-    'DEFAULT_WALLET',
+    "DEFAULT_WALLET",
 ]
 
 # List of settings that can be overridden on Site/Org level:
 ORG_SETTINGS = [
-    'DEFAULT_ISSUER_DID',
-    'DEFAULT_ISSUER_KEY',
+    "DEFAULT_ISSUER_DID",
+    "DEFAULT_ISSUER_KEY",
 ]
 
 
@@ -54,6 +57,7 @@ class VCSettings:
     under the VERIFIABLE_CREDENTIALS name. It is not intended to be used by 3rd-party
     apps, and test helpers like `override_settings` may not work as expected.
     """
+
     def __init__(self, explicit_settings=None, defaults=None, import_strings=None):
         if explicit_settings:
             self._explicit_settings = explicit_settings
@@ -63,8 +67,8 @@ class VCSettings:
 
     @property
     def explicit_settings(self):
-        if not hasattr(self, '_explicit_settings'):
-            self._explicit_settings = getattr(settings, 'VERIFIABLE_CREDENTIALS', {})
+        if not hasattr(self, "_explicit_settings"):
+            self._explicit_settings = getattr(settings, "VERIFIABLE_CREDENTIALS", {})
         return self._explicit_settings
 
     def __getattr__(self, attr):
@@ -92,8 +96,8 @@ vc_settings = VCSettings(None, DEFAULTS, IMPORT_STRINGS)
 
 
 def reload_vc_settings(*args, **kwargs):
-    setting = kwargs['setting']
-    if setting == 'VERIFIABLE_CREDENTIALS':
+    setting = kwargs["setting"]
+    if setting == "VERIFIABLE_CREDENTIALS":
         vc_settings.reload()
 
 
@@ -124,4 +128,3 @@ def import_from_string(val, setting_name):
     except ImportError as e:
         msg = "Could not import '%s' for VC setting '%s'. %s: %s." % (val, setting_name, e.__class__.__name__, e)
         raise ImportError(msg)
-

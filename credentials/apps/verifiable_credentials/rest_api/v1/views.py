@@ -1,5 +1,4 @@
 """verifiable_credentials API v1 views."""
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import mixins, status, viewsets
@@ -8,12 +7,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from credentials.apps.verifiable_credentials.issuance import CredentialIssuer
+from credentials.apps.verifiable_credentials.settings import vc_settings
 from credentials.apps.verifiable_credentials.utils import get_user_program_credentials_data
 
 from .serializers import ProgramCredentialSerializer
 
 
 User = get_user_model()
+Wallet = vc_settings.DEFAULT_WALLET
 
 
 class ProgramCredentialsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -42,7 +44,7 @@ class ProgramCredentialsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         return Response({"program_credentials": serializer.data})
 
 
-class VCIssuanceQRCodeView(APIView):
+class QRCodeView(APIView):
     """
     Generates a QR code for VC issuance process initiation.
     POST: /verifiable_credentials/api/v1/qrcode/
@@ -70,7 +72,7 @@ class VCIssuanceQRCodeView(APIView):
         return Response({"qrcode": "<base64-encoded-content>"})
 
 
-class VCIssuanceDeeplinkView(APIView):
+class DeeplinkView(APIView):
     """
     Generates a deeplink for VC issuance process initiation.
     POST: /verifiable_credentials/api/v1/deeplink/
@@ -93,15 +95,17 @@ class VCIssuanceDeeplinkView(APIView):
         credential_uuid = request.data.get("uuid")
 
         if not credential_uuid:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response("Credential uuid is required", status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"deeplink": "<parametrized-deep-link>"})
+        issuance = CredentialIssuer.create_issuance_request(credential_uuid)
+
+        return Response({"deeplink": Wallet.create_deeplink_url(issuance.uuid)})
 
 
-class VCIssuanceWalletView(APIView):
+class IssueCredentialView(APIView):
     """
     This API endpoint allow requests for VC issuing.
-    GET: /verifiable_credentials/api/v1/wallet/
+    POST: /verifiable_credentials/api/v1/credential/issue/{issuance_uuid}
 
     Arguments:
         request: A request to control data returned in endpoint response
@@ -110,12 +114,12 @@ class VCIssuanceWalletView(APIView):
         response(dict): signed VC document for storing
     """
 
-    authentication_classes = (
-        JwtAuthentication,
-        SessionAuthentication,
-    )
+    authentication_classes = ()
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
-    def get(self, request):
-        return Response({"document_format": settings.VC_DEFAULT_STANDARD})
+    def post(self, request, *args, **kwargs):
+        credential_issuer = CredentialIssuer(request.data, kwargs.get("issuance_uuid"))
+        verifiable_credential_document = credential_issuer.issue()
+
+        return Response(verifiable_credential_document)
