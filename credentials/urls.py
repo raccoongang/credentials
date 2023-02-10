@@ -31,6 +31,7 @@ from rest_framework import permissions
 from credentials.apps.core import views as core_views
 from credentials.apps.plugins.constants import PROJECT_TYPE
 from credentials.apps.records.views import ProgramListingView
+from credentials.apps.verifiable_credentials.toggles import is_verifiable_credentials_enabled
 from credentials.views import FaviconView, MockToggleStateView
 
 
@@ -66,7 +67,7 @@ urlpatterns = oauth2_urlpatterns + [
     re_path(r"^hijack/", include("hijack.urls", namespace="hijack")),
 ]
 
-if settings.ENABLE_VERIFIABLE_CREDENTIALS:
+if is_verifiable_credentials_enabled():
     urlpatterns += [
         re_path(
             r"^verifiable_credentials/",

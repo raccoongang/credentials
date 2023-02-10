@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import admin
 
 from .models import IssuanceConfiguration
+from .toggles import is_verifiable_credentials_enabled
 
 
 class IssuanceConfigurationAdmin(KeyedConfigurationModelAdmin):
@@ -19,5 +20,6 @@ class IssuanceConfigurationAdmin(KeyedConfigurationModelAdmin):
             "digital_credential_format",
         )
 
-if settings.ENABLE_VERIFIABLE_CREDENTIALS:
+
+if is_verifiable_credentials_enabled():
     admin.site.register(IssuanceConfiguration, IssuanceConfigurationAdmin)
