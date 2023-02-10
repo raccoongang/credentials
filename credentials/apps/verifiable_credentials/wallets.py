@@ -1,0 +1,2 @@
+class LCWallet:
+    pass
