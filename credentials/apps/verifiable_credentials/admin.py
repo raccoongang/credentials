@@ -1,8 +1,8 @@
 from config_models.admin import KeyedConfigurationModelAdmin
-from django.conf import settings
 from django.contrib import admin
 
 from .models import IssuanceConfiguration, VerifiableCredentialIssuance
+from .toggles import is_verifiable_credentials_enabled
 
 
 class IssuanceConfigurationAdmin(KeyedConfigurationModelAdmin):
@@ -26,6 +26,6 @@ class VerifiableCredentialIssuanceAdmin(admin.ModelAdmin):
     search_fields = ("uuid",)
 
 
-if settings.ENABLE_VERIFIABLE_CREDENTIALS:
+if is_verifiable_credentials_enabled():
     admin.site.register(IssuanceConfiguration, IssuanceConfigurationAdmin)
     admin.site.register(VerifiableCredentialIssuance, VerifiableCredentialIssuanceAdmin)

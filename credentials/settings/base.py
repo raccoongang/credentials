@@ -560,15 +560,3 @@ LEARNER_RECORD_MFE_RECORDS_PAGE_URL = ""
 # Plugin Django Apps
 INSTALLED_APPS.extend(get_plugin_apps(PROJECT_TYPE))
 add_plugins(__name__, PROJECT_TYPE, SettingsType.BASE)
-
-# Verifiable credentials settings
-
-# .. toggle_name: ENABLE_VERIFIABLE_CREDENTIALS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Determines if the Credentials IDA uses digital credentials issuance.
-# .. toggle_warning: Requires the Learner Record MFE to be deployed and used in a given environment if toggled to true.
-# .. toggle_life_expectancy: permanent
-# .. toggle_permanent_justification: Digital Credentials are optional for usage.
-# .. toggle_creation_date: 2023-02-02
-ENABLE_VERIFIABLE_CREDENTIALS = False
