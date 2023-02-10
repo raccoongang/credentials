@@ -13,6 +13,7 @@ from edx_toggles.toggles import SettingToggle
 # .. toggle_life_expectancy: permanent
 # .. toggle_permanent_justification: Digital Credentials are optional for usage.
 # .. toggle_creation_date: 2023-02-02
+# .. toggle_use_cases: open_edx
 
 
 def is_verifiable_credentials_enabled():
