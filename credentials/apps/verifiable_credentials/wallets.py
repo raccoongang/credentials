@@ -5,9 +5,12 @@ from django.urls import reverse
 
 
 class BaseWallet:
-    """Base Class for TODO: Verifiable Credentials.
+    """Base Class for Verifiable Credentials wallets.
     This class provides a blueprint for implementing wallet for Verifiable Credentials.
     """
+
+    APP_LINK_ANDROID = "SET-ME-PLEASE"
+    APP_LINK_IOS = "SET-ME-PLEASE"
 
     @classmethod
     def create_deeplink_url(cls, issuance_uuid):
@@ -30,10 +33,11 @@ class BaseWallet:
         raise NotImplementedError
 
 
-# pylint: disable=abstract-method
 class LCWallet(BaseWallet):
     AUTH_TYPE = "code"
     DEEP_LINK_URL = "dccrequest://request"
+    APP_LINK_ANDROID = "https://play.google.com/store/apps/details?id=app.lcw"
+    APP_LINK_IOS = "https://apps.apple.com/app/learner-credential-wallet/id1590615710"
 
     @classmethod
     def create_deeplink_url(cls, issuance_uuid):
@@ -51,3 +55,7 @@ class LCWallet(BaseWallet):
         }
 
         return f"{cls.DEEP_LINK_URL}?{urlencode(params)}"
+
+    @classmethod
+    def create_qr_code(cls, issuance_uuid):
+        return "qrcode"
