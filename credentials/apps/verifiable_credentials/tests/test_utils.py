@@ -1,3 +1,5 @@
+import base64
+
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
@@ -14,7 +16,7 @@ from credentials.apps.credentials.tests.factories import (
     ProgramCertificateFactory,
     UserCredentialFactory,
 )
-from credentials.apps.verifiable_credentials.utils import get_user_program_credentials_data
+from credentials.apps.verifiable_credentials.utils import generate_base64_qr_code, get_user_program_credentials_data
 
 
 class GetProgramCertificatesTests(SiteMixin, TestCase):
@@ -110,3 +112,14 @@ class GetProgramCertificatesTests(SiteMixin, TestCase):
         assert result[1]["credential_id"] == self.program_user_credential2.credential_id
         assert result[1]["program_uuid"] == str(self.program_user_credential2.credential.program_uuid).replace("-", "")
         assert result[1]["program_title"] == self.program_user_credential2.credential.program.title
+
+
+class TestGenerateBase64QRCode(TestCase):
+    def test_correct_output_format(self):
+        result = generate_base64_qr_code("Test Text")
+        self.assertIsInstance(result, str)
+
+        decoded_result = base64.b64decode(result)
+        self.assertIsInstance(decoded_result, bytes)
+
+    # TODO: write more tests

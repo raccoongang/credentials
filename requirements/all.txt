@@ -13,7 +13,7 @@ asgiref==3.6.0
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   django
-astroid==2.13.3
+astroid==2.11.7
     # via
     #   -r requirements/dev.txt
     #   pylint
@@ -34,7 +34,7 @@ bcrypt==4.0.1
     # via
     #   -r requirements/dev.txt
     #   paramiko
-black==22.12.0
+black==23.1.0
     # via -r requirements/dev.txt
 bleach==6.0.0
     # via
@@ -42,11 +42,11 @@ bleach==6.0.0
     #   -r requirements/production.txt
 bok-choy==1.1.1
     # via -r requirements/dev.txt
-boto3==1.26.57
+boto3==1.26.70
     # via
     #   -r requirements/production.txt
     #   django-ses
-botocore==1.29.57
+botocore==1.29.70
     # via
     #   -r requirements/production.txt
     #   boto3
@@ -101,7 +101,7 @@ coreschema==0.0.4
     #   drf-yasg
 coverage==7.1.0
     # via -r requirements/dev.txt
-cryptography==39.0.0
+cryptography==39.0.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -128,7 +128,7 @@ distro==1.8.0
     # via
     #   -r requirements/dev.txt
     #   docker-compose
-django==3.2.16
+django==3.2.18
     # via
     #   -c requirements/common_constraints.txt
     #   -c requirements/constraints.txt
@@ -227,7 +227,7 @@ django-waffle==3.0.0
     #   edx-django-utils
     #   edx-drf-extensions
     #   edx-toggles
-django-webpack-loader==1.8.0
+django-webpack-loader==1.8.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -259,7 +259,7 @@ drf-jwt==1.19.2
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   edx-drf-extensions
-drf-yasg==1.21.4
+drf-yasg==1.21.5
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -300,7 +300,7 @@ edx-i18n-tools==0.9.2
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   edx-credentials-themes
-edx-lint==5.3.0
+edx-lint==5.3.1
     # via -r requirements/dev.txt
 edx-opaque-keys==2.3.0
     # via
@@ -321,7 +321,7 @@ exceptiongroup==1.1.0
     #   pytest
 factory-boy==3.2.1
     # via -r requirements/dev.txt
-faker==16.6.1
+faker==17.0.0
     # via
     #   -r requirements/dev.txt
     #   factory-boy
@@ -337,7 +337,7 @@ future==0.18.3
     #   pyjwkest
 gevent==22.10.2
     # via -r requirements/production.txt
-greenlet==2.0.1
+greenlet==2.0.2
     # via
     #   -r requirements/production.txt
     #   gevent
@@ -364,7 +364,7 @@ iniconfig==2.0.0
     # via
     #   -r requirements/dev.txt
     #   pytest
-isort==5.11.4
+isort==5.12.0
     # via
     #   -r requirements/dev.txt
     #   pylint
@@ -414,7 +414,7 @@ monotonic==1.6
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   analytics-python
-mypy-extensions==0.4.3
+mypy-extensions==1.0.0
     # via
     #   -r requirements/dev.txt
     #   black
@@ -422,7 +422,7 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-newrelic==8.5.0
+newrelic==8.6.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -444,6 +444,7 @@ packaging==23.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
+    #   black
     #   docker
     #   drf-yasg
     #   pytest
@@ -470,7 +471,7 @@ pillow==9.4.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-platformdirs==2.6.2
+platformdirs==3.0.0
     # via
     #   -r requirements/dev.txt
     #   black
@@ -500,7 +501,7 @@ pycparser==2.21
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   cffi
-pycryptodomex==3.16.0
+pycryptodomex==3.17
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -523,7 +524,7 @@ pyjwt[crypto]==2.6.0
     #   edx-drf-extensions
     #   edx-rest-api-client
     #   social-auth-core
-pylint==2.15.10
+pylint==2.14.5
     # via
     #   -r requirements/dev.txt
     #   edx-lint
@@ -554,6 +555,11 @@ pynacl==1.5.0
     #   -r requirements/production.txt
     #   edx-django-utils
     #   paramiko
+pypng==0.20220715.0
+    # via
+    #   -r requirements/dev.txt
+    #   -r requirements/production.txt
+    #   qrcode
 pyrsistent==0.19.3
     # via
     #   -r requirements/dev.txt
@@ -581,7 +587,7 @@ python-memcached==1.59
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-python-slugify==7.0.0
+python-slugify==8.0.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -610,6 +616,10 @@ pyyaml==5.4.1
     #   docker-compose
     #   edx-django-release-util
     #   edx-i18n-tools
+qrcode==7.4.2
+    # via
+    #   -r requirements/dev.txt
+    #   -r requirements/production.txt
 requests==2.28.2
     # via
     #   -r requirements/dev.txt
@@ -661,7 +671,7 @@ semantic-version==2.10.0
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   edx-drf-extensions
-simplejson==3.18.1
+simplejson==3.18.3
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -708,7 +718,7 @@ sqlparse==0.4.3
     #   -r requirements/production.txt
     #   django
     #   django-debug-toolbar
-stevedore==4.1.1
+stevedore==5.0.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -716,7 +726,7 @@ stevedore==4.1.1
     #   edx-ace
     #   edx-django-utils
     #   edx-opaque-keys
-testfixtures==7.0.4
+testfixtures==7.1.0
     # via -r requirements/dev.txt
 text-unidecode==1.3
     # via
@@ -746,16 +756,18 @@ tox==3.28.0
     # via
     #   -c requirements/common_constraints.txt
     #   -r requirements/dev.txt
-types-toml==0.10.8.1
+types-toml==0.10.8.3
     # via
     #   -r requirements/dev.txt
     #   responses
 typing-extensions==4.4.0
     # via
     #   -r requirements/dev.txt
+    #   -r requirements/production.txt
     #   astroid
     #   black
     #   pylint
+    #   qrcode
 uritemplate==4.1.1
     # via
     #   -r requirements/dev.txt
@@ -771,7 +783,7 @@ urllib3==1.26.14
     #   requests
     #   responses
     #   selenium
-virtualenv==20.17.1
+virtualenv==20.19.0
     # via
     #   -r requirements/dev.txt
     #   tox
@@ -793,7 +805,7 @@ xss-utils==0.4.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-zipp==3.11.0
+zipp==3.13.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt

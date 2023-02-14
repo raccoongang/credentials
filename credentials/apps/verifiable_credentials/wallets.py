@@ -1,7 +1,10 @@
 from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
+from django.core.cache import cache
 from django.urls import reverse
+
+from .utils import generate_base64_qr_code
 
 
 class BaseWallet:
@@ -41,6 +44,10 @@ class LCWallet(BaseWallet):
 
     @classmethod
     def create_deeplink_url(cls, issuance_uuid):
+        cached_result = cache.get(issuance_uuid.hex)
+        if cached_result:
+            return cached_result
+
         params = {
             "auth_type": cls.AUTH_TYPE,
             "issuer": settings.ROOT_URL,
@@ -53,9 +60,10 @@ class LCWallet(BaseWallet):
             ),
             "challenge": issuance_uuid.hex,
         }
-
-        return f"{cls.DEEP_LINK_URL}?{urlencode(params)}"
+        result = f"{cls.DEEP_LINK_URL}?{urlencode(params)}"
+        cache.set(issuance_uuid.hex, result, timeout=10)
+        return result
 
     @classmethod
     def create_qr_code(cls, issuance_uuid):
-        return "qrcode"
+        return generate_base64_qr_code(cls.create_deeplink_url(issuance_uuid))
