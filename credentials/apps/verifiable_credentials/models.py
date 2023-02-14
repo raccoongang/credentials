@@ -62,7 +62,11 @@ class IssuanceConfiguration(ConfigurationModel):
 
 
 class VerifiableCredentialIssuance(TimeStampedModel):
-    """Data model representing a request for verifiable credentials"""
+    """
+    Data model representing a request for verifiable credentials
+
+    .. no_pii:
+    """
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user_credential = models.ForeignKey(UserCredential, related_name="vc_issues", on_delete=models.CASCADE)
