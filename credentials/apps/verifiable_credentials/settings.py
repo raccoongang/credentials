@@ -15,13 +15,15 @@ from django.conf import settings
 from django.core.signals import setting_changed
 from django.utils.module_loading import import_string
 
+from .constants import OPEN_BADGES_V3_KEY
+
 
 DEFAULTS = {
     "SUPPORTED_DATA_MODELS": [
-        "OBv3",
+        OPEN_BADGES_V3_KEY,
         # 'VC',
     ],
-    "DEFAULT_DATA_MODEL": "OBv3",
+    "DEFAULT_DATA_MODEL": OPEN_BADGES_V3_KEY,
     "DEFAULT_WALLET": "credentials.apps.verifiable_credentials.wallets.LCWallet",
     "DEFAULT_ISSUER_DID": "SET-ME-PLEASE",
     "DEFAULT_ISSUER_KEY": "SET-ME-PLEASE",
