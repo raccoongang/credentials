@@ -1,13 +1,19 @@
 from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
+from django.core.cache import cache
 from django.urls import reverse
+
+from .utils import generate_base64_qr_code
 
 
 class BaseWallet:
-    """Base Class for TODO: Verifiable Credentials.
+    """Base Class for Verifiable Credentials wallets.
     This class provides a blueprint for implementing wallet for Verifiable Credentials.
     """
+
+    APP_LINK_ANDROID = "SET-ME-PLEASE"
+    APP_LINK_IOS = "SET-ME-PLEASE"
 
     @classmethod
     def create_deeplink_url(cls, issuance_uuid):
@@ -30,13 +36,18 @@ class BaseWallet:
         raise NotImplementedError
 
 
-# pylint: disable=abstract-method
 class LCWallet(BaseWallet):
     AUTH_TYPE = "code"
     DEEP_LINK_URL = "dccrequest://request"
+    APP_LINK_ANDROID = "https://play.google.com/store/apps/details?id=app.lcw"
+    APP_LINK_IOS = "https://apps.apple.com/app/learner-credential-wallet/id1590615710"
 
     @classmethod
     def create_deeplink_url(cls, issuance_uuid):
+        cached_result = cache.get(issuance_uuid.hex)
+        if cached_result:
+            return cached_result
+
         params = {
             "auth_type": cls.AUTH_TYPE,
             "issuer": settings.ROOT_URL,
@@ -49,5 +60,10 @@ class LCWallet(BaseWallet):
             ),
             "challenge": issuance_uuid.hex,
         }
+        result = f"{cls.DEEP_LINK_URL}?{urlencode(params)}"
+        cache.set(issuance_uuid.hex, result, timeout=10)
+        return result
 
-        return f"{cls.DEEP_LINK_URL}?{urlencode(params)}"
+    @classmethod
+    def create_qr_code(cls, issuance_uuid):
+        return generate_base64_qr_code(cls.create_deeplink_url(issuance_uuid))

@@ -1,3 +1,7 @@
+import base64
+from io import BytesIO
+
+import qrcode
 from django.contrib.contenttypes.models import ContentType
 
 from credentials.apps.credentials.api import get_user_credentials_by_content_type
@@ -32,3 +36,15 @@ def get_user_program_credentials_data(username):
         }
         for credential in program_credentials
     ]
+
+
+def generate_base64_qr_code(text):
+    qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10)
+    qr.add_data(text)
+    qr.make(fit=True)
+
+    img = qr.make_image()
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+    return img_str
