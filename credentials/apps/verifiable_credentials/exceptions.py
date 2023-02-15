@@ -1,0 +1,2 @@
+class UnexpectedCredentialTypeException(Exception):
+    pass

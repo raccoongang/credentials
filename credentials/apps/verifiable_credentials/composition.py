@@ -9,6 +9,7 @@ from django.conf import settings
 
 from credentials.apps.credentials.models import ProgramCertificate
 
+from .exceptions import UnexpectedCredentialTypeException
 from .models import VerifiableCredentialIssuance
 
 
@@ -38,7 +39,9 @@ def compose_open_badge_v3(data):
     if isinstance(user_credential.credential, ProgramCertificate):
         achievement = _build_program_achievement(user_credential)
     else:
-        raise Exception(f"Unexpected courseware object type for digital credentials: {type(user_credential)}")
+        raise UnexpectedCredentialTypeException(
+            f"Unexpected courseware object type for digital credentials: {type(user_credential)}"
+        )
 
     return {
         "@context": [
