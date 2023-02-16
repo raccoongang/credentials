@@ -20,5 +20,6 @@ class OpenBadge(Schema):
     """
     Open Badges data model.
     """
+
     context = models.JSONField(blank=True, default=OBContext.values)
     id = models.UUIDField(default=uuid.uuid4, editable=False)

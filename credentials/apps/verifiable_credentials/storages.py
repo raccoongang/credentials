@@ -5,62 +5,61 @@ from django.conf import settings
 from django.core.cache import cache
 from django.urls import reverse
 
-from .utils import generate_base64_qr_code
+from .settings import vc_settings
 
 
 class StorageType(Enum):
-    MOBILE = 'mobile'
-    WEB = 'web'
+    MOBILE = "mobile"
+    WEB = "web"
+
 
 class BaseWallet:
     """Base Class for Verifiable Credentials wallets.
     This class provides a blueprint for implementing wallet for Verifiable Credentials.
     """
 
-    APP_LINK_ANDROID = "SET-ME-PLEASE"
-    APP_LINK_IOS = "SET-ME-PLEASE"
+    DEEP_LINK_URL = ""
 
     @classmethod
-    def create_deeplink_url(cls, issuance_uuid):
-        """Create a deeplink URL.
-        Args:
-            issuance_uuid (str): Unique identifier for the VerifiableCredentialIssuance.
-        Returns:
-            str: Deeplink URL.
-        """
-        raise NotImplementedError
+    def get_deeplink_url(cls, *args, **kwargs):
+        return cls.DEEP_LINK_URL
 
     @classmethod
-    def create_qr_code(cls, issuance_uuid):
-        """Create a QR code for a credential.
-        Args:
-            issuance_uuid (str): Unique identifier for the VerifiableCredentialIssuance.
-        Returns:
-            str: QR code data.
-        """
-        raise NotImplementedError
+    def is_mobile(cls):
+        return cls.TYPE == StorageType.MOBILE
+
+    @classmethod
+    def is_web(cls):
+        return cls.TYPE == StorageType.WEB
+
+    @property
+    def issuance_request_serializer(self):
+        return vc_settings.DEFAULT_ISSUANCE_REQUEST_SERIALIZER
 
 
-class LCWallet(BaseWallet):
+class MobileWallet(BaseWallet):
+    TYPE = StorageType.MOBILE
+    APP_LINK_ANDROID = ""
+    APP_LINK_IOS = ""
+
+
+class WebWallet(BaseWallet):
+    TYPE = StorageType.WEB
+
+
+class LCWallet(MobileWallet):
     """
     Learner Credential Wallet by DCC.
     """
 
     ID = "lcwallet"
-    TYPE = StorageType.MOBILE
-    AUTH_TYPE = "code"
-    DEEP_LINK_URL = "dccrequest://request"
     APP_LINK_ANDROID = "https://play.google.com/store/apps/details?id=app.lcw"
     APP_LINK_IOS = "https://apps.apple.com/app/learner-credential-wallet/id1590615710"
+    DEEP_LINK_URL = "dccrequest://request"
 
     @classmethod
-    def create_deeplink_url(cls, issuance_uuid):
-        cached_result = cache.get(issuance_uuid.hex)
-        if cached_result:
-            return cached_result
-
+    def get_deeplink_url(cls, issuance_uuid):
         params = {
-            "auth_type": cls.AUTH_TYPE,
             "issuer": settings.ROOT_URL,
             "vc_request_url": urljoin(
                 settings.ROOT_URL,
@@ -71,10 +70,4 @@ class LCWallet(BaseWallet):
             ),
             "challenge": issuance_uuid.hex,
         }
-        result = f"{cls.DEEP_LINK_URL}?{urlencode(params)}"
-        cache.set(issuance_uuid.hex, result, timeout=10)
-        return result
-
-    @classmethod
-    def create_qr_code(cls, issuance_uuid):
-        return generate_base64_qr_code(cls.create_deeplink_url(issuance_uuid))
+        return f"{cls.DEEP_LINK_URL}?{urlencode(params)}"

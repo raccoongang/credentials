@@ -20,6 +20,7 @@ class Issuer(Schema):
     """
     Issuer schema.
     """
+
     id = models.CharField(max_length=255, editable=False)
 
 
@@ -27,6 +28,7 @@ class VerifiableCredential(Schema):
     """
     Verifiable Credentials data model.
     """
+
     context = models.JSONField(blank=True, default=VCContext.values, editable=False)
     id = models.UUIDField(default=uuid.uuid4, editable=False)
     # type = ["VerifiableCredential", "UniversityDegreeCredential"]
@@ -43,8 +45,9 @@ class VerifiableCredential(Schema):
     class Serializer(serializers.ModelSerializer):
         class Meta:
             from . import VerifiableCredential as data_model
+
             model = data_model
-            fields = '__all__'
+            fields = "__all__"
 
 
 class VerifiableCredentialIssuanceData(Schema):
@@ -64,4 +67,3 @@ class VerifiableCredentialIssuanceData(Schema):
         }
     }
     """
-    credential =

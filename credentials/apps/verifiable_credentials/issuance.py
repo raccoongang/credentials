@@ -1,9 +1,14 @@
+import logging
+
+from django.utils.translation import gettext as _
+from rest_framework.exceptions import ValidationError
+
 from credentials.apps.credentials.models import UserCredential
 
-from .composition import compose_open_badge_v3, compose_verifiable_credential
-from .constants import OPEN_BADGES_V3_KEY, VERIFIABLE_CREDENTIAL_KEY
-from .models import VerifiableCredentialIssuance
+from .models import IssuanceLine
 from .settings import vc_settings
+
+logger = logging.getLogger(__name__)
 
 
 class CredentialIssuer:
@@ -27,29 +32,42 @@ class CredentialIssuer:
     # }
 
     def __init__(self, request_data, issuance_uuid):
-        self._issuance = VerifiableCredentialIssuance.objects.get(uuid=issuance_uuid)
+        self._issuance_line = IssuanceLine.objects.get(uuid=issuance_uuid)
         self._validated_data = self._validate(request_data)
 
-    def _validate(storage_data):
+    def _validate(self, request_data):
+        serializer = self._issuance_line.storage.issuance_request_serializer(data=request_data)
+        serializer.is_valid()
+        return serializer.validated_data
 
+    @classmethod
+    def init(cls, *, credential_uuid, storage_id):
+        user_credential = UserCredential.objects.filter(uuid=credential_uuid).first()
+        # validate given user credential exists:
+        if not user_credential:
+            msg = _(f"No such user credential [{credential_uuid}]")
+            logger.exception(msg)
+            raise ValidationError({"credential_uuid": msg})
 
-    def serialize_request(self):
-        """
-        Serialize and validate the request data.
-        """
-        # TODO: Do we need this serialization?
-        # serializer = IssuanceRequestSerializer(data=self.request_data)
-        # if not serializer.is_valid():
-        #     raise ValueError("Invalid request data")
-        # return serializer.validated_data
-        return self.request_data
+        # validate given storage is active:
+        if not any(filter(lambda storage: storage.ID == storage_id, vc_settings.storages)):
+            msg = _(f"Provided storage backend isn't active [{storage_id}]")
+            logger.exception(msg)
+            raise ValidationError({"storage_id": msg})
+
+        # create init issuance line:
+        issuance_line, _ = IssuanceLine.objects.get_or_create(
+            user_credential=user_credential,
+            issuer_id=credential_uuid,
+            storage_id=storage_id,
+        )
+        return issuance_line
 
     def compose(self):
         """
         Compose a digital credential document for signing.
         """
-        validated_data = self.serialize_request()
-        return self._get_compose_function()(data=validated_data)
+        return self._get_compose_function()(data=self._validated_data)
 
     def sign(self, composed_credential):
         """
@@ -90,22 +108,4 @@ class CredentialIssuer:
         """
         Pick signing key(s).
         """
-
-    @classmethod
-    def create_issuance_request(cls, credential_uuid):
-        """
-        Creates issuance request.
-        Arguments:
-            credential_uuid(str): Credential uuid.
-        Returns
-            str: UUID of issuance.
-        """
-        user_credential = UserCredential.objects.get(uuid=credential_uuid)
-
-        return VerifiableCredentialIssuance.objects.create(
-            user_credential=user_credential,
-            issuer_did=vc_settings.DEFAULT_ISSUER_DID,
-        )
-
-
-class Issuance
+        pass

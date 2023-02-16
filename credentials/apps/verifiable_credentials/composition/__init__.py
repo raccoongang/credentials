@@ -9,6 +9,7 @@ class Schema(models.Model):
     """
     All VC data models are unmanaged.
     """
+
     class Meta:
         abstract = True
         managed = False

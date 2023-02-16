@@ -3,75 +3,38 @@ Database models for verifiable_credentials.
 """
 import uuid
 
-from config_models.models import ConfigurationModel
-from django.conf import settings
-from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
-from credentials.apps.catalog.models import Organization
 from credentials.apps.credentials.models import UserCredential
 
-from .constants import OPEN_BADGES_V3_KEY, VERIFIABLE_CREDENTIAL_KEY
+from .settings import vc_settings
 
 
-class IssuanceConfiguration(ConfigurationModel):
+class IssuanceLine(TimeStampedModel):
     """
-    A model representing the configuration settings for digital credentials issuance.
-    This model stores the details needed to generate and issue digital credentials,
-    such as credential format, site, etc.
-
-    NOTE: (wowkalucky) suspended - it is decided to proceed with system-wide config for now.
-
-    .. no_pii:
-    """
-
-    KEY_FIELDS = (
-        "site_id",
-        "slug",
-    )
-    DIGITAL_CREDENTIAL_FORMAT_CHOICES = (
-        (VERIFIABLE_CREDENTIAL_KEY, _("Verifiable Credentials")),
-        (OPEN_BADGES_V3_KEY, _("Open Badges v3")),
-    )
-
-    enabled = models.BooleanField(default=False)
-    site = models.ForeignKey(
-        Site,
-        default=settings.SITE_ID,
-        related_name="%(class)ss",
-        on_delete=models.CASCADE,
-    )
-    slug = models.SlugField(
-        max_length=30,
-        default="default",
-        blank=True,
-    )
-    organization = models.ForeignKey(
-        Organization,
-        blank=True,
-        null=True,
-        on_delete=models.CASCADE,
-    )
-    digital_credential_format = models.CharField(
-        max_length=128,
-        blank=True,
-        verbose_name=_("Digital Credential Format"),
-        default=VERIFIABLE_CREDENTIAL_KEY,
-        choices=DIGITAL_CREDENTIAL_FORMAT_CHOICES,
-    )
-
-
-class VerifiableCredentialIssuance(TimeStampedModel):
-    """
-    Initiated verifiable credentials issuance details (issuance line).
+    Specific verifiable credential issuance details (issuance line).
 
     .. no_pii:
     """
 
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user_credential = models.ForeignKey(UserCredential, related_name="vc_issues", on_delete=models.CASCADE)
-    issuer_id = models.CharField(max_length=255)
-    processed = models.BooleanField(default=False)
-    storage
+    user_credential = models.ForeignKey(
+        UserCredential,
+        related_name="vc_issues",
+        on_delete=models.PROTECT,
+        help_text=_("Related Open edX learner credential"),
+    )
+    processed = models.BooleanField(default=False, help_text=_("Completeness indicator"))
+    issuer_id = models.CharField(max_length=255, help_text=_("Issuer DID"))
+    storage_id = models.CharField(max_length=128, help_text=_("Target storage identifier"))
+
+    def __str__(self) -> str:
+        return f"IssuanceLine(user_credential={self.user_credential}, issuer_id={self.issuer_id}, storage_id={self.storage_id})"
+
+    @property
+    def storage(self):
+        for storage in vc_settings.storages:
+            if storage.ID == self.storage_id:
+                return storage

@@ -7,7 +7,6 @@ from django.db import models
 
 
 class BaseContext(Enum):
-
     @classmethod
     def values(cls):
         return [item.value for item in cls]
@@ -17,6 +16,7 @@ class Schema(models.Model):
     """
     All VC data models are unmanaged.
     """
+
     class Meta:
         abstract = True
         managed = False
