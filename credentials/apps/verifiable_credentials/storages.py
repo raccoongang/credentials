@@ -1,8 +1,13 @@
+from enum import Enum
 from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
 from django.urls import reverse
 
+
+class StorageType(Enum):
+    MOBILE = 'mobile'
+    WEB = 'web'
 
 class BaseWallet:
     """Base Class for TODO: Verifiable Credentials.
@@ -32,6 +37,12 @@ class BaseWallet:
 
 # pylint: disable=abstract-method
 class LCWallet(BaseWallet):
+    """
+    Learner Credential Wallet by DCC.
+    """
+
+    ID = "lcwallet"
+    TYPE = StorageType.MOBILE
     AUTH_TYPE = "code"
     DEEP_LINK_URL = "dccrequest://request"
 

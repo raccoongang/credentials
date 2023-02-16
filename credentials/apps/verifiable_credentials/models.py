@@ -22,6 +22,8 @@ class IssuanceConfiguration(ConfigurationModel):
     This model stores the details needed to generate and issue digital credentials,
     such as credential format, site, etc.
 
+    NOTE: (wowkalucky) suspended - it is decided to proceed with system-wide config for now.
+
     .. no_pii:
     """
 
@@ -63,13 +65,13 @@ class IssuanceConfiguration(ConfigurationModel):
 
 class VerifiableCredentialIssuance(TimeStampedModel):
     """
-    Data model representing a request for verifiable credentials
+    Initiated verifiable credentials issuance details (issuance line).
 
     .. no_pii:
     """
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user_credential = models.ForeignKey(UserCredential, related_name="vc_issues", on_delete=models.CASCADE)
-    issuer_did = models.TextField()
-
+    issuer_id = models.CharField(max_length=255)
     processed = models.BooleanField(default=False)
+    storage

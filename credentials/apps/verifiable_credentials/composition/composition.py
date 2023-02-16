@@ -1,5 +1,5 @@
 """
-Digital credentials formats.
+Verifiable credentials formats.
 """
 from datetime import datetime
 from urllib.parse import urljoin

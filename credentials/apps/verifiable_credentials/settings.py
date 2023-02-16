@@ -24,14 +24,16 @@ DEFAULTS = {
         # 'VC',
     ],
     "DEFAULT_DATA_MODEL": OPEN_BADGES_V3_KEY,
-    "DEFAULT_WALLET": "credentials.apps.verifiable_credentials.wallets.LCWallet",
-    "DEFAULT_ISSUER_DID": "SET-ME-PLEASE",
-    "DEFAULT_ISSUER_KEY": "SET-ME-PLEASE",
+    "DEFAULT_STORAGES": [
+        "credentials.apps.verifiable_credentials.storages.LCWallet",
+    ],
+    "DEFAULT_ISSUER_DID": "GENERATED-ISSUER-DID-WEB",
+    "DEFAULT_ISSUER_KEY": "PATH-TO-PRIVATE-ISSUER-KEY",
 }
 
 # List of settings that may be in string import notation:
 IMPORT_STRINGS = [
-    "DEFAULT_WALLET",
+    "DEFAULT_STORAGES",
 ]
 
 # List of settings that can be overridden on Site/Org level:
@@ -47,7 +49,7 @@ class VCSettings:
     properties. For example:
 
         from credentials.apps.verifiable_credentials.settings import vc_settings
-        print(vc_settings.DEFAULT_WALLET)
+        print(vc_settings.DEFAULT_STORAGE)
 
     Any setting with string import paths will be automatically resolved
     and return the class, rather than the string literal.

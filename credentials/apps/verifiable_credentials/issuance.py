@@ -7,16 +7,31 @@ from .settings import vc_settings
 
 
 class CredentialIssuer:
-    """Class is responsible for digital credential composition and signing."""
+    """
+    Instances of this class manage the whole pipeline of verifiable credential issuance.
 
-    compose_functions = {
-        VERIFIABLE_CREDENTIAL_KEY: compose_verifiable_credential,
-        OPEN_BADGES_V3_KEY: compose_open_badge_v3,
-    }
+    Args:
+        request_data: issuance HTTP API request
+        issuance_uuid: (optional) identifier for current issuance line
+
+    Steps:
+        - incoming data validation
+        - resolving issuance configuration
+        - resolving data model to use for verifiable credential composition
+        - composed verifiable credential signing
+    """
+
+    # compose_functions = {
+    #     VERIFIABLE_CREDENTIAL_KEY: compose_verifiable_credential,
+    #     OPEN_BADGES_V3_KEY: compose_open_badge_v3,
+    # }
 
     def __init__(self, request_data, issuance_uuid):
-        self.request_data = request_data
-        self.issuance = VerifiableCredentialIssuance.objects.get(uuid=issuance_uuid)
+        self._issuance = VerifiableCredentialIssuance.objects.get(uuid=issuance_uuid)
+        self._validated_data = self._validate(request_data)
+
+    def _validate(storage_data):
+
 
     def serialize_request(self):
         """
@@ -91,3 +106,6 @@ class CredentialIssuer:
             user_credential=user_credential,
             issuer_did=vc_settings.DEFAULT_ISSUER_DID,
         )
+
+
+class Issuance
