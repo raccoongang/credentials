@@ -43,40 +43,14 @@ class ProgramCredentialsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         return Response({"program_credentials": serializer.data})
 
 
-class QRCodeView(APIView):
+class InitIssuanceView(APIView):
     """
-    Generates a QR code for VC issuance process initiation.
-    POST: /verifiable_credentials/api/v1/qrcode/
+    Generates a deeplink, qrcode for VC issuance process initiation.
+    POST: /verifiable_credentials/api/v1/credentials/init
     POST Parameters:
         * uuid: Required. An unique uuid for UserCredential
     Returns:
-        response(dict): base64 encoded qrcode
-    """
-
-    authentication_classes = (
-        JwtAuthentication,
-        SessionAuthentication,
-    )
-
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        credential_uuid = request.data.get("uuid")
-
-        if not credential_uuid:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({"qrcode": "<base64-encoded-content>"})
-
-
-class DeeplinkView(APIView):
-    """
-    Generates a deeplink for VC issuance process initiation.
-    POST: /verifiable_credentials/api/v1/deeplink/
-    POST Parameters:
-        * uuid: Required. An unique uuid for UserCredential
-    Returns:
-        response(dict): parametrized deep link
+        response(dict): parametrized deep link, qrcode and mobile app links
     """
 
     authentication_classes = (
@@ -98,7 +72,14 @@ class DeeplinkView(APIView):
             'storage_id': storage_id,
         })
 
-        return Response({"deeplink": Wallet.create_deeplink_url(issuance.uuid)})
+        return Response(
+            {
+                "deeplink": Wallet.create_deeplink_url(issuance.uuid),
+                "qrcode": Wallet.create_qr_code(issuance.uuid),
+                "app_link_android": Wallet.APP_LINK_ANDROID,
+                "app_link_ios": Wallet.APP_LINK_IOS,
+            }
+        )
 
 
 class IssueCredentialView(APIView):
