@@ -15,34 +15,34 @@ from django.conf import settings
 from django.core.signals import setting_changed
 from django.utils.module_loading import import_string
 
-from .constants import OPEN_BADGES_V3_KEY
-
-
 DEFAULTS = {
-    "SUPPORTED_DATA_MODELS": [
-        OPEN_BADGES_V3_KEY,
-        # 'VC',
+    "DEFAULT_DATA_MODELS": [
+        "credentials.apps.verifiable_credentials.composition.verifiable_credentials.VerifiableCredentialsDataModel",
+        "credentials.apps.verifiable_credentials.composition.open_badges.OpenBadgesDataModel",
     ],
-    "DEFAULT_DATA_MODEL": OPEN_BADGES_V3_KEY,
+    "FORCE_DATA_MODEL": None,
     "DEFAULT_STORAGES": [
-        "credentials.apps.verifiable_credentials.storages.LCWallet",
+        "credentials.apps.verifiable_credentials.storages.learner_credential_wallet.LCWallet",
     ],
-    "DEFAULT_ISSUER_DID": "GENERATED-ISSUER-DID-WEB",
-    "DEFAULT_ISSUER_KEY": "PATH-TO-PRIVATE-ISSUER-KEY",
-    "DEFAULT_ISSUANCE_REQUEST_SERIALIZER": "credentials.apps.verifiable_credentials.issuance.IssuanceRequestSerializer",
+    "DEFAULT_ISSUER_DID": None,
+    "DEFAULT_ISSUER_KEY": None,
+    "DEFAULT_ISSUANCE_REQUEST_SERIALIZER": "credentials.apps.verifiable_credentials.issuance.IssuanceLineSerializer",
 }
 
 # List of settings that may be in string import notation:
 IMPORT_STRINGS = [
+    "DEFAULT_DATA_MODELS",
+    "FORCE_DATA_MODEL",
     "DEFAULT_STORAGES",
     "DEFAULT_ISSUANCE_REQUEST_SERIALIZER",
 ]
 
-# List of settings that can be overridden on Site/Org level:
-ORG_SETTINGS = [
-    "DEFAULT_ISSUER_DID",
-    "DEFAULT_ISSUER_KEY",
-]
+# TODO: implement settings self-checks:
+# - DEFAULT_DATA_MODELS are not empty (at least 1 data model is active)
+# - FORCE_DATA_MODEL in DEFAULT_DATA_MODELS
+# - DEFAULT_STORAGES are not empty (at least 1 storage is available)
+# - DEFAULT_ISSUER_DID is set
+# - DEFAULT_ISSUER_KEY is set
 
 
 class VCSettings:
@@ -134,5 +134,5 @@ def import_from_string(val, setting_name):
     try:
         return import_string(val)
     except ImportError as e:
-        msg = "Could not import '%s' for VC setting '%s'. %s: %s." % (val, setting_name, e.__class__.__name__, e)
+        msg = "Improperly configured! Could not import '%s' for VC setting '%s'. %s: %s." % (val, setting_name, e.__class__.__name__, e)
         raise ImportError(msg)

@@ -2,14 +2,13 @@
 Composition is responsible for a construct of verifiable credential based on
 different specifications (data models).
 """
-from django.db import models
+from rest_framework import serializers
 
 
-class Schema(models.Model):
+class BaseDataModel(serializers.BaseSerializer):
     """
-    All VC data models are unmanaged.
+    Verifiable credential common parts.
     """
 
-    class Meta:
-        abstract = True
-        managed = False
+    def to_representation(self, instance):
+        raise NotImplementedError("Concrete data model serializers must implement their representation!")

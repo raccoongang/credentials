@@ -1,12 +1,14 @@
 import logging
+import uuid
 
-from django.utils.translation import gettext as _
-from rest_framework.exceptions import ValidationError
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+from django_extensions.db.models import TimeStampedModel
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from credentials.apps.credentials.models import UserCredential
 
-from .models import IssuanceLine
 from .settings import vc_settings
 
 logger = logging.getLogger(__name__)
@@ -27,14 +29,9 @@ class CredentialIssuer:
         - composed verifiable credential signing
     """
 
-    # compose_functions = {
-    #     VERIFIABLE_CREDENTIAL_KEY: compose_verifiable_credential,
-    #     OPEN_BADGES_V3_KEY: compose_open_badge_v3,
-    # }
-
     def __init__(self, request_data, issuance_uuid):
         self._issuance_line = self._pickup_issuance_line(issuance_uuid)
-        self._validated_data = self._validate(request_data)
+        self._validate(request_data)
 
     def _pickup_issuance_line(self, issuance_uuid):
         issuance_line = IssuanceLine.objects.filter(uuid=issuance_uuid).first()
@@ -46,12 +43,15 @@ class CredentialIssuer:
         return issuance_line
 
     def _validate(self, request_data):
-        serializer = self._issuance_line.storage.ISSUANCE_REQUEST_SERIALIZER(data=request_data)
+        serializer = self._issuance_line.storage.ISSUANCE_REQUEST_SERIALIZER(self._issuance_line, data=request_data)
         serializer.is_valid(raise_exception=True)
-        return serializer.validated_data
+        serializer.save()
 
     @classmethod
     def init(cls, *, credential_uuid, storage_id):
+        """
+        The very first action in verifiable credential issuance line.
+        """
         user_credential = UserCredential.objects.filter(uuid=credential_uuid).first()
         # validate given user credential exists:
         if not user_credential:
@@ -75,9 +75,9 @@ class CredentialIssuer:
 
     def compose(self):
         """
-        Compose a digital credential document for signing.
+        Construct an appropriate verifiable credential for signing.
         """
-        return self._validated_data
+        return self._issuance_line.data_model
 
     def sign(self, composed_credential):
         """
@@ -115,7 +115,54 @@ class CredentialIssuer:
         pass
 
 
-class IssuanceRequestSerializer(serializers.Serializer):
+class IssuanceLine(TimeStampedModel):
+    """
+    Specific verifiable credential issuance details (issuance line).
+
+    .. no_pii:
+    """
+
+    # Initial data:
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    user_credential = models.ForeignKey(
+        UserCredential,
+        related_name="vc_issues",
+        on_delete=models.PROTECT,
+        help_text=_("Related Open edX learner credential"),
+    )
+    processed = models.BooleanField(default=False, help_text=_("Completeness indicator"))
+    issuer_id = models.CharField(max_length=255, help_text=_("Issuer DID"))
+    storage_id = models.CharField(max_length=128, help_text=_("Target storage identifier"))
+    # Storage request data:
+    holder_id = models.CharField(max_length=255, help_text=_("Holder DID"))
+    subject_id = models.CharField(max_length=255, blank=True, null=True, help_text=_("Subject DID (if not provided corresponds to \"Holder ID\")"))
+
+    def __str__(self) -> str:
+        return f"IssuanceLine(user_credential={self.user_credential}, issuer_id={self.issuer_id}, storage_id={self.storage_id})"
+
+    @property
+    def storage(self):
+        for storage in vc_settings.storages:
+            if storage.ID == self.storage_id:
+                return storage
+
+    @property
+    def data_model(self):
+        """
+        Data model lookup:
+        - check if there is FORCE_DATA_MODEL set
+        - check issuance request options (not implemented)
+        - check current storage preference
+        - use default
+        """
+        # Pin data model choice no matter what:
+        if vc_settings.FORCE_DATA_MODEL is not None:
+            return vc_settings.FORCE_DATA_MODEL(self).data
+
+        return self.storage.PREFERRED_DATA_MODEL(self).data
+
+
+class IssuanceLineSerializer(serializers.ModelSerializer):
     """
     Incoming issuance request default serializer.
 
@@ -123,6 +170,10 @@ class IssuanceRequestSerializer(serializers.Serializer):
     But once it is not the case, swapping this class for something more specific is possible.
     """
     class Meta:
+        model = IssuanceLine
         fields = "__all__"
+        read_only_fields = ['uuid', 'user_credential', 'processed', 'issuer_id', 'storage_id']
 
-    holder = serializers.CharField(help_text=_("Learner DID"))
+    @staticmethod
+    def swap_value(data: dict, source_key: str, target_key: str) -> None:
+        data[target_key] = data.pop(source_key)

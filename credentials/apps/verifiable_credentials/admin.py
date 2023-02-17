@@ -1,7 +1,7 @@
 from config_models.admin import KeyedConfigurationModelAdmin
 from django.contrib import admin
 
-from .models import IssuanceLine
+from .issuance import IssuanceLine
 from .toggles import is_verifiable_credentials_enabled
 
 
