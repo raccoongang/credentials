@@ -19,6 +19,7 @@ class BaseWallet:
     """
 
     DEEP_LINK_URL = ""
+    ISSUANCE_REQUEST_SERIALIZER = vc_settings.DEFAULT_ISSUANCE_REQUEST_SERIALIZER
 
     @classmethod
     def get_deeplink_url(cls, *args, **kwargs):
@@ -31,10 +32,6 @@ class BaseWallet:
     @classmethod
     def is_web(cls):
         return cls.TYPE == StorageType.WEB
-
-    @property
-    def issuance_request_serializer(self):
-        return vc_settings.DEFAULT_ISSUANCE_REQUEST_SERIALIZER
 
 
 class MobileWallet(BaseWallet):

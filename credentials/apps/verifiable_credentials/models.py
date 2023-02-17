@@ -19,7 +19,7 @@ class IssuanceLine(TimeStampedModel):
     .. no_pii:
     """
 
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     user_credential = models.ForeignKey(
         UserCredential,
         related_name="vc_issues",

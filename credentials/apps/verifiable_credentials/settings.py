@@ -29,11 +29,13 @@ DEFAULTS = {
     ],
     "DEFAULT_ISSUER_DID": "GENERATED-ISSUER-DID-WEB",
     "DEFAULT_ISSUER_KEY": "PATH-TO-PRIVATE-ISSUER-KEY",
+    "DEFAULT_ISSUANCE_REQUEST_SERIALIZER": "credentials.apps.verifiable_credentials.issuance.IssuanceRequestSerializer",
 }
 
 # List of settings that may be in string import notation:
 IMPORT_STRINGS = [
     "DEFAULT_STORAGES",
+    "DEFAULT_ISSUANCE_REQUEST_SERIALIZER",
 ]
 
 # List of settings that can be overridden on Site/Org level:

@@ -2,6 +2,7 @@ import logging
 
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
+from rest_framework import serializers
 
 from credentials.apps.credentials.models import UserCredential
 
@@ -32,12 +33,21 @@ class CredentialIssuer:
     # }
 
     def __init__(self, request_data, issuance_uuid):
-        self._issuance_line = IssuanceLine.objects.get(uuid=issuance_uuid)
+        self._issuance_line = self._pickup_issuance_line(issuance_uuid)
         self._validated_data = self._validate(request_data)
 
+    def _pickup_issuance_line(self, issuance_uuid):
+        issuance_line = IssuanceLine.objects.filter(uuid=issuance_uuid).first()
+        if not issuance_line:
+            msg = _(f"Couldn't find such issuance line: ['issuance_uuid']")
+            logger.exception(msg)
+            raise ValidationError({'issuance_uuid': msg})
+
+        return issuance_line
+
     def _validate(self, request_data):
-        serializer = self._issuance_line.storage.issuance_request_serializer(data=request_data)
-        serializer.is_valid()
+        serializer = self._issuance_line.storage.ISSUANCE_REQUEST_SERIALIZER(data=request_data)
+        serializer.is_valid(raise_exception=True)
         return serializer.validated_data
 
     @classmethod
@@ -67,7 +77,7 @@ class CredentialIssuer:
         """
         Compose a digital credential document for signing.
         """
-        return self._get_compose_function()(data=self._validated_data)
+        return self._validated_data
 
     def sign(self, composed_credential):
         """
@@ -84,16 +94,10 @@ class CredentialIssuer:
         composed_credential = self.compose()
         verifiable_credential = self.sign(composed_credential)
 
-        self.issuance.processed = True
-        self.issuance.save()
+        self._issuance_line.processed = True
+        self._issuance_line.save()
 
         return verifiable_credential
-
-    def _get_compose_function(self):
-        """
-        Choose an appropriate compose function.
-        """
-        return self.compose_functions[vc_settings.DEFAULT_DATA_MODEL]
 
     def _get_issuance_config(self):
         """
@@ -109,3 +113,16 @@ class CredentialIssuer:
         Pick signing key(s).
         """
         pass
+
+
+class IssuanceRequestSerializer(serializers.Serializer):
+    """
+    Incoming issuance request default serializer.
+
+    It is expected incoming requests from different storages to have unified shape.
+    But once it is not the case, swapping this class for something more specific is possible.
+    """
+    class Meta:
+        fields = "__all__"
+
+    holder = serializers.CharField(help_text=_("Learner DID"))

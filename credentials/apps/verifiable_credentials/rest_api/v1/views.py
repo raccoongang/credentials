@@ -119,9 +119,10 @@ class IssueCredentialView(APIView):
 
     authentication_classes = ()
 
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
     def post(self, request, *args, **kwargs):
-        credential_issuer = CredentialIssuer(request.data, kwargs.get("issuance_uuid"))
+        credential_issuer = CredentialIssuer(request.data, kwargs.get("issuance_line_uuid"))
 
         return Response({"verifiableCredential": credential_issuer.issue()}, status=status.HTTP_201_CREATED)
