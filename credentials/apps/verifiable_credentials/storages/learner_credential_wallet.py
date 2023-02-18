@@ -2,7 +2,6 @@ from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
 from django.urls import reverse
-from rest_framework import serializers
 
 from ..composition.open_badges import OpenBadgesDataModel
 from ..issuance import IssuanceLineSerializer
@@ -35,7 +34,7 @@ class LCWallet(MobileWallet):
     APP_LINK_IOS = "https://apps.apple.com/app/learner-credential-wallet/id1590615710"
     DEEP_LINK_URL = "dccrequest://request"
     ISSUANCE_REQUEST_SERIALIZER = LearnerCredentialWalletRequest
-    PREFERRED_DATA_MODEL = OpenBadgesDataModel
+    # PREFERRED_DATA_MODEL = OpenBadgesDataModel
 
     @classmethod
     def get_deeplink_url(cls, issuance_uuid):

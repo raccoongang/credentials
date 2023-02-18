@@ -1,14 +1,13 @@
-"""
-Composition is responsible for a construct of verifiable credential based on
-different specifications (data models).
-"""
+from collections import OrderedDict
+
 from rest_framework import serializers
 
 
-class BaseDataModel(serializers.BaseSerializer):
-    """
-    Verifiable credential common parts.
-    """
+class BaseDataModel(serializers.Serializer):
+
+    id = serializers.UUIDField(format='urn', source="uuid", read_only=True)
 
     def to_representation(self, instance):
-        raise NotImplementedError("Concrete data model serializers must implement their representation!")
+        credential = OrderedDict({'@context': self.context})
+        credential.update(super().to_representation(instance))
+        return credential

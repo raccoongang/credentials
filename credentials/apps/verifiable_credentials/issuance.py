@@ -77,15 +77,18 @@ class CredentialIssuer:
         """
         Construct an appropriate verifiable credential for signing.
         """
-        return self._issuance_line.data_model
+        # TODO: build status entry
+        status = {}
+        return self._issuance_line.construct({"credentialStatus": status})
 
     def sign(self, composed_credential):
         """
         Sign the composed digital credential document.
         """
-        signed_credential = composed_credential.copy()
-        signed_credential["proof"] = {}
-        return signed_credential
+        # TODO: use didkit lib for signing
+        verifiable_credential = composed_credential.copy()
+        verifiable_credential["proof"] = {'fake': 'proof'}
+        return verifiable_credential
 
     def issue(self):
         """
@@ -93,26 +96,9 @@ class CredentialIssuer:
         """
         composed_credential = self.compose()
         verifiable_credential = self.sign(composed_credential)
-
-        self._issuance_line.processed = True
-        self._issuance_line.save()
+        self._issuance_line.mark_processed()
 
         return verifiable_credential
-
-    def _get_issuance_config(self):
-        """
-        Load appropriate issuance configuration.
-        """
-        # TODO
-        # use Org/Site or system defaults
-        # add DID to Org/Site config
-        # add key to Org/Site config
-
-    def _load_keys(self):
-        """
-        Pick signing key(s).
-        """
-        pass
 
 
 class IssuanceLine(TimeStampedModel):
@@ -134,15 +120,15 @@ class IssuanceLine(TimeStampedModel):
     issuer_id = models.CharField(max_length=255, help_text=_("Issuer DID"))
     storage_id = models.CharField(max_length=128, help_text=_("Target storage identifier"))
     # Storage request data:
-    holder_id = models.CharField(max_length=255, help_text=_("Holder DID"))
-    subject_id = models.CharField(max_length=255, blank=True, null=True, help_text=_("Subject DID (if not provided corresponds to \"Holder ID\")"))
+    holder_id = models.CharField(max_length=255, blank=True, null=True, help_text=_("Holder DID"))
+    subject_id = models.CharField(max_length=255, blank=True, default=holder_id, help_text=_("Subject DID (if not provided corresponds to \"Holder ID\")"))
 
     def __str__(self) -> str:
         return f"IssuanceLine(user_credential={self.user_credential}, issuer_id={self.issuer_id}, storage_id={self.storage_id})"
 
     @property
     def storage(self):
-        for storage in vc_settings.storages:
+        for storage in vc_settings.DEFAULT_STORAGES:
             if storage.ID == self.storage_id:
                 return storage
 
@@ -157,9 +143,20 @@ class IssuanceLine(TimeStampedModel):
         """
         # Pin data model choice no matter what:
         if vc_settings.FORCE_DATA_MODEL is not None:
-            return vc_settings.FORCE_DATA_MODEL(self).data
+            return vc_settings.FORCE_DATA_MODEL
 
-        return self.storage.PREFERRED_DATA_MODEL(self).data
+        return self.storage.PREFERRED_DATA_MODEL
+
+    def construct(self, data=None):
+        if data is None:
+            data = {}
+        serializer = self.data_model(self, data)
+        serializer.is_valid(raise_exception=True)
+        return serializer.data
+
+    def mark_processed(self):
+        self.processed = True
+        self.save()
 
 
 class IssuanceLineSerializer(serializers.ModelSerializer):

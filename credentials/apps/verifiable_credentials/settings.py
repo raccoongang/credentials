@@ -75,10 +75,6 @@ class VCSettings:
             self._explicit_settings = getattr(settings, "VERIFIABLE_CREDENTIALS", {})
         return self._explicit_settings
 
-    @property
-    def storages(self):
-        return self.DEFAULT_STORAGES
-
     def __getattr__(self, attr):
         if attr not in self.defaults:
             raise AttributeError("Invalid VC setting: '%s'" % attr)
