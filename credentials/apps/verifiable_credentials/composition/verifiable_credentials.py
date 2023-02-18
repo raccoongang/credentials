@@ -11,7 +11,7 @@ from ..composition import BaseDataModel
 
 
 class Types(Enum):
-    VERIFIABLE_CREDENTIAL= "VerifiableCredential"
+    VERIFIABLE_CREDENTIAL = "VerifiableCredential"
     UNIVERSITY_DEGREE_CREDENTIAL = "UniversityDegreeCredential"
 
 
@@ -24,12 +24,13 @@ class VerifiableCredentialsDataModel(BaseDataModel):
     """
     Verifiable Credentials data model.
     """
+
     VERSION = 1.1
 
     type = serializers.SerializerMethodField()
     issuer = serializers.CharField(source="issuer_id", read_only=True)
     issuanceDate = serializers.DateTimeField(source="modified", read_only=True)
-    credentialSubject = serializers.SerializerMethodField(method_name='get_subject')
+    credentialSubject = serializers.SerializerMethodField(method_name="get_subject")
 
     @property
     def context(self):
@@ -55,7 +56,7 @@ class VerifiableCredentialsDataModel(BaseDataModel):
             "programcertificate": [
                 Types.UNIVERSITY_DEGREE_CREDENTIAL.value,  # FIXME: as example
             ],
-            "coursecertificate": []
+            "coursecertificate": [],
         }
 
         if content_type not in linked_types:

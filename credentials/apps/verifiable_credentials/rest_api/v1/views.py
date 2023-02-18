@@ -45,11 +45,9 @@ class ProgramCredentialsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         Returns:
             response(dict): Information about the user's program credentials
         """
-        program_credentials = get_user_program_credentials_data(
-            request.user.username)
+        program_credentials = get_user_program_credentials_data(request.user.username)
 
-        serializer = ProgramCredentialSerializer(
-            program_credentials, many=True)
+        serializer = ProgramCredentialSerializer(program_credentials, many=True)
         return Response({"program_credentials": serializer.data})
 
 
@@ -78,14 +76,12 @@ class InitIssuanceView(APIView):
         storage_id = request.data.get("storage_id")
 
         if not all([credential_uuid, storage_id]):
-            msg = _(
-                f"Incomplete required data: ['credential_uuid', 'storage_id']")
+            msg = _(f"Incomplete required data: ['credential_uuid', 'storage_id']")
             logger.exception(msg)
             return Response(msg, status=status.HTTP_400_BAD_REQUEST)
 
         if not is_valid_uuid(credential_uuid):
-            msg = _(
-                f"Credential identifier must be valid UUID: ['credential_uuid']")
+            msg = _(f"Credential identifier must be valid UUID: ['credential_uuid']")
             logger.exception(msg)
             return Response(msg, status=status.HTTP_400_BAD_REQUEST)
 
@@ -128,8 +124,7 @@ class IssueCredentialView(APIView):
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
-        credential_issuer = CredentialIssuer(
-            request.data, kwargs.get("issuance_line_uuid"))
+        credential_issuer = CredentialIssuer(request.data, kwargs.get("issuance_line_uuid"))
 
         return Response({"verifiableCredential": credential_issuer.issue()}, status=status.HTTP_201_CREATED)
 
@@ -139,5 +134,7 @@ class NoWalletView(APIView):
 
     def get(self, request, *args, **kwargs):
         return render(
-            request, "no-wallet.html",
-            context={'title': _("Verifiable Credentials issuance sandbox"), 'content': request.query_params})
+            request,
+            "no-wallet.html",
+            context={"title": _("Verifiable Credentials issuance sandbox"), "content": request.query_params},
+        )

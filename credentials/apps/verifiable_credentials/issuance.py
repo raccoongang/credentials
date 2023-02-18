@@ -38,7 +38,7 @@ class CredentialIssuer:
         if not issuance_line:
             msg = _(f"Couldn't find such issuance line: ['issuance_uuid']")
             logger.exception(msg)
-            raise ValidationError({'issuance_uuid': msg})
+            raise ValidationError({"issuance_uuid": msg})
 
         return issuance_line
 
@@ -78,8 +78,7 @@ class CredentialIssuer:
         Construct an appropriate verifiable credential for signing.
         """
         # TODO: build status entry
-        status = {}
-        return self._issuance_line.construct({"credentialStatus": status})
+        return self._issuance_line.construct()
 
     def sign(self, composed_credential):
         """
@@ -87,7 +86,7 @@ class CredentialIssuer:
         """
         # TODO: use didkit lib for signing
         verifiable_credential = composed_credential.copy()
-        verifiable_credential["proof"] = {'fake': 'proof'}
+        verifiable_credential["proof"] = {"fake": "proof"}
         return verifiable_credential
 
     def issue(self):
@@ -121,7 +120,12 @@ class IssuanceLine(TimeStampedModel):
     storage_id = models.CharField(max_length=128, help_text=_("Target storage identifier"))
     # Storage request data:
     holder_id = models.CharField(max_length=255, blank=True, null=True, help_text=_("Holder DID"))
-    subject_id = models.CharField(max_length=255, blank=True, default=holder_id, help_text=_("Subject DID (if not provided corresponds to \"Holder ID\")"))
+    subject_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text=_('Subject DID (if not provided corresponds to "Holder ID")'),
+    )
 
     def __str__(self) -> str:
         return f"IssuanceLine(user_credential={self.user_credential}, issuer_id={self.issuer_id}, storage_id={self.storage_id})"
@@ -147,11 +151,8 @@ class IssuanceLine(TimeStampedModel):
 
         return self.storage.PREFERRED_DATA_MODEL
 
-    def construct(self, data=None):
-        if data is None:
-            data = {}
-        serializer = self.data_model(self, data)
-        serializer.is_valid(raise_exception=True)
+    def construct(self):
+        serializer = self.data_model(self)
         return serializer.data
 
     def mark_processed(self):
@@ -166,11 +167,17 @@ class IssuanceLineSerializer(serializers.ModelSerializer):
     It is expected incoming requests from different storages to have unified shape.
     But once it is not the case, swapping this class for something more specific is possible.
     """
+
     class Meta:
         model = IssuanceLine
         fields = "__all__"
-        read_only_fields = ['uuid', 'user_credential', 'processed', 'issuer_id', 'storage_id']
+        read_only_fields = ["uuid", "user_credential", "processed", "issuer_id", "storage_id"]
 
     @staticmethod
     def swap_value(data: dict, source_key: str, target_key: str) -> None:
         data[target_key] = data.pop(source_key)
+
+    def update(self, instance, validated_data):
+        if "subject_id" not in validated_data:
+            validated_data["subject_id"] =  validated_data.get("holder_id")
+        return super().update(instance, validated_data)

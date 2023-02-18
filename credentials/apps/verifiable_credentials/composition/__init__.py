@@ -5,9 +5,9 @@ from rest_framework import serializers
 
 class BaseDataModel(serializers.Serializer):
 
-    id = serializers.UUIDField(format='urn', source="uuid", read_only=True)
+    id = serializers.UUIDField(format="urn", source="uuid", read_only=True)
 
     def to_representation(self, instance):
-        credential = OrderedDict({'@context': self.context})
+        credential = OrderedDict({"@context": self.context})
         credential.update(super().to_representation(instance))
         return credential

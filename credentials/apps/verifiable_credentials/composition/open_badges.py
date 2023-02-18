@@ -10,6 +10,7 @@ class OpenBadgesDataModel(BaseDataModel):
     """
     Open Badges data model.
     """
+
     VERSION = 3.0
 
     def to_representation(self, instance):
@@ -17,14 +18,14 @@ class OpenBadgesDataModel(BaseDataModel):
             "@context": [
                 "https://www.w3.org/2018/credentials/v1",
                 "https://www.w3.org/2018/credentials/examples/v1",
-                "https://purl.imsglobal.org/spec/ob/v3p0/context.json"
+                "https://purl.imsglobal.org/spec/ob/v3p0/context.json",
             ],
             "id": "http://example.edu/credentials/3732",
             "type": ["VerifiableCredential", "OpenBadgeCredential"],
             "issuer": {
                 "id": "https://example.edu/issuers/565049",
                 "type": ["IssuerProfile"],
-                "name": "Example University"
+                "name": "Example University",
             },
             "issuanceDate": "2010-01-01T00:00:00Z",
             "name": "Teamwork Badge",
@@ -33,14 +34,12 @@ class OpenBadgesDataModel(BaseDataModel):
                 "type": ["AchievementSubject"],
                 "achievement": {
                     "id": "https://example.com/achievements/21st-century-skills/teamwork",
-                    "type": [
-                        "Achievement"
-                    ],
+                    "type": ["Achievement"],
                     "criteria": {
                         "narrative": "Team members are nominated for this badge by their peers and recognized upon review by Example Corp management."
                     },
                     "description": "This badge recognizes the development of the capacity to collaborate within a group environment.",
-                    "name": "Teamwork"
-                }
-            }
+                    "name": "Teamwork",
+                },
+            },
         }

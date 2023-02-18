@@ -19,8 +19,7 @@ class LearnerCredentialWalletRequest(IssuanceLineSerializer):
         """
         Maps storage-specific request properties to the unified verifiable credential source data.
         """
-        self.swap_value(data, 'holder', 'holder_id')
-        data['subject_id'] = data.get('embedded', {}).get('subjectId')
+        self.swap_value(data, "holder", "holder_id")
         return super().to_internal_value(data)
 
 
