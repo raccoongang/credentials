@@ -1,75 +1,72 @@
 """
-Database models for verifiable_credentials.
+Verifiable Credentials DB models.
 """
 import uuid
 
-from config_models.models import ConfigurationModel
-from django.conf import settings
-from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
-from credentials.apps.catalog.models import Organization
 from credentials.apps.credentials.models import UserCredential
 
-from .constants import OPEN_BADGES_V3_KEY, VERIFIABLE_CREDENTIAL_KEY
+from .settings import vc_settings
 
 
-class IssuanceConfiguration(ConfigurationModel):
+class IssuanceLine(TimeStampedModel):
     """
-    A model representing the configuration settings for digital credentials issuance.
-    This model stores the details needed to generate and issue digital credentials,
-    such as credential format, site, etc.
+    Specific verifiable credential issuance details (issuance line).
 
     .. no_pii:
     """
 
-    KEY_FIELDS = (
-        "site_id",
-        "slug",
+    # Initial data:
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    user_credential = models.ForeignKey(
+        UserCredential,
+        related_name="vc_issues",
+        on_delete=models.PROTECT,
+        help_text=_("Related Open edX learner credential"),
     )
-    DIGITAL_CREDENTIAL_FORMAT_CHOICES = (
-        (VERIFIABLE_CREDENTIAL_KEY, _("Verifiable Credentials")),
-        (OPEN_BADGES_V3_KEY, _("Open Badges v3")),
-    )
-
-    enabled = models.BooleanField(default=False)
-    site = models.ForeignKey(
-        Site,
-        default=settings.SITE_ID,
-        related_name="%(class)ss",
-        on_delete=models.CASCADE,
-    )
-    slug = models.SlugField(
-        max_length=30,
-        default="default",
-        blank=True,
-    )
-    organization = models.ForeignKey(
-        Organization,
+    processed = models.BooleanField(default=False, help_text=_("Completeness indicator"))
+    issuer_id = models.CharField(max_length=255, help_text=_("Issuer DID"))
+    storage_id = models.CharField(max_length=128, help_text=_("Target storage identifier"))
+    # Storage request data:
+    holder_id = models.CharField(max_length=255, blank=True, null=True, help_text=_("Holder DID"))
+    subject_id = models.CharField(
+        max_length=255,
         blank=True,
         null=True,
-        on_delete=models.CASCADE,
-    )
-    digital_credential_format = models.CharField(
-        max_length=128,
-        blank=True,
-        verbose_name=_("Digital Credential Format"),
-        default=VERIFIABLE_CREDENTIAL_KEY,
-        choices=DIGITAL_CREDENTIAL_FORMAT_CHOICES,
+        help_text=_('Subject DID (if not provided corresponds to "Holder ID")'),
     )
 
+    def __str__(self) -> str:
+        return f"IssuanceLine(user_credential={self.user_credential}, issuer_id={self.issuer_id}, storage_id={self.storage_id})"
 
-class VerifiableCredentialIssuance(TimeStampedModel):
-    """
-    Data model representing a request for verifiable credentials
+    @property
+    def storage(self):
+        for storage in vc_settings.DEFAULT_STORAGES:
+            if storage.ID == self.storage_id:
+                return storage
 
-    .. no_pii:
-    """
+    @property
+    def data_model(self):
+        """
+        Data model lookup:
+        - check if there is FORCE_DATA_MODEL set
+        - check issuance request options (not implemented)
+        - check current storage preference
+        - use default
+        """
+        # Pin data model choice no matter what:
+        if vc_settings.FORCE_DATA_MODEL is not None:
+            return vc_settings.FORCE_DATA_MODEL
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    user_credential = models.ForeignKey(UserCredential, related_name="vc_issues", on_delete=models.CASCADE)
-    issuer_did = models.TextField()
+        return self.storage.PREFERRED_DATA_MODEL
 
-    processed = models.BooleanField(default=False)
+    def construct(self):
+        serializer = self.data_model(self)
+        return serializer.data
+
+    def mark_processed(self):
+        self.processed = True
+        self.save()

@@ -1,7 +1,7 @@
 from config_models.admin import KeyedConfigurationModelAdmin
 from django.contrib import admin
 
-from .models import IssuanceConfiguration, VerifiableCredentialIssuance
+from .issuance import IssuanceLine
 from .toggles import is_verifiable_credentials_enabled
 
 
@@ -20,12 +20,14 @@ class IssuanceConfigurationAdmin(KeyedConfigurationModelAdmin):
         )
 
 
-class VerifiableCredentialIssuanceAdmin(admin.ModelAdmin):
-    list_display = ("uuid", "user_credential", "issuer_did", "processed")
+class IssuanceLineAdmin(admin.ModelAdmin):
+    list_display = ("uuid", "user_credential", "issuer_id", "storage_id", "processed")
+    readonly_fields = [
+        "uuid",
+    ]
     list_filter = ("processed",)
     search_fields = ("uuid",)
 
 
 if is_verifiable_credentials_enabled():
-    admin.site.register(IssuanceConfiguration, IssuanceConfigurationAdmin)
-    admin.site.register(VerifiableCredentialIssuance, VerifiableCredentialIssuanceAdmin)
+    admin.site.register(IssuanceLine, IssuanceLineAdmin)

@@ -19,7 +19,7 @@ from credentials.apps.credentials.tests.factories import (
     ProgramCertificateFactory,
     UserCredentialFactory,
 )
-from credentials.apps.verifiable_credentials.models import VerifiableCredentialIssuance
+from credentials.apps.verifiable_credentials.models import IssuanceLine
 from credentials.apps.verifiable_credentials.rest_api.v1.serializers import ProgramCredentialSerializer
 from credentials.apps.verifiable_credentials.settings import vc_settings
 from credentials.apps.verifiable_credentials.utils import get_user_program_credentials_data
@@ -137,7 +137,7 @@ class InitIssuanceViewTestCase(SiteMixin, TestCase):
         response = self.client.post(self.url, data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        issuance = VerifiableCredentialIssuance.objects.last()
+        issuance = IssuanceLine.objects.last()
         self.assertEqual(response.data["deeplink"], self.wallet.create_deeplink_url(issuance.uuid))
         self.assertEqual(response.data["qrcode"], self.wallet.create_qr_code(issuance.uuid))
         self.assertEqual(response.data["app_link_android"], self.wallet.APP_LINK_ANDROID)
