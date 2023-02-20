@@ -131,11 +131,12 @@ class IssueCredentialView(APIView):
 
 
 class NoWalletView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
     def get(self, request, *args, **kwargs):
         return render(
             request,
-            "no-wallet.html",
+            "verifiable_credentials/no-wallet.html",
             context={"title": _("Verifiable Credentials issuance sandbox"), "content": request.query_params},
         )
