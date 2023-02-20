@@ -4,7 +4,7 @@ from django.conf import settings
 from django.urls import reverse
 
 from ..composition.open_badges import OpenBadgesDataModel
-from ..issuance import IssuanceLineSerializer
+from ..serializers import IssuanceLineSerializer
 from ..storages import MobileWallet
 
 
@@ -33,7 +33,7 @@ class LCWallet(MobileWallet):
     APP_LINK_IOS = "https://apps.apple.com/app/learner-credential-wallet/id1590615710"
     DEEP_LINK_URL = "dccrequest://request"
     ISSUANCE_REQUEST_SERIALIZER = LearnerCredentialWalletRequest
-    # PREFERRED_DATA_MODEL = OpenBadgesDataModel
+    PREFERRED_DATA_MODEL = OpenBadgesDataModel
 
     @classmethod
     def get_deeplink_url(cls, issuance_uuid):
@@ -43,9 +43,9 @@ class LCWallet(MobileWallet):
                 settings.ROOT_URL,
                 reverse(
                     "verifiable_credentials:api:v1:credentials-issue",
-                    kwargs={"issuance_uuid": issuance_uuid.hex},
+                    kwargs={"issuance_line_uuid": issuance_uuid},
                 ),
             ),
-            "challenge": issuance_uuid.hex,
+            "challenge": issuance_uuid,
         }
         return f"{cls.DEEP_LINK_URL}?{urlencode(params)}"

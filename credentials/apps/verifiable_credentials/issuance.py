@@ -1,14 +1,11 @@
 import logging
-import uuid
 
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django_extensions.db.models import TimeStampedModel
-from rest_framework import serializers
+from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 
 from credentials.apps.credentials.models import UserCredential
 
+from .models import IssuanceLine
 from .settings import vc_settings
 
 logger = logging.getLogger(__name__)
@@ -60,7 +57,7 @@ class CredentialIssuer:
             raise ValidationError({"credential_uuid": msg})
 
         # validate given storage is active:
-        if not any(filter(lambda storage: storage.ID == storage_id, vc_settings.storages)):
+        if not any(filter(lambda storage: storage.ID == storage_id, vc_settings.DEFAULT_STORAGES)):
             msg = _(f"Provided storage backend isn't active [{storage_id}]")
             logger.exception(msg)
             raise ValidationError({"storage_id": msg})
@@ -98,86 +95,3 @@ class CredentialIssuer:
         self._issuance_line.mark_processed()
 
         return verifiable_credential
-
-
-class IssuanceLine(TimeStampedModel):
-    """
-    Specific verifiable credential issuance details (issuance line).
-
-    .. no_pii:
-    """
-
-    # Initial data:
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    user_credential = models.ForeignKey(
-        UserCredential,
-        related_name="vc_issues",
-        on_delete=models.PROTECT,
-        help_text=_("Related Open edX learner credential"),
-    )
-    processed = models.BooleanField(default=False, help_text=_("Completeness indicator"))
-    issuer_id = models.CharField(max_length=255, help_text=_("Issuer DID"))
-    storage_id = models.CharField(max_length=128, help_text=_("Target storage identifier"))
-    # Storage request data:
-    holder_id = models.CharField(max_length=255, blank=True, null=True, help_text=_("Holder DID"))
-    subject_id = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        help_text=_('Subject DID (if not provided corresponds to "Holder ID")'),
-    )
-
-    def __str__(self) -> str:
-        return f"IssuanceLine(user_credential={self.user_credential}, issuer_id={self.issuer_id}, storage_id={self.storage_id})"
-
-    @property
-    def storage(self):
-        for storage in vc_settings.DEFAULT_STORAGES:
-            if storage.ID == self.storage_id:
-                return storage
-
-    @property
-    def data_model(self):
-        """
-        Data model lookup:
-        - check if there is FORCE_DATA_MODEL set
-        - check issuance request options (not implemented)
-        - check current storage preference
-        - use default
-        """
-        # Pin data model choice no matter what:
-        if vc_settings.FORCE_DATA_MODEL is not None:
-            return vc_settings.FORCE_DATA_MODEL
-
-        return self.storage.PREFERRED_DATA_MODEL
-
-    def construct(self):
-        serializer = self.data_model(self)
-        return serializer.data
-
-    def mark_processed(self):
-        self.processed = True
-        self.save()
-
-
-class IssuanceLineSerializer(serializers.ModelSerializer):
-    """
-    Incoming issuance request default serializer.
-
-    It is expected incoming requests from different storages to have unified shape.
-    But once it is not the case, swapping this class for something more specific is possible.
-    """
-
-    class Meta:
-        model = IssuanceLine
-        fields = "__all__"
-        read_only_fields = ["uuid", "user_credential", "processed", "issuer_id", "storage_id"]
-
-    @staticmethod
-    def swap_value(data: dict, source_key: str, target_key: str) -> None:
-        data[target_key] = data.pop(source_key)
-
-    def update(self, instance, validated_data):
-        if "subject_id" not in validated_data:
-            validated_data["subject_id"] =  validated_data.get("holder_id")
-        return super().update(instance, validated_data)

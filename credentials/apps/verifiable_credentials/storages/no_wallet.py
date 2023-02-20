@@ -35,8 +35,8 @@ class NoWallet(WebWallet):
         params = {
             "issuance_url": reverse(
                 "verifiable_credentials:api:v1:credentials-issue",
-                kwargs={"issuance_uuid": issuance_uuid.hex},
+                kwargs={"issuance_line_uuid": issuance_uuid},
             ),
-            "challenge": issuance_uuid.hex,
+            "challenge": issuance_uuid,
         }
         return f"{cls.DEEP_LINK_URL}?{urlencode(params)}"

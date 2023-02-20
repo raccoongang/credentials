@@ -69,7 +69,8 @@ class InitIssuanceView(APIView):
         SessionAuthentication,
     )
 
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
     def post(self, request):
         credential_uuid = request.data.get("credential_uuid")
