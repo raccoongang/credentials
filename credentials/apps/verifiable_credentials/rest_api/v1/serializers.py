@@ -9,3 +9,5 @@ class ProgramCredentialSerializer(serializers.Serializer):  # pylint: disable=ab
     credential_id = serializers.IntegerField(read_only=True)
     program_uuid = serializers.UUIDField(read_only=True)
     program_title = serializers.CharField(max_length=255, read_only=True)
+    program_org = serializers.CharField(max_length=255, read_only=True)
+    modified_date = serializers.DateTimeField()

@@ -1,3 +1,4 @@
+import json
 import logging
 import uuid
 
@@ -10,6 +11,7 @@ from rest_framework.exceptions import ValidationError
 from credentials.apps.credentials.models import UserCredential
 
 from .settings import vc_settings
+from .utils import sign_with_didkit
 
 logger = logging.getLogger(__name__)
 
@@ -84,9 +86,14 @@ class CredentialIssuer:
         """
         Sign the composed digital credential document.
         """
-        # TODO: use didkit lib for signing
-        verifiable_credential = composed_credential.copy()
-        verifiable_credential["proof"] = {"fake": "proof"}
+        didkit_options = {
+            "proofPurpose": self.request_data["proof"]["proofPurpose"],
+            "verificationMethod": self.request_data["proof"]["verificationMethod"],
+        }
+        verifiable_credential = sign_with_didkit(
+            json.dumps(composed_credential), json.dumps(didkit_options), vc_settings.DEFAULT_ISSUER_KEY
+        )
+        verifiable_credential = json.loads(verifiable_credential)
         return verifiable_credential
 
     def issue(self):

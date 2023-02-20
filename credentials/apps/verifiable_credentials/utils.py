@@ -2,7 +2,9 @@ from uuid import UUID
 import base64
 from io import BytesIO
 
+import didkit
 import qrcode
+from asgiref.sync import async_to_sync
 from django.contrib.contenttypes.models import ContentType
 
 from credentials.apps.credentials.api import get_user_credentials_by_content_type
@@ -34,6 +36,10 @@ def get_user_program_credentials_data(username):
             "credential_id": credential.credential_id,
             "program_uuid": credential.credential.program_uuid.hex,
             "program_title": credential.credential.program.title,
+            "program_org": ", ".join(
+                credential.credential.program.authoring_organizations.values_list("name", flat=True)
+            ),
+            "modified_date": credential.modified.strftime("%Y-%d-%m"),
         }
         for credential in program_credentials
     ]
@@ -77,3 +83,7 @@ def is_valid_uuid(uuid_to_test, version=4):
     except ValueError:
         return False
     return str(uuid_obj) == uuid_to_test
+
+@async_to_sync
+async def sign_with_didkit(credential, options, issuer_key):
+    return await didkit.issue_credential(credential, options, issuer_key)
