@@ -4,6 +4,7 @@ Verifiable Credentials API v1 views.
 import logging
 
 from django.contrib.auth import get_user_model
+from django.shortcuts import render
 from django.utils.translation import gettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import mixins, status, viewsets
@@ -11,9 +12,9 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.shortcuts import render
 
 from credentials.apps.verifiable_credentials.issuance import CredentialIssuer
+from credentials.apps.verifiable_credentials.storages.learner_credential_wallet import LCWallet
 from credentials.apps.verifiable_credentials.utils import (
     generate_base64_qr_code,
     get_user_program_credentials_data,
@@ -69,14 +70,17 @@ class InitIssuanceView(APIView):
         SessionAuthentication,
     )
 
-    # permission_classes = (IsAuthenticated,)
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         credential_uuid = request.data.get("credential_uuid")
-        storage_id = request.data.get("storage_id")
+        storage_id = request.data.get("storage_id", LCWallet.ID)  # NOTE: pin LCWallet for now
 
-        if not all([credential_uuid, storage_id]):
+        if not all(
+            [
+                credential_uuid,
+            ]
+        ):
             msg = _(f"Incomplete required data: ['credential_uuid', 'storage_id']")
             logger.exception(msg)
             return Response(msg, status=status.HTTP_400_BAD_REQUEST)
@@ -119,10 +123,12 @@ class IssueCredentialView(APIView):
     https://w3c-ccg.github.io/vc-api/#issue-credential
     """
 
-    authentication_classes = ()
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthentication,
+    )
 
-    # permission_classes = (IsAuthenticated,)
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
         credential_issuer = CredentialIssuer(request.data, kwargs.get("issuance_line_uuid"))
