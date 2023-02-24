@@ -24,7 +24,6 @@ def get_user_program_credentials_data(username):
     program_credentials = get_user_credentials_by_content_type(
         username, [program_cert_content_type], UserCredentialStatus.AWARDED.value
     )
-
     return [
         {
             "uuid": credential.uuid.hex,
@@ -34,6 +33,10 @@ def get_user_program_credentials_data(username):
             "credential_id": credential.credential_id,
             "program_uuid": credential.credential.program_uuid.hex,
             "program_title": credential.credential.program.title,
+            "program_org": ", ".join(
+                credential.credential.program.authoring_organizations.values_list("name", flat=True)
+            ),
+            "modified_date": credential.modified.date().isoformat(),
         }
         for credential in program_credentials
     ]
