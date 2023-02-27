@@ -34,7 +34,7 @@ bcrypt==4.0.1
     # via
     #   -r requirements/dev.txt
     #   paramiko
-black==22.12.0
+black==23.1.0
     # via -r requirements/dev.txt
 bleach==6.0.0
     # via
@@ -42,11 +42,11 @@ bleach==6.0.0
     #   -r requirements/production.txt
 bok-choy==1.1.1
     # via -r requirements/dev.txt
-boto3==1.26.71
+boto3==1.26.79
     # via
     #   -r requirements/production.txt
     #   django-ses
-botocore==1.29.71
+botocore==1.29.79
     # via
     #   -r requirements/production.txt
     #   boto3
@@ -99,7 +99,7 @@ coreschema==0.0.4
     #   -r requirements/production.txt
     #   coreapi
     #   drf-yasg
-coverage==7.1.0
+coverage==7.2.1
     # via -r requirements/dev.txt
 cryptography==39.0.1
     # via
@@ -116,6 +116,10 @@ defusedxml==0.7.1
     #   -r requirements/production.txt
     #   python3-openid
     #   social-auth-core
+didkit==0.3.1
+    # via
+    #   -r requirements/dev.txt
+    #   -r requirements/production.txt
 dill==0.3.6
     # via
     #   -r requirements/dev.txt
@@ -167,7 +171,7 @@ django-config-models==2.3.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-django-cors-headers==3.13.0
+django-cors-headers==3.14.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -263,7 +267,7 @@ drf-yasg==1.21.5
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-edx-ace==1.6.0
+edx-ace==1.6.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -321,7 +325,7 @@ exceptiongroup==1.1.0
     #   pytest
 factory-boy==3.2.1
     # via -r requirements/dev.txt
-faker==17.0.0
+faker==17.3.0
     # via
     #   -r requirements/dev.txt
     #   factory-boy
@@ -422,7 +426,7 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-newrelic==8.6.0
+newrelic==8.7.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -444,6 +448,7 @@ packaging==23.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
+    #   black
     #   docker
     #   drf-yasg
     #   pytest
@@ -481,7 +486,7 @@ pluggy==1.0.0
     #   -r requirements/dev.txt
     #   pytest
     #   tox
-polib==1.1.1
+polib==1.2.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -586,7 +591,7 @@ python-memcached==1.59
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-python-slugify==8.0.0
+python-slugify==8.0.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -755,7 +760,7 @@ tox==3.28.0
     # via
     #   -c requirements/common_constraints.txt
     #   -r requirements/dev.txt
-types-toml==0.10.8.3
+types-toml==0.10.8.5
     # via
     #   -r requirements/dev.txt
     #   responses
@@ -796,7 +801,7 @@ websocket-client==0.59.0
     #   -r requirements/dev.txt
     #   docker
     #   docker-compose
-wrapt==1.14.1
+wrapt==1.15.0
     # via
     #   -r requirements/dev.txt
     #   astroid
@@ -804,7 +809,7 @@ xss-utils==0.4.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-zipp==3.13.0
+zipp==3.15.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt

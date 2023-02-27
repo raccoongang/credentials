@@ -68,7 +68,7 @@ class CredentialIssuer:
         # create init issuance line:
         issuance_line, __ = IssuanceLine.objects.get_or_create(
             user_credential=user_credential,
-            issuer_id=credential_uuid,
+            issuer_id=vc_settings.DEFAULT_ISSUER_DID,
             storage_id=storage_id,
         )
         return issuance_line
