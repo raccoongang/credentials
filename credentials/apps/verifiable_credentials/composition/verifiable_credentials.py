@@ -15,12 +15,12 @@ class Types(Enum):
     UNIVERSITY_DEGREE_CREDENTIAL = "UniversityDegreeCredential"
 
 
-class SubjectDataModel(serializers.Serializer):
+class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-method
     id = serializers.CharField(source="subject_id", read_only=True)
     name = serializers.CharField(required=False, read_only=True)
 
 
-class VerifiableCredentialsDataModel(BaseDataModel):
+class VerifiableCredentialsDataModel(BaseDataModel):  # pylint: disable=abstract-method
     """
     Verifiable Credentials data model.
     """

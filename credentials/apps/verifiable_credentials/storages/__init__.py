@@ -13,12 +13,13 @@ class BaseWallet:
     This class provides a blueprint for implementing wallet for Verifiable Credentials.
     """
 
+    TYPE = ""
     DEEP_LINK_URL = ""
     ISSUANCE_REQUEST_SERIALIZER = vc_settings.DEFAULT_ISSUANCE_REQUEST_SERIALIZER
     PREFERRED_DATA_MODEL = vc_settings.DEFAULT_DATA_MODELS[0]
 
     @classmethod
-    def get_deeplink_url(cls, *args, **kwargs):
+    def get_deeplink_url(cls, issuance_uuid):  # pylint: disable=unused-argument
         return cls.DEEP_LINK_URL
 
     @classmethod

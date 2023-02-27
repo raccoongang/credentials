@@ -23,6 +23,7 @@ from credentials.apps.verifiable_credentials.utils import (
 
 from .serializers import ProgramCredentialSerializer
 
+
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
@@ -81,12 +82,12 @@ class InitIssuanceView(APIView):
                 credential_uuid,
             ]
         ):
-            msg = _(f"Incomplete required data: ['credential_uuid', 'storage_id']")
+            msg = _("Incomplete required data: ['credential_uuid', 'storage_id']")
             logger.exception(msg)
             return Response(msg, status=status.HTTP_400_BAD_REQUEST)
 
         if not is_valid_uuid(credential_uuid):
-            msg = _(f"Credential identifier must be valid UUID: ['credential_uuid']")
+            msg = _("Credential identifier must be valid UUID: ['credential_uuid']")
             logger.exception(msg)
             return Response(msg, status=status.HTTP_400_BAD_REQUEST)
 

@@ -6,7 +6,7 @@ See specification: https://1edtech.github.io/openbadges-specification/ob_v3p0.ht
 from ..composition import BaseDataModel
 
 
-class OpenBadgesDataModel(BaseDataModel):
+class OpenBadgesDataModel(BaseDataModel):  # pylint: disable=abstract-method
     """
     Open Badges data model.
     """
@@ -36,9 +36,15 @@ class OpenBadgesDataModel(BaseDataModel):
                     "id": "https://example.com/achievements/21st-century-skills/teamwork",
                     "type": ["Achievement"],
                     "criteria": {
-                        "narrative": "Team members are nominated for this badge by their peers and recognized upon review by Example Corp management."
+                        "narrative": (
+                            "Team members are nominated for this badge by their peers and "
+                            "recognized upon review by Example Corp management."
+                        )
                     },
-                    "description": "This badge recognizes the development of the capacity to collaborate within a group environment.",
+                    "description": (
+                        "This badge recognizes the development of the capacity "
+                        "to collaborate within a group environment."
+                    ),
                     "name": "Teamwork",
                 },
             },
