@@ -11,6 +11,7 @@ class IssuanceLineAdmin(admin.ModelAdmin):
         "issuer_id",
         "storage_id",
         "processed",
+        "status_index",
     )
     readonly_fields = [
         "uuid",

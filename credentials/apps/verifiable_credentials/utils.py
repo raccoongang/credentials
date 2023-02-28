@@ -5,10 +5,13 @@ from uuid import UUID
 import didkit
 import qrcode
 from asgiref.sync import async_to_sync
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 
 from credentials.apps.credentials.api import get_user_credentials_by_content_type
 from credentials.apps.credentials.data import UserCredentialStatus
+
+from .settings import vc_settings
 
 
 def get_user_program_credentials_data(username):
@@ -83,6 +86,9 @@ def is_valid_uuid(uuid_to_test, version=4):
     except (ValueError, TypeError):
         return False
 
+
+def make_status_list_path(issuer_did):
+    return f"{settings.ROOT_URL}{vc_settings.STATUS_LIST['PUBLIC_PATH']}{issuer_did}.json"
 
 @async_to_sync
 async def sign_with_didkit(credential, options, issuer_key):

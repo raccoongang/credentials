@@ -8,9 +8,10 @@ from rest_framework import serializers
 
 from ..composition import CredentialDataModel
 from .schemas import CredentialSubjectSchema, IssuerSchema
+from .status import StatusEntryDataModelMixin
 
 
-class VerifiableCredentialsDataModel(CredentialDataModel):  # pylint: disable=abstract-method
+class VerifiableCredentialsDataModel(StatusEntryDataModelMixin, CredentialDataModel):  # pylint: disable=abstract-method
     """
     Verifiable Credentials data model.
     """

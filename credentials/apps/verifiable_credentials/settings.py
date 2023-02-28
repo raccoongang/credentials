@@ -30,6 +30,11 @@ DEFAULTS = {
     "DEFAULT_ISSUER_NAME": None,
     "DEFAULT_ISSUANCE_REQUEST_SERIALIZER": "credentials.apps.verifiable_credentials.issuance.serializers.IssuanceLineSerializer",  # pylint: disable=line-too-long
     "DEFAULT_RENDERER": "credentials.apps.verifiable_credentials.issuance.JSONLDRenderer",
+    "STATUS_LIST": {
+        "LENGTH": 10000,
+        "PUBLIC_ROOT": "verifiable-credentials/status/status-list/2021/v1/",
+        "PUBLIC_PATH": "verifiable-credentials/status/status-list/2021/v1/",
+    }
 }
 
 # List of settings that may be in string import notation:
