@@ -38,6 +38,7 @@ class IssuanceLine(TimeStampedModel):
         null=True,
         help_text=_('Subject DID (if not provided corresponds to "Holder ID")'),
     )
+    status_index = models.PositiveIntegerField(null=True)
 
     def __str__(self) -> str:
         return (
@@ -74,3 +75,10 @@ class IssuanceLine(TimeStampedModel):
     def mark_processed(self):
         self.processed = True
         self.save()
+
+    @classmethod
+    def get_next_status_index(cls):
+        last = cls.objects.filter(status_index__gte=0).last()
+        if not last:
+            return 0
+        return last.status_index + 1

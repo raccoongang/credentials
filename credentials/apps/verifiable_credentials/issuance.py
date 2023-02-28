@@ -5,6 +5,7 @@ from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 
 from credentials.apps.credentials.models import UserCredential
+from credentials.apps.verifiable_credentials.composition.status import StatusListDataModel
 
 from .models import IssuanceLine
 from .settings import vc_settings
@@ -66,18 +67,27 @@ class CredentialIssuer:
             raise ValidationError({"storage_id": msg})
 
         # create init issuance line:
-        issuance_line, __ = IssuanceLine.objects.get_or_create(
+        issuance_line, created = IssuanceLine.objects.get_or_create(
             user_credential=user_credential,
             issuer_id=credential_uuid,
             storage_id=storage_id,
+            defaults={
+                "status_index": IssuanceLine.get_next_status_index(),
+            },
         )
+
+        # generate status list
+        if created:
+            status_list = StatusListDataModel(data={"issuer": "did:example:abc"})
+            status_list.is_valid()
+            status_list.save()
+
         return issuance_line
 
     def compose(self):
         """
         Construct an appropriate verifiable credential for signing.
         """
-        # TODO: build status entry
         return self._issuance_line.construct()
 
     def sign(self, composed_credential):

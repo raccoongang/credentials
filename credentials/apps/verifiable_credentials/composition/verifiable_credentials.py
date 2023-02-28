@@ -8,6 +8,7 @@ from enum import Enum
 from rest_framework import serializers
 
 from ..composition import BaseDataModel
+from .status import StatusEntryDataModelMixin
 
 
 class Types(Enum):
@@ -20,7 +21,7 @@ class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-meth
     name = serializers.CharField(required=False, read_only=True)
 
 
-class VerifiableCredentialsDataModel(BaseDataModel):  # pylint: disable=abstract-method
+class VerifiableCredentialsDataModel(StatusEntryDataModelMixin, BaseDataModel):  # pylint: disable=abstract-method
     """
     Verifiable Credentials data model.
     """
@@ -37,7 +38,7 @@ class VerifiableCredentialsDataModel(BaseDataModel):  # pylint: disable=abstract
         return [
             "https://www.w3.org/2018/credentials/v1",
             "https://www.w3.org/2018/credentials/examples/v1",
-        ]
+        ] + super().context
 
     def get_type(self, issuance_line):
         default_types = [Types.VERIFIABLE_CREDENTIAL.value]
