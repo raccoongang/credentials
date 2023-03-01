@@ -59,7 +59,6 @@ class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-meth
         return "StatusList2021"
 
     def get_id(self, data):
-        print(f'[kyrylo] self: {dir(self)}')
         return f"{make_status_list_path(self.initial_data['issuer'])}#list"
 
     def validate(self, attrs):
