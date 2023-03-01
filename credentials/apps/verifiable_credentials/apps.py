@@ -13,3 +13,4 @@ class VerifiableCredentialsConfig(AppConfig):
         """
         if is_verifiable_credentials_enabled():
             from .checks import vc_settings_checks  # pylint: disable=unused-import,import-outside-toplevel
+        from credentials.apps.verifiable_credentials import signals  # pylint: disable=unused-import,import-outside-toplevel
