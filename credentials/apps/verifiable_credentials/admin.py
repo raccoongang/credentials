@@ -12,9 +12,11 @@ class IssuanceLineAdmin(admin.ModelAdmin):
         "storage_id",
         "processed",
         "status_index",
+        "status",
     )
     readonly_fields = [
         "uuid",
+        "status_index",
     ]
     list_filter = ("processed",)
     search_fields = ("uuid",)

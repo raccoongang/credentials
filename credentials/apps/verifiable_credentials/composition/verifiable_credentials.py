@@ -15,7 +15,6 @@ class VerifiableCredentialsDataModel(StatusEntryDataModelMixin, CredentialDataMo
     """
     Verifiable Credentials data model.
     """
-
     VERSION = 1.1
     ID = "vc"
     NAME = _("Verifiable Credentials Data Model v1.1")

@@ -4,13 +4,10 @@ import logging
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 
-from credentials.apps.credentials.models import UserCredential
-from credentials.apps.verifiable_credentials.composition.status import StatusListDataModel
-
-from .models import IssuanceLine
-from .settings import vc_settings
+from .composition.status_list import StatusListDataModel
+from .models import IssuanceLine, UserCredential
+from .settings import VerifiableCredentialsImproperlyConfigured, vc_settings
 from .utils import sign_with_didkit
-
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +44,13 @@ class CredentialIssuer:
         serializer = self._issuance_line.storage.ISSUANCE_REQUEST_SERIALIZER(self._issuance_line, data=request_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+    def _get_key(self):
+        key = vc_settings.DEFAULT_ISSUER_KEY
+        if key is None:
+            msg = _("Issuer key must be provided!")
+            raise VerifiableCredentialsImproperlyConfigured(msg)
+        return key
 
     @classmethod
     def init(cls, *, credential_uuid, storage_id):
@@ -92,21 +96,31 @@ class CredentialIssuer:
 
     def sign(self, composed_credential):
         """
-        Sign the composed digital credential document.
+        Sign a credential document.
         """
+        return composed_credential  # FIXME: remove this line
+
         didkit_options = {}
+
         verifiable_credential = sign_with_didkit(
-            json.dumps(composed_credential), json.dumps(didkit_options), vc_settings.DEFAULT_ISSUER_KEY
+            json.dumps(composed_credential),
+            json.dumps(didkit_options),
+            self._get_key()
         )
-        verifiable_credential = json.loads(verifiable_credential)
-        return verifiable_credential
+
+        return json.loads(verifiable_credential)
 
     def issue(self):
         """
         Issue a signed digital credential document by validating, composing, and signing.
         """
+        # construct a digital credential from a given data model:
         composed_credential = self.compose()
+
+        # add a proof:
         verifiable_credential = self.sign(composed_credential)
+
+        # finalize issuance:
         self._issuance_line.mark_processed()
 
         return verifiable_credential

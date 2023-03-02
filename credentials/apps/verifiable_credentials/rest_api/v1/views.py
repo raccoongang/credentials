@@ -10,6 +10,7 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import ListAPIView
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -19,13 +20,9 @@ from credentials.apps.verifiable_credentials.issuance import CredentialIssuer, s
 from credentials.apps.verifiable_credentials.issuance.exceptions import IssuanceException
 from credentials.apps.verifiable_credentials.storages import get_available_storages, get_storage
 from credentials.apps.verifiable_credentials.utils import (
-    generate_base64_qr_code,
-    get_user_program_credentials_data,
-    is_valid_uuid,
-)
+    generate_base64_qr_code, get_user_program_credentials_data, is_valid_uuid)
 
 from .serializers import ProgramCredentialSerializer
-
 
 logger = logging.getLogger(__name__)
 

@@ -12,10 +12,15 @@ from credentials.apps.credentials.models import UserCredential
 from ..models import IssuanceLine
 from ..settings import vc_settings
 from ..utils import make_status_list_path
-from . import BaseDataModel
+from . import CredentialDataModel
 
 
-class _StatusEntryDataModel(serializers.Serializer):
+class StatusEntryDataModel(serializers.Serializer):
+    """
+    Status List 2021 Entry model.
+
+    See: https://w3c.github.io/vc-status-list-2021/#statuslist2021entry
+    """
     id = serializers.SerializerMethodField(method_name="get_id", read_only=True)
     statusListIndex = serializers.CharField(source="status_index", read_only=True)
     statusListCredential = serializers.SerializerMethodField(method_name="get_list_credential", read_only=True)
@@ -35,18 +40,25 @@ class _StatusEntryDataModel(serializers.Serializer):
         return make_status_list_path(issuance_line.issuer_id)
 
 
-class StatusEntryDataModelMixin(serializers.Serializer):
-    credentialStatus = serializers.SerializerMethodField(method_name="get_status", read_only=True)
+class StatusEntryMixin(serializers.Serializer):
+    """
+    Extends original data model with the status info.
+    """
+    credentialStatus = serializers.SerializerMethodField(method_name="get_status_entry", read_only=True)
 
-    def get_status(self, issuance_line):
-        return _StatusEntryDataModel(issuance_line).data
+    def get_status_entry(self, issuance_line):
+        return StatusEntryDataModel(issuance_line).data
 
-    @property
-    def context(self):
-        return ["https://w3id.org/vc/status-list/2021/v1"]
+    @classmethod
+    def get_context(cls):
+        return [
+            "https://w3id.org/vc/status-list/2021/v1",
+        ]
 
 
 class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    """
     id = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
     statusPurpose = serializers.SerializerMethodField(method_name="get_status_purpose")
@@ -61,8 +73,8 @@ class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-meth
     def get_id(self, data):
         return f"{make_status_list_path(self.initial_data['issuer'])}#list"
 
-    def validate(self, attrs):
-        return attrs
+    # def validate(self, attrs):
+    #     return attrs
 
     def get_encoded_list(self, data):
         status_list = bytearray(vc_settings.STATUS_LIST["LENGTH"])
@@ -83,9 +95,15 @@ class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-meth
         return base64_data.decode("utf-8")
 
 
-class StatusListDataModel(BaseDataModel):
+class StatusListDataModel(CredentialDataModel):
+    """
+    Status List 2021 Credential model.
+
+    See: https://w3c.github.io/vc-status-list-2021/#statuslist2021credential
+    """
     id = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
+    # NOTE: specification defines "issued" field name but "didkit" doesn't pass that
     issuanceDate = serializers.SerializerMethodField(method_name="get_issuance_date")
     issuer = serializers.CharField()
     credentialSubject = serializers.SerializerMethodField(method_name="get_subject")
@@ -107,12 +125,11 @@ class StatusListDataModel(BaseDataModel):
     @property
     def context(self):
         return [
-            "https://www.w3.org/2018/credentials/v1",
             "https://w3id.org/vc/status-list/2021/v1",
         ]
 
-    def validate(self, attrs):
-        return attrs
+    # def validate(self, attrs):
+    #     return attrs
 
     def save(self):
         path = os.path.join(vc_settings.STATUS_LIST["PUBLIC_ROOT"], f"{self.initial_data['issuer']}.json")
@@ -121,3 +138,17 @@ class StatusListDataModel(BaseDataModel):
 
         with open(file_path, 'w') as file:
             file.write(json.dumps(self.data, indent=2))
+
+    def publish(self):
+        """
+        Upload to storage.
+        """
+
+
+def revoke_items(positions):
+    """
+    Given revocation indices list issue a new status list document and publish it.
+    """
+    # re-generate byte-sequence
+    # [re]issue Status List credential
+    # [re]publish Status List credential

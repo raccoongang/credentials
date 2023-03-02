@@ -11,10 +11,14 @@ This module provides the `vc_setting` object, that is used to access
 Verifiable Credentials settings, checking for explicit settings first, then falling
 back to the defaults.
 """
+import logging
+
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.signals import setting_changed
 from django.utils.module_loading import import_string
 
+logger = logging.getLogger(__name__)
 
 DEFAULTS = {
     "DEFAULT_DATA_MODELS": [
@@ -152,4 +156,12 @@ def import_from_string(val, setting_name):
             e.__class__.__name__,
             e,
         )
-        raise ImportError(msg)
+        logger.exception(msg)
+        raise VerifiableCredentialsImproperlyConfigured(msg)
+
+
+class VerifiableCredentialsImproperlyConfigured(ImproperlyConfigured):
+    """
+    Verifiable Credentials settings are somehow improperly configured.
+    """
+    pass
