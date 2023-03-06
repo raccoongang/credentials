@@ -1,6 +1,5 @@
 """
 Open Badges 3.0 data model.
-
 See specification: https://1edtech.github.io/openbadges-specification/ob_v3p0.html
 """
 from enum import Enum
@@ -18,7 +17,7 @@ class Types(Enum):
     ACHIEVEMENT = "Achievement"
 
 
-class IssuerDataModel(serializers.Serializer):
+class IssuerDataModel(serializers.Serializer):  # pylint: disable=abstract-method
     id = serializers.CharField(source="issuer_id", read_only=True)
     type = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
@@ -30,7 +29,7 @@ class IssuerDataModel(serializers.Serializer):
         return "Example University"
 
 
-class AchievementDataModel(serializers.Serializer):
+class AchievementDataModel(serializers.Serializer):  # pylint: disable=abstract-method
     id = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
 
@@ -41,7 +40,7 @@ class AchievementDataModel(serializers.Serializer):
         return issuance_line.user_credential.download_url
 
 
-class SubjectDataModel(serializers.Serializer):
+class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-method
     id = serializers.CharField(source="subject_id", read_only=True)
     type = serializers.SerializerMethodField()
     achievement = serializers.SerializerMethodField()
@@ -53,7 +52,7 @@ class SubjectDataModel(serializers.Serializer):
         return [Types.ACHIEVEMENT_SUBJECT.value]
 
 
-class OpenBadgesDataModel(BaseDataModel):
+class OpenBadgesDataModel(BaseDataModel):  # pylint: disable=abstract-method
     """
     Open Badges data model.
     """

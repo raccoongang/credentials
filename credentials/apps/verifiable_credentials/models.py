@@ -40,13 +40,17 @@ class IssuanceLine(TimeStampedModel):
     )
 
     def __str__(self) -> str:
-        return f"IssuanceLine(user_credential={self.user_credential}, issuer_id={self.issuer_id}, storage_id={self.storage_id})"
+        return (
+            f"IssuanceLine(user_credential={self.user_credential}, "
+            f"issuer_id={self.issuer_id}, storage_id={self.storage_id})"
+        )
 
     @property
     def storage(self):
         for storage in vc_settings.DEFAULT_STORAGES:
             if storage.ID == self.storage_id:
                 return storage
+        return None
 
     @property
     def data_model(self):

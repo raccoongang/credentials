@@ -1,8 +1,10 @@
-from uuid import UUID
 import base64
 from io import BytesIO
+from uuid import UUID
 
+import didkit
 import qrcode
+from asgiref.sync import async_to_sync
 from django.contrib.contenttypes.models import ContentType
 
 from credentials.apps.credentials.api import get_user_credentials_by_content_type
@@ -76,7 +78,12 @@ def is_valid_uuid(uuid_to_test, version=4):
     """
 
     try:
-        uuid_obj = UUID(uuid_to_test, version=version)
+        UUID(uuid_to_test, version=version)
         return True
     except ValueError:
         return False
+
+
+@async_to_sync
+async def sign_with_didkit(credential, options, issuer_key):
+    return await didkit.issue_credential(credential, options, issuer_key)  # pylint: disable=no-member
