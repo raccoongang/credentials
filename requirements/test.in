@@ -13,7 +13,7 @@
 -c constraints.txt
 -r base.txt
 
-black==22.12.0
+black
 bok-choy
 code-annotations          # provides commands used by the pii_check make target
 coverage

@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django.utils.translation import gettext as _
@@ -7,6 +8,8 @@ from credentials.apps.credentials.models import UserCredential
 
 from .models import IssuanceLine
 from .settings import vc_settings
+from .utils import sign_with_didkit
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +36,7 @@ class CredentialIssuer:
     def _pickup_issuance_line(self, issuance_uuid):
         issuance_line = IssuanceLine.objects.filter(uuid=issuance_uuid).first()
         if not issuance_line:
-            msg = _(f"Couldn't find such issuance line: ['issuance_uuid']")
+            msg = _("Couldn't find such issuance line: ['issuance_uuid']")
             logger.exception(msg)
             raise ValidationError({"issuance_uuid": msg})
 
@@ -52,20 +55,20 @@ class CredentialIssuer:
         user_credential = UserCredential.objects.filter(uuid=credential_uuid).first()
         # validate given user credential exists:
         if not user_credential:
-            msg = _(f"No such user credential [{credential_uuid}]")
+            msg = _("No such user credential [%(credential_uuid)s]") % {"credential_uuid": credential_uuid}
             logger.exception(msg)
             raise ValidationError({"credential_uuid": msg})
 
         # validate given storage is active:
         if not any(filter(lambda storage: storage.ID == storage_id, vc_settings.DEFAULT_STORAGES)):
-            msg = _(f"Provided storage backend isn't active [{storage_id}]")
+            msg = _("Provided storage backend isn't active [%(storage_id)s]") % {"storage_id": storage_id}
             logger.exception(msg)
             raise ValidationError({"storage_id": msg})
 
         # create init issuance line:
-        issuance_line, _ = IssuanceLine.objects.get_or_create(
+        issuance_line, __ = IssuanceLine.objects.get_or_create(
             user_credential=user_credential,
-            issuer_id=credential_uuid,
+            issuer_id=vc_settings.DEFAULT_ISSUER_DID,
             storage_id=storage_id,
         )
         return issuance_line
@@ -81,9 +84,11 @@ class CredentialIssuer:
         """
         Sign the composed digital credential document.
         """
-        # TODO: use didkit lib for signing
-        verifiable_credential = composed_credential.copy()
-        verifiable_credential["proof"] = {"fake": "proof"}
+        didkit_options = {}
+        verifiable_credential = sign_with_didkit(
+            json.dumps(composed_credential), json.dumps(didkit_options), vc_settings.DEFAULT_ISSUER_KEY
+        )
+        verifiable_credential = json.loads(verifiable_credential)
         return verifiable_credential
 
     def issue(self):
