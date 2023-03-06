@@ -13,6 +13,8 @@ class BaseWallet:
     This class provides a blueprint for implementing wallet for Verifiable Credentials.
     """
 
+    ID = ""
+    VERBOSE_NAME = ""
     TYPE = ""
     DEEP_LINK_URL = ""
     ISSUANCE_REQUEST_SERIALIZER = vc_settings.DEFAULT_ISSUANCE_REQUEST_SERIALIZER

@@ -17,11 +17,12 @@ from credentials.apps.verifiable_credentials.issuance import CredentialIssuer
 from credentials.apps.verifiable_credentials.storages.learner_credential_wallet import LCWallet
 from credentials.apps.verifiable_credentials.utils import (
     generate_base64_qr_code,
+    get_available_storages,
     get_user_program_credentials_data,
     is_valid_uuid,
 )
 
-from .serializers import ProgramCredentialSerializer
+from .serializers import ProgramCredentialSerializer, StorageSerializer
 
 
 logger = logging.getLogger(__name__)
@@ -147,3 +148,27 @@ class NoWalletView(APIView):
             "verifiable_credentials/no-wallet.html",
             context={"title": _("Verifiable Credentials issuance sandbox"), "content": request.query_params},
         )
+
+
+class AvailableStoragesView(APIView):
+    """
+    List data for all available storages.
+    GET: /verifiable_credentials/api/v1/storages/
+    Arguments:
+        request: A request to control data returned in endpoint response
+    Returns:
+        response(dict): List of available storages
+    """
+
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthentication,
+    )
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, *args, **kwargs):
+        storages = get_available_storages()
+
+        serializer = StorageSerializer(storages, many=True)
+        return Response(serializer.data)
