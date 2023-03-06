@@ -26,6 +26,7 @@ class VerifiableCredentialsDataModel(BaseDataModel):  # pylint: disable=abstract
     """
 
     VERSION = 1.1
+    ID = "vc"
 
     type = serializers.SerializerMethodField()
     issuer = serializers.CharField(source="issuer_id", read_only=True)

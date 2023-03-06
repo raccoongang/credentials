@@ -70,6 +70,7 @@ class CredentialIssuer:
             user_credential=user_credential,
             issuer_id=vc_settings.DEFAULT_ISSUER_DID,
             storage_id=storage_id,
+            data_model = IssuanceLine.get_data_model(storage_id).ID
         )
         return issuance_line
 

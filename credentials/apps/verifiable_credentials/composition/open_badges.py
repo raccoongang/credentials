@@ -58,6 +58,7 @@ class OpenBadgesDataModel(BaseDataModel):  # pylint: disable=abstract-method
     """
 
     VERSION = 3.0
+    ID = "obv3"
 
     type = serializers.SerializerMethodField()
     issuer = serializers.SerializerMethodField()

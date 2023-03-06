@@ -10,6 +10,7 @@ from django_extensions.db.models import TimeStampedModel
 from credentials.apps.credentials.models import UserCredential
 
 from .settings import vc_settings
+from .utils import get_storage
 
 
 class IssuanceLine(TimeStampedModel):
@@ -38,6 +39,8 @@ class IssuanceLine(TimeStampedModel):
         null=True,
         help_text=_('Subject DID (if not provided corresponds to "Holder ID")'),
     )
+    data_model = models.CharField(max_length=255, blank=True, null=True, help_text=_("Data model lookup"))
+    expiration_date = models.DateTimeField(null=True, blank=True, db_index=True)
 
     def __str__(self) -> str:
         return (
@@ -47,13 +50,10 @@ class IssuanceLine(TimeStampedModel):
 
     @property
     def storage(self):
-        for storage in vc_settings.DEFAULT_STORAGES:
-            if storage.ID == self.storage_id:
-                return storage
-        return None
+        return get_storage(self.storage_id)
 
-    @property
-    def data_model(self):
+    @classmethod
+    def get_data_model(cls, storage_id):
         """
         Data model lookup:
         - check if there is FORCE_DATA_MODEL set
@@ -65,10 +65,10 @@ class IssuanceLine(TimeStampedModel):
         if vc_settings.FORCE_DATA_MODEL is not None:
             return vc_settings.FORCE_DATA_MODEL
 
-        return self.storage.PREFERRED_DATA_MODEL
+        return get_storage(storage_id).PREFERRED_DATA_MODEL
 
     def construct(self):
-        serializer = self.data_model(self)
+        serializer = self.get_data_model(self.storage_id)(self)
         return serializer.data
 
     def mark_processed(self):
