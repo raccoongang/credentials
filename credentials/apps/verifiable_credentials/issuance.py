@@ -69,7 +69,7 @@ class CredentialIssuer:
         # create init issuance line:
         issuance_line, created = IssuanceLine.objects.get_or_create(
             user_credential=user_credential,
-            issuer_id=credential_uuid,
+            issuer_id=vc_settings.DEFAULT_ISSUER_DID,
             storage_id=storage_id,
             defaults={
                 "status_index": IssuanceLine.get_next_status_index(),
