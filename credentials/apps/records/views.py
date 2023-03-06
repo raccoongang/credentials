@@ -8,6 +8,7 @@ from uuid import uuid4
 from analytics.client import Client as SegmentClient
 from django import http
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -19,7 +20,6 @@ from edx_ace import Recipient, ace
 from ratelimit.decorators import ratelimit
 
 from credentials.apps.catalog.models import Pathway, Program
-from credentials.apps.core.models import User
 from credentials.apps.core.views import ThemeViewMixin
 from credentials.apps.credentials.models import ProgramCertificate, UserCredential
 from credentials.apps.records.api import get_program_details, get_program_record_data
@@ -33,6 +33,7 @@ from .constants import RECORDS_RATE_LIMIT
 
 
 log = logging.getLogger(__name__)
+User = get_user_model()
 
 
 def rate_limited(request, exception):  # pylint: disable=unused-argument
@@ -179,12 +180,15 @@ class ProgramRecordView(ConditionallyRequireLoginMixin, RecordsEnabledMixin, Tem
     # NOTE: We _must_ keep this to ensure we are redirecting users to the Learner Record MFE when viewing shared public
     # program records.
     def get(self, request, *args, **kwargs):
-        # If we're using the Learner Record MFE for displaying program records AND this is a public program record
-        # request, redirect the request to the Learner Record MFE.
-        is_public = kwargs["is_public"]
-        if settings.USE_LEARNER_RECORD_MFE and is_public:
+        # If the Learner Record MFE is enabled, ensure we are redirecting users to the correct route depending on the
+        # privacy level of the program record entity.
+        if settings.USE_LEARNER_RECORD_MFE:
+            is_public = kwargs["is_public"]
             uuid = kwargs["uuid"]
-            url = urllib.parse.urljoin(settings.LEARNER_RECORD_MFE_RECORDS_PAGE_URL, f"shared/{uuid}")
+            if is_public:
+                url = urllib.parse.urljoin(settings.LEARNER_RECORD_MFE_RECORDS_PAGE_URL, f"shared/{uuid}")
+            else:
+                url = urllib.parse.urljoin(settings.LEARNER_RECORD_MFE_RECORDS_PAGE_URL, f"{uuid}")
             return HttpResponseRedirect(url)
 
         return super().get(request, *args, **kwargs)
@@ -275,6 +279,11 @@ class ProgramSendView(LoginRequiredMixin, RecordsEnabledMixin, View):
                 "previously_sent": False,
                 "csv_link": csv_link,
             },
+        )
+
+        log.info(
+            f"[Share Program Record] Internal Credentials User [{user.id}] is sharing their progress in program "
+            f"[{program_uuid}] with pathway [{pathway_id}]"
         )
         ace.send(msg)
 
