@@ -7,6 +7,7 @@ from enum import Enum
 from rest_framework import serializers
 
 from ..composition import BaseDataModel
+from .status import StatusEntryDataModelMixin
 
 
 class Types(Enum):
@@ -52,7 +53,7 @@ class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-meth
         return [Types.ACHIEVEMENT_SUBJECT.value]
 
 
-class OpenBadgesDataModel(BaseDataModel):  # pylint: disable=abstract-method
+class OpenBadgesDataModel(StatusEntryDataModelMixin, BaseDataModel):  # pylint: disable=abstract-method
     """
     Open Badges data model.
     """
@@ -87,4 +88,4 @@ class OpenBadgesDataModel(BaseDataModel):  # pylint: disable=abstract-method
             "https://www.w3.org/2018/credentials/v1",
             "https://www.w3.org/2018/credentials/examples/v1",
             "https://purl.imsglobal.org/spec/ob/v3p0/context.json",
-        ]
+        ] + super().context

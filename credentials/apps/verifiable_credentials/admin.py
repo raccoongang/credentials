@@ -21,14 +21,7 @@ class IssuanceConfigurationAdmin(KeyedConfigurationModelAdmin):
 
 
 class IssuanceLineAdmin(admin.ModelAdmin):
-    list_display = (
-        "uuid",
-        "user_credential",
-        "issuer_id",
-        "storage_id",
-        "processed",
-        "status_index"
-    )
+    list_display = ("uuid", "user_credential", "issuer_id", "storage_id", "processed", "status_index")
     readonly_fields = [
         "uuid",
     ]

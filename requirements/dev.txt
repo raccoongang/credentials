@@ -28,6 +28,7 @@ backoff==1.10.0
 bcrypt==4.0.1
     # via paramiko
 black==23.1.0
+black==23.1.0
     # via -r requirements/test.txt
 bleach==6.0.0
 bleach==6.0.0
@@ -339,10 +340,7 @@ packaging==23.0
     # via
     #   -r requirements/test.txt
     #   black
-<<<<<<< HEAD
-=======
     #   black
->>>>>>> rg_dcc_master
     #   docker
     #   drf-yasg
     #   pytest

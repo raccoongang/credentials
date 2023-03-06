@@ -32,7 +32,7 @@ DEFAULTS = {
         "LENGTH": 10000,
         "PUBLIC_ROOT": "verifiable-credentials/status/status-list/2021/v1/",
         "PUBLIC_PATH": "verifiable-credentials/status/status-list/2021/v1/",
-    }
+    },
 }
 
 # List of settings that may be in string import notation:

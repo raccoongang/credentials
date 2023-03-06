@@ -90,6 +90,7 @@ def is_valid_uuid(uuid_to_test, version=4):
 def make_status_list_path(issuer_did):
     return f"{settings.ROOT_URL}{vc_settings.STATUS_LIST['PUBLIC_PATH']}{issuer_did}.json"
 
+
 @async_to_sync
 async def sign_with_didkit(credential, options, issuer_key):
     return await didkit.issue_credential(credential, options, issuer_key)  # pylint: disable=no-member

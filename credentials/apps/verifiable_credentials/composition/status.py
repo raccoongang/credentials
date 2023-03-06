@@ -15,17 +15,17 @@ from ..utils import make_status_list_path
 from . import BaseDataModel
 
 
-class _StatusEntryDataModel(serializers.Serializer):
+class _StatusEntryDataModel(serializers.Serializer):  # pylint: disable=abstract-method
     id = serializers.SerializerMethodField(method_name="get_id", read_only=True)
     statusListIndex = serializers.CharField(source="status_index", read_only=True)
     statusListCredential = serializers.SerializerMethodField(method_name="get_list_credential", read_only=True)
     type = serializers.SerializerMethodField()
-    statusPurpose = serializers.SerializerMethodField(method_name="get_status_purpose",read_only=True)
+    statusPurpose = serializers.SerializerMethodField(method_name="get_status_purpose", read_only=True)
 
-    def get_status_purpose(self, issuance_line):
+    def get_status_purpose(self, *args, **kwargs):
         return "revocation"
 
-    def get_type(self, issuance_line):
+    def get_type(self, *args, **kwargs):
         return "StatusList2021Entry"
 
     def get_id(self, issuance_line):
@@ -35,7 +35,7 @@ class _StatusEntryDataModel(serializers.Serializer):
         return make_status_list_path(issuance_line.issuer_id)
 
 
-class StatusEntryDataModelMixin(serializers.Serializer):
+class StatusEntryDataModelMixin(serializers.Serializer):  # pylint: disable=abstract-method
     credentialStatus = serializers.SerializerMethodField(method_name="get_status", read_only=True)
 
     def get_status(self, issuance_line):
@@ -52,23 +52,23 @@ class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-meth
     statusPurpose = serializers.SerializerMethodField(method_name="get_status_purpose")
     encodedList = serializers.SerializerMethodField(method_name="get_encoded_list")
 
-    def get_status_purpose(self, data):
+    def get_status_purpose(self, *args, **kwargs):
         return "revocation"
 
-    def get_type(self, data):
+    def get_type(self, *args, **kwargs):
         return "StatusList2021"
 
-    def get_id(self, data):
+    def get_id(self, *args, **kwargs):
         return f"{make_status_list_path(self.initial_data['issuer'])}#list"
 
     def validate(self, attrs):
         return attrs
 
-    def get_encoded_list(self, data):
+    def get_encoded_list(self, *args, **kwargs):
         status_list = bytearray(vc_settings.STATUS_LIST["LENGTH"])
 
         issuance_lines = IssuanceLine.objects.filter(
-            issuer_id=self.initial_data['issuer'],
+            issuer_id=self.initial_data["issuer"],
             user_credential__status=UserCredential.REVOKED,
             processed=True,
             status_index__gte=0,
@@ -90,18 +90,18 @@ class StatusListDataModel(BaseDataModel):
     issuer = serializers.CharField()
     credentialSubject = serializers.SerializerMethodField(method_name="get_subject")
 
-    def get_issuance_date(self, data):
+    def get_issuance_date(self, *args, **kwargs):
         return str(datetime.now())
 
-    def get_subject(self, data):
+    def get_subject(self, *args, **kwargs):
         subject = SubjectDataModel(data=self.initial_data)
         subject.is_valid()
         return subject.data
 
-    def get_id(self, data):
+    def get_id(self, *args, **kwargs):
         return make_status_list_path(self.initial_data["issuer"])
 
-    def get_type(self, data):
+    def get_type(self, *args, **kwargs):
         return ["VerifiableCredential", "StatusList2021Credential"]
 
     @property
@@ -114,10 +114,8 @@ class StatusListDataModel(BaseDataModel):
     def validate(self, attrs):
         return attrs
 
-    def save(self):
-        path = os.path.join(vc_settings.STATUS_LIST["PUBLIC_ROOT"], f"{self.initial_data['issuer']}.json")
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        file_path = default_storage.path(path)
-
-        with open(file_path, 'w') as file:
+    def save(self, *args, **kwargs):
+        path = os.path.join(vc_settings.STATUS_LIST["PUBLIC_ROOT"], f"{self.validated_data.get('issuer')}.json")
+        # FIXME: folders must be created
+        with default_storage.open(path, "w") as file:
             file.write(json.dumps(self.data, indent=2))
