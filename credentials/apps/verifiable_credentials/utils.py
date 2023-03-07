@@ -1,4 +1,5 @@
 import base64
+import logging
 from io import BytesIO
 from uuid import UUID
 
@@ -10,6 +11,9 @@ from django.contrib.contenttypes.models import ContentType
 from credentials.apps.credentials.api import get_user_credentials_by_content_type
 from credentials.apps.credentials.data import UserCredentialStatus
 from credentials.apps.verifiable_credentials.composition.status import StatusListDataModel
+
+
+log = logging.getLogger(__name__)
 
 
 def get_user_program_credentials_data(username):
@@ -92,5 +96,7 @@ async def sign_with_didkit(credential, options, issuer_key):
 
 def generate_status_list(issuer_did):
     status_list = StatusListDataModel(data={"issuer": issuer_did})
-    status_list.is_valid()
-    status_list.save()
+    if status_list.is_valid():
+        status_list.save()
+    else:
+        log.error(f"Status list generation failed: {status_list.errors}")

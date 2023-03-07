@@ -98,7 +98,7 @@ class StatusListDataModel(BaseDataModel):  # pylint: disable=abstract-method
         return str(datetime.now())
 
     def get_subject(self, *args, **kwargs):
-        subject = SubjectDataModel(data=self.validated_data)
+        subject = SubjectDataModel(data={"issuer": self.validated_data.get("issuer")})
         subject.is_valid()
         return subject.data
 
@@ -116,6 +116,9 @@ class StatusListDataModel(BaseDataModel):  # pylint: disable=abstract-method
         ]
 
     def validate(self, attrs):
+        issuance_line = IssuanceLine.objects.filter(issuer_id=attrs.get("issuer"))
+        if not issuance_line:
+            raise serializers.ValidationError("Couldn't find any issuance line: ['issuer_id']")
         return attrs
 
     def save(self, *args, **kwargs):
