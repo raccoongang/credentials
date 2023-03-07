@@ -5,11 +5,10 @@ from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 
 from credentials.apps.credentials.models import UserCredential
-from credentials.apps.verifiable_credentials.composition.status import StatusListDataModel
 
 from .models import IssuanceLine
 from .settings import vc_settings
-from .utils import sign_with_didkit
+from .utils import generate_status_list, sign_with_didkit
 
 
 logger = logging.getLogger(__name__)
@@ -78,9 +77,7 @@ class CredentialIssuer:
 
         # generate status list
         if created:
-            status_list = StatusListDataModel(data={"issuer": "did:example:abc"})
-            status_list.is_valid()
-            status_list.save()
+            generate_status_list(issuance_line.issuer_id)
 
         return issuance_line
 

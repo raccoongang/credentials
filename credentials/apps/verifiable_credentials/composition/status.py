@@ -4,6 +4,7 @@ import json
 import os
 from datetime import datetime
 
+from django.conf import settings
 from django.core.files.storage import default_storage
 from rest_framework import serializers
 
@@ -11,8 +12,11 @@ from credentials.apps.credentials.models import UserCredential
 
 from ..models import IssuanceLine
 from ..settings import vc_settings
-from ..utils import make_status_list_path
 from . import BaseDataModel
+
+
+def make_status_list_path(issuer_did):
+    return f"{settings.ROOT_URL}{vc_settings.STATUS_LIST['PUBLIC_PATH']}{issuer_did}.json"
 
 
 class _StatusEntryDataModel(serializers.Serializer):  # pylint: disable=abstract-method
@@ -59,7 +63,7 @@ class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-meth
         return "StatusList2021"
 
     def get_id(self, *args, **kwargs):
-        return f"{make_status_list_path(self.initial_data['issuer'])}#list"
+        return f"{make_status_list_path(self.validated_data.get('issuer'))}#list"
 
     def validate(self, attrs):
         return attrs
@@ -68,7 +72,7 @@ class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-meth
         status_list = bytearray(vc_settings.STATUS_LIST["LENGTH"])
 
         issuance_lines = IssuanceLine.objects.filter(
-            issuer_id=self.initial_data["issuer"],
+            issuer_id=self.validated_data.get("issuer"),
             user_credential__status=UserCredential.REVOKED,
             processed=True,
             status_index__gte=0,
@@ -83,7 +87,7 @@ class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-meth
         return base64_data.decode("utf-8")
 
 
-class StatusListDataModel(BaseDataModel):
+class StatusListDataModel(BaseDataModel):  # pylint: disable=abstract-method
     id = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
     issuanceDate = serializers.SerializerMethodField(method_name="get_issuance_date")
@@ -94,12 +98,12 @@ class StatusListDataModel(BaseDataModel):
         return str(datetime.now())
 
     def get_subject(self, *args, **kwargs):
-        subject = SubjectDataModel(data=self.initial_data)
+        subject = SubjectDataModel(data=self.validated_data)
         subject.is_valid()
         return subject.data
 
     def get_id(self, *args, **kwargs):
-        return make_status_list_path(self.initial_data["issuer"])
+        return make_status_list_path(self.validated_data.get("issuer"))
 
     def get_type(self, *args, **kwargs):
         return ["VerifiableCredential", "StatusList2021Credential"]
