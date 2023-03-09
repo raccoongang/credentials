@@ -11,8 +11,3 @@ class ProgramCredentialSerializer(serializers.Serializer):  # pylint: disable=ab
     program_title = serializers.CharField(max_length=255, read_only=True)
     program_org = serializers.CharField(max_length=255, read_only=True)
     modified_date = serializers.DateTimeField()
-
-
-class StorageSerializer(serializers.Serializer):  # pylint: disable=abstract-method
-    id = serializers.CharField(max_length=255, read_only=True)
-    name = serializers.CharField(max_length=255, read_only=True)

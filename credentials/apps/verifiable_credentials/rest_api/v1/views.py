@@ -9,20 +9,22 @@ from django.utils.translation import gettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import mixins, status, viewsets
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from credentials.apps.verifiable_credentials.issuance import CredentialIssuer
+from credentials.apps.verifiable_credentials.storages import get_available_storages
 from credentials.apps.verifiable_credentials.storages.learner_credential_wallet import LCWallet
+from credentials.apps.verifiable_credentials.storages.serializers import StorageSerializer
 from credentials.apps.verifiable_credentials.utils import (
     generate_base64_qr_code,
-    get_available_storages,
     get_user_program_credentials_data,
     is_valid_uuid,
 )
 
-from .serializers import ProgramCredentialSerializer, StorageSerializer
+from .serializers import ProgramCredentialSerializer
 
 
 logger = logging.getLogger(__name__)
@@ -31,7 +33,6 @@ User = get_user_model()
 
 
 class ProgramCredentialsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-
     authentication_classes = (
         JwtAuthentication,
         SessionAuthentication,
@@ -150,9 +151,10 @@ class NoWalletView(APIView):
         )
 
 
-class AvailableStoragesView(APIView):
+class AvailableStoragesView(ListAPIView):
     """
     List data for all available storages.
+
     GET: /verifiable_credentials/api/v1/storages/
     Arguments:
         request: A request to control data returned in endpoint response
@@ -160,15 +162,13 @@ class AvailableStoragesView(APIView):
         response(dict): List of available storages
     """
 
+    serializer_class = StorageSerializer
+    pagination_class = None
     authentication_classes = (
         JwtAuthentication,
         SessionAuthentication,
     )
-
     permission_classes = (IsAuthenticated,)
 
-    def get(self, *args, **kwargs):
-        storages = get_available_storages()
-
-        serializer = StorageSerializer(storages, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        return get_available_storages()

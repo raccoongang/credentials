@@ -4,7 +4,6 @@ from rest_framework import serializers
 
 
 class BaseDataModel(serializers.Serializer):  # pylint: disable=abstract-method
-
     id = serializers.UUIDField(format="urn", source="uuid", read_only=True)
 
     def to_representation(self, instance):

@@ -2,6 +2,7 @@ from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from ..composition.open_badges import OpenBadgesDataModel
 from ..serializers import IssuanceLineSerializer
@@ -28,8 +29,8 @@ class LCWallet(MobileWallet):
     Learner Credential Wallet by DCC.
     """
 
-    ID = "lcwallet"
-    VERBOSE_NAME = "Learner Credential Wallet"
+    ID = "lc_wallet"
+    VERBOSE_NAME = _("Learner Credential Wallet")
     APP_LINK_ANDROID = "https://play.google.com/store/apps/details?id=app.lcw"
     APP_LINK_IOS = "https://apps.apple.com/app/learner-credential-wallet/id1590615710"
     DEEP_LINK_URL = "dccrequest://request"
