@@ -13,8 +13,10 @@ class BaseWallet:
     This class provides a blueprint for implementing wallet for Verifiable Credentials.
     """
 
-    TYPE = ""
-    DEEP_LINK_URL = ""
+    ID = None
+    VERBOSE_NAME = None
+    TYPE = None
+    DEEP_LINK_URL = None
     ISSUANCE_REQUEST_SERIALIZER = vc_settings.DEFAULT_ISSUANCE_REQUEST_SERIALIZER
     PREFERRED_DATA_MODEL = vc_settings.DEFAULT_DATA_MODELS[0]
 
@@ -33,9 +35,16 @@ class BaseWallet:
 
 class MobileWallet(BaseWallet):
     TYPE = StorageType.MOBILE
-    APP_LINK_ANDROID = ""
-    APP_LINK_IOS = ""
+    APP_LINK_ANDROID = None
+    APP_LINK_IOS = None
 
 
 class WebWallet(BaseWallet):
     TYPE = StorageType.WEB
+
+
+def get_available_storages():
+    """
+    Returns currently configured verifiable credentials storages.
+    """
+    return vc_settings.DEFAULT_STORAGES
