@@ -49,5 +49,12 @@ JWT_AUTH.update(
     }
 )
 STATICFILES_STORAGE = None
+
+# Verifiable Credentials
 ENABLE_VERIFIABLE_CREDENTIALS = True
+VERIFIABLE_CREDENTIALS = {
+    "DEFAULT_ISSUER_DID": "test-issuer-did",
+    "DEFAULT_ISSUER_KEY": "test-issuer-key",
+}
+
 add_plugins(__name__, PROJECT_TYPE, SettingsType.TEST)
