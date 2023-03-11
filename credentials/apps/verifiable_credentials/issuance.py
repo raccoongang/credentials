@@ -4,12 +4,12 @@ import logging
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 
-from credentials.apps.credentials.models import UserCredential
+
 
 from .models import IssuanceLine
 from .settings import vc_settings
+from .storages import get_available_storages
 from .utils import sign_with_didkit
-
 
 logger = logging.getLogger(__name__)
 
@@ -48,24 +48,10 @@ class CredentialIssuer:
         serializer.save()
 
     @classmethod
-    def init(cls, *, credential_uuid, storage_id):
+    def init(cls, *, user_credential, storage_id):
         """
         The very first action in verifiable credential issuance line.
         """
-        user_credential = UserCredential.objects.filter(uuid=credential_uuid).first()
-        # validate given user credential exists:
-        if not user_credential:
-            msg = _("No such user credential [%(credential_uuid)s]") % {"credential_uuid": credential_uuid}
-            logger.exception(msg)
-            raise ValidationError({"credential_uuid": msg})
-
-        # validate given storage is active:
-        if not any(filter(lambda storage: storage.ID == storage_id, vc_settings.DEFAULT_STORAGES)):
-            msg = _("Provided storage backend isn't active [%(storage_id)s]") % {"storage_id": storage_id}
-            logger.exception(msg)
-            raise ValidationError({"storage_id": msg})
-
-        # create init issuance line:
         issuance_line, __ = IssuanceLine.objects.get_or_create(
             user_credential=user_credential,
             issuer_id=vc_settings.DEFAULT_ISSUER_DID,
