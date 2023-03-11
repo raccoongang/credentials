@@ -15,7 +15,6 @@ from django.conf import settings
 from django.core.signals import setting_changed
 from django.utils.module_loading import import_string
 
-
 DEFAULTS = {
     "DEFAULT_DATA_MODELS": [
         "credentials.apps.verifiable_credentials.composition.verifiable_credentials.VerifiableCredentialsDataModel",
@@ -96,17 +95,23 @@ class VCSettings:
         setattr(self, attr, val)
         return val
 
+    def reload(self):
+        for attr in self._cached_attrs:
+            delattr(self, attr)
+        self._cached_attrs.clear()
+        if hasattr(self, '_explicit_settings'):
+            delattr(self, '_explicit_settings')
+
+
 
 vc_settings = VCSettings(None, DEFAULTS, IMPORT_STRINGS)
-
 
 def reload_vc_settings(*args, **kwargs):
     setting = kwargs["setting"]
     if setting == "VERIFIABLE_CREDENTIALS":
         vc_settings.reload()
 
-
-# Reload on related settings change:
+# Reload on related settings change (testing):
 setting_changed.connect(reload_vc_settings)
 
 
