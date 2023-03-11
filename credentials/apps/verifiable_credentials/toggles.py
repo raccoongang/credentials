@@ -14,7 +14,8 @@ from edx_toggles.toggles import SettingToggle
 # .. toggle_permanent_justification: Digital Credentials are optional for usage.
 # .. toggle_creation_date: 2023-02-02
 # .. toggle_use_cases: open_edx
+ENABLE_VERIFIABLE_CREDENTIALS = SettingToggle("ENABLE_VERIFIABLE_CREDENTIALS", default=False, module_name=__name__)
 
 
 def is_verifiable_credentials_enabled():
-    return SettingToggle("ENABLE_VERIFIABLE_CREDENTIALS", default=False, module_name=__name__).is_enabled()
+    return ENABLE_VERIFIABLE_CREDENTIALS.is_enabled()

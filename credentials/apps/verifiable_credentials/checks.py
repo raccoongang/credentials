@@ -1,12 +1,13 @@
 from django.core.checks import Error, Tags, register
 
 from .settings import vc_settings
+from .toggles import ENABLE_VERIFIABLE_CREDENTIALS
 
 
 @register(Tags.compatibility)
 def vc_settings_checks(*args, **kwargs):
     """
-    Checks the compatibility of verifiable_credentials settings.
+    Checks the consistency of the verifiable_credentials settings.
 
     Raises compatibility Errors upon:
         - No default data models defined
@@ -50,8 +51,8 @@ def vc_settings_checks(*args, **kwargs):
     if not vc_settings.DEFAULT_ISSUER_DID:
         errors.append(
             Error(
-                "DEFAULT_ISSUER_DID is not set.",
-                hint="Set DEFAULT_ISSUER_DID to a valid DID string.",
+                f"DEFAULT_ISSUER_DID is mandatory when {ENABLE_VERIFIABLE_CREDENTIALS.name} is True.",
+                hint=" Set DEFAULT_ISSUER_DID to a valid DID string.",
                 id="verifiable_credentials.E004",
             )
         )
@@ -59,7 +60,7 @@ def vc_settings_checks(*args, **kwargs):
     if not vc_settings.DEFAULT_ISSUER_KEY:
         errors.append(
             Error(
-                "DEFAULT_ISSUER_KEY is not set.",
+                f"DEFAULT_ISSUER_KEY is mandatory when {ENABLE_VERIFIABLE_CREDENTIALS.name} is True.",
                 hint="Set DEFAULT_ISSUER_KEY to a valid key string.",
                 id="verifiable_credentials.E005",
             )
