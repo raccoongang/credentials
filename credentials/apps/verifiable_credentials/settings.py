@@ -15,6 +15,7 @@ from django.conf import settings
 from django.core.signals import setting_changed
 from django.utils.module_loading import import_string
 
+
 DEFAULTS = {
     "DEFAULT_DATA_MODELS": [
         "credentials.apps.verifiable_credentials.composition.verifiable_credentials.VerifiableCredentialsDataModel",

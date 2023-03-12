@@ -14,11 +14,17 @@ class BaseWallet:
     """
 
     ID = None
-    VERBOSE_NAME = None
+    NAME = None
     TYPE = None
     DEEP_LINK_URL = None
-    ISSUANCE_REQUEST_SERIALIZER = vc_settings.DEFAULT_ISSUANCE_REQUEST_SERIALIZER
+    ISSUANCE_REQUEST_SERIALIZER = None
     PREFERRED_DATA_MODEL = vc_settings.DEFAULT_DATA_MODELS[0]
+
+    @classmethod
+    def get_request_serializer(cls, *args, **kwargs):
+        if cls.ISSUANCE_REQUEST_SERIALIZER:
+            return cls.ISSUANCE_REQUEST_SERIALIZER(*args, **kwargs)
+        return vc_settings.DEFAULT_ISSUANCE_REQUEST_SERIALIZER(*args, **kwargs)
 
     @classmethod
     def get_deeplink_url(cls, issuance_uuid):  # pylint: disable=unused-argument
@@ -48,3 +54,9 @@ def get_available_storages():
     Returns currently configured verifiable credentials storages.
     """
     return vc_settings.DEFAULT_STORAGES
+
+
+def get_storage(storage_id):
+    for storage in get_available_storages():
+        if storage.ID == storage_id:
+            return storage

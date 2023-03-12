@@ -89,9 +89,3 @@ def is_valid_uuid(uuid_to_test, version=4):
 @async_to_sync
 async def sign_with_didkit(credential, options, issuer_key):
     return await didkit.issue_credential(credential, options, issuer_key)  # pylint: disable=no-member
-
-
-def get_storage(storage_id):
-    for storage in vc_settings.DEFAULT_STORAGES:
-        if storage.ID == storage_id:
-            return storage

@@ -4,23 +4,21 @@ Verifiable Credentials API v1 views.
 import logging
 
 from django.contrib.auth import get_user_model
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import mixins, status, viewsets
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.exceptions import ValidationError, NotFound
-from django.shortcuts import redirect
 
 from credentials.apps.credentials.models import UserCredential
 from credentials.apps.verifiable_credentials.issuance import CredentialIssuer
-from credentials.apps.verifiable_credentials.storages import get_available_storages
-from credentials.apps.verifiable_credentials.storages.learner_credential_wallet import LCWallet
-from credentials.apps.verifiable_credentials.storages.serializers import StorageSerializer
+from credentials.apps.verifiable_credentials.storages import get_available_storages, get_storage
+from credentials.apps.verifiable_credentials.serializers import StorageSerializer
 from credentials.apps.verifiable_credentials.utils import (
     generate_base64_qr_code,
     get_user_program_credentials_data,
@@ -77,7 +75,6 @@ class InitIssuanceView(APIView):
     )
 
     permission_classes = (IsAuthenticated,)
-    permission_classes = []  # FIXME!
 
     def post(self, request):
         credential_uuid = request.data.get("credential_uuid")
@@ -106,11 +103,11 @@ class InitIssuanceView(APIView):
             raise NotFound({"credential_uuid": msg})
 
         # validate given storage is active:
-        active_storages = get_available_storages()
-        if not any(filter(lambda storage: storage.ID == storage_id, active_storages)):
+        storage = get_storage(storage_id)
+        if not storage:
             msg = _(
                 f"Provided storage backend ({storage_id}) isn't active. \
-                Storages: {[storage.ID for storage in active_storages]}"
+                Storages: {[storage.ID for storage in get_available_storages()]}"
             )
             logger.exception(msg)
             raise NotFound({"storage_id": msg})
@@ -162,21 +159,8 @@ class IssueCredentialView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        credential_issuer = CredentialIssuer(request.data, kwargs.get("issuance_line_uuid"))
-
+        credential_issuer = CredentialIssuer(request_data=request.data, issuance_uuid=kwargs.get("issuance_line_uuid"))
         return Response({"verifiableCredential": credential_issuer.issue()}, status=status.HTTP_201_CREATED)
-
-
-class NoWalletView(APIView):
-    # permission_classes = (IsAuthenticated,)
-    permission_classes = ()
-
-    def get(self, request, *args, **kwargs):
-        return render(
-            request,
-            "verifiable_credentials/no-wallet.html",
-            context={"title": _("Verifiable Credentials issuance sandbox"), "content": request.query_params},
-        )
 
 
 class AvailableStoragesView(ListAPIView):

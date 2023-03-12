@@ -17,7 +17,6 @@ urlpatterns = [
         views.IssueCredentialView.as_view(),
         name="credentials-issue",
     ),
-    path(r"credentials/nowallet/", views.NoWalletView.as_view(), name="credentials-nowallet"),
     path(r"storages/", views.AvailableStoragesView.as_view(), name="storages"),
 ]
 

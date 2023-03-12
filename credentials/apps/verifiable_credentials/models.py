@@ -10,7 +10,8 @@ from django_extensions.db.models import TimeStampedModel
 from credentials.apps.credentials.models import UserCredential
 
 from .settings import vc_settings
-from .utils import get_storage
+from .storages import get_storage
+from .composition import get_data_model
 
 
 class IssuanceLine(TimeStampedModel):
@@ -32,14 +33,13 @@ class IssuanceLine(TimeStampedModel):
     issuer_id = models.CharField(max_length=255, help_text=_("Issuer DID"))
     storage_id = models.CharField(max_length=128, help_text=_("Target storage identifier"))
     # Storage request data:
-    holder_id = models.CharField(max_length=255, blank=True, null=True, help_text=_("Holder DID"))
     subject_id = models.CharField(
         max_length=255,
-        blank=True,
-        null=True,
-        help_text=_('Subject DID (if not provided corresponds to "Holder ID")'),
+        help_text=_('Verifiable credential subject DID'),
     )
-    data_model = models.CharField(max_length=255, blank=True, null=True, help_text=_("Data model lookup"))
+    data_model_id = models.CharField(
+        max_length=255, blank=True, null=True, help_text=_("Verifiable credential specification to use")
+    )
     expiration_date = models.DateTimeField(null=True, blank=True, db_index=True)
 
     def __str__(self) -> str:
@@ -52,25 +52,35 @@ class IssuanceLine(TimeStampedModel):
     def storage(self):
         return get_storage(self.storage_id)
 
+    @property
+    def data_model(self):
+        return get_data_model(self.data_model_id)
+
+    def construct(self):
+        serializer = self.data_model(self)
+        return serializer.data
+
+    def mark_processed(self):
+        self.processed = True
+        self.save()
+
     @classmethod
-    def get_data_model(cls, storage_id):
+    def resolve_issuer(cls):
+        """
+        Unconditionally (for now) returns system-level Issier ID.
+        """
+        return vc_settings.DEFAULT_ISSUER_DID
+
+    @classmethod
+    def resolve_data_model(cls, storage_id):
         """
         Data model lookup:
         - check if there is FORCE_DATA_MODEL set
-        - check issuance request options (not implemented)
         - check current storage preference
-        - use default
+        - or use the first one from the available ones
         """
         # Pin data model choice no matter what:
         if vc_settings.FORCE_DATA_MODEL is not None:
             return vc_settings.FORCE_DATA_MODEL
 
         return get_storage(storage_id).PREFERRED_DATA_MODEL
-
-    def construct(self):
-        serializer = self.get_data_model(self.storage_id)(self)
-        return serializer.data
-
-    def mark_processed(self):
-        self.processed = True
-        self.save()

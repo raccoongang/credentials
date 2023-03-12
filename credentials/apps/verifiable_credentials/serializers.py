@@ -23,7 +23,10 @@ class IssuanceLineSerializer(serializers.ModelSerializer):
     def swap_value(data: dict, source_key: str, target_key: str) -> None:
         data[target_key] = data.pop(source_key)
 
-    def update(self, instance, validated_data):
-        if "subject_id" not in validated_data:
-            validated_data["subject_id"] = validated_data.get("holder_id")
-        return super().update(instance, validated_data)
+
+class StorageSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    id = serializers.CharField(max_length=255, source="ID")
+    name = serializers.CharField(max_length=255, source="NAME")
+
+    class Meta:
+        read_only_fields = "__all__"

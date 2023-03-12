@@ -4,12 +4,11 @@ import logging
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 
-
-
 from .models import IssuanceLine
 from .settings import vc_settings
 from .storages import get_available_storages
 from .utils import sign_with_didkit
+
 
 logger = logging.getLogger(__name__)
 
@@ -29,36 +28,30 @@ class CredentialIssuer:
         - composed verifiable credential signing
     """
 
-    def __init__(self, request_data, issuance_uuid):
+    def __init__(self, *, request_data, issuance_uuid):
         self._issuance_line = self._pickup_issuance_line(issuance_uuid)
+        self._storage = self._issuance_line.storage
         self._validate(request_data)
 
     def _pickup_issuance_line(self, issuance_uuid):
+        """
+        Find previously initiated issuance line for processing.
+        """
         issuance_line = IssuanceLine.objects.filter(uuid=issuance_uuid).first()
         if not issuance_line:
-            msg = _("Couldn't find such issuance line: ['issuance_uuid']")
+            msg = _(f"Couldn't find such issuance line: [{issuance_uuid}]")
             logger.exception(msg)
             raise ValidationError({"issuance_uuid": msg})
 
         return issuance_line
 
     def _validate(self, request_data):
-        serializer = self._issuance_line.storage.ISSUANCE_REQUEST_SERIALIZER(self._issuance_line, data=request_data)
+        """
+        Check incoming request data and update issuance line if needed.
+        """
+        serializer = self._storage.get_request_serializer(self._issuance_line, data=request_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
-    @classmethod
-    def init(cls, *, user_credential, storage_id):
-        """
-        The very first action in verifiable credential issuance line.
-        """
-        issuance_line, __ = IssuanceLine.objects.get_or_create(
-            user_credential=user_credential,
-            issuer_id=vc_settings.DEFAULT_ISSUER_DID,
-            storage_id=storage_id,
-            data_model = IssuanceLine.get_data_model(storage_id).ID
-        )
-        return issuance_line
 
     def compose(self):
         """
@@ -83,7 +76,24 @@ class CredentialIssuer:
         Issue a signed digital credential document by validating, composing, and signing.
         """
         composed_credential = self.compose()
-        verifiable_credential = self.sign(composed_credential)
+        # FIXME: disable for now
+        # verifiable_credential = self.sign(composed_credential)
         self._issuance_line.mark_processed()
 
-        return verifiable_credential
+        return composed_credential
+
+    @classmethod
+    def init(cls, *, user_credential, storage_id):
+        """
+        The very first action in verifiable credential issuance line.
+        """
+        issuance_line, __ = IssuanceLine.objects.get_or_create(
+            user_credential=user_credential,
+            storage_id=storage_id,
+            processed=False,
+            defaults={
+                "issuer_id": IssuanceLine.resolve_issuer(),
+                "data_model": IssuanceLine.resolve_data_model(storage_id),
+            }
+        )
+        return issuance_line
