@@ -118,17 +118,20 @@ class InitIssuanceView(APIView):
             storage_id=storage_id,
         )
 
-        deeplink = issuance_line.storage.get_deeplink_url(issuance_line.uuid)
+        deeplink = issuance_line.storage.get_deeplink_url(issuance_line.uuid, request=request)
 
-        # everything is ready for a web storage:
-        if issuance_line.storage.is_web():
-            return redirect(deeplink)
-
-        # proceed if mobile/native:
         init_data = {
             "deeplink": deeplink,
             "qrcode": generate_base64_qr_code(deeplink),
         }
+
+        # auto-redirect to web storage:
+        if issuance_line.storage.is_web():
+            init_data.update(
+                {
+                    "redirect": True,
+                }
+            )
 
         if issuance_line.storage.is_mobile():
             init_data.update(

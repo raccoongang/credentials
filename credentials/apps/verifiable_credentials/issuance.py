@@ -49,7 +49,7 @@ class CredentialIssuer:
         """
         Check incoming request data and update issuance line if needed.
         """
-        serializer = self._storage.get_request_serializer(self._issuance_line, data=request_data)
+        serializer = self._storage.get_request_serializer(self._issuance_line, data=request_data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -93,7 +93,7 @@ class CredentialIssuer:
             processed=False,
             defaults={
                 "issuer_id": IssuanceLine.resolve_issuer(),
-                "data_model": IssuanceLine.resolve_data_model(storage_id),
-            }
+                "data_model_id": IssuanceLine.resolve_data_model(storage_id).ID,
+            },
         )
         return issuance_line

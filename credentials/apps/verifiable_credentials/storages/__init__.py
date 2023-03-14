@@ -27,7 +27,7 @@ class BaseWallet:
         return vc_settings.DEFAULT_ISSUANCE_REQUEST_SERIALIZER(*args, **kwargs)
 
     @classmethod
-    def get_deeplink_url(cls, issuance_uuid):  # pylint: disable=unused-argument
+    def get_deeplink_url(cls, issuance_uuid, **kwargs):  # pylint: disable=unused-argument
         return cls.DEEP_LINK_URL
 
     @classmethod

@@ -11,7 +11,11 @@ from credentials.apps.credentials.models import UserCredential
 
 from .settings import vc_settings
 from .storages import get_storage
-from .composition import get_data_model
+from .composition import get_data_model, get_available_data_models
+
+
+def generate_data_model_choices():
+    return [(data_model.ID, data_model.NAME) for data_model in get_available_data_models()]
 
 
 class IssuanceLine(TimeStampedModel):
@@ -35,10 +39,14 @@ class IssuanceLine(TimeStampedModel):
     # Storage request data:
     subject_id = models.CharField(
         max_length=255,
-        help_text=_('Verifiable credential subject DID'),
+        help_text=_("Verifiable credential subject DID"),
     )
     data_model_id = models.CharField(
-        max_length=255, blank=True, null=True, help_text=_("Verifiable credential specification to use")
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text=_("Verifiable credential specification to use"),
+        choices=generate_data_model_choices(),
     )
     expiration_date = models.DateTimeField(null=True, blank=True, db_index=True)
 

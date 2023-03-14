@@ -38,7 +38,7 @@ class LCWallet(MobileWallet):
     PREFERRED_DATA_MODEL = OpenBadgesDataModel
 
     @classmethod
-    def get_deeplink_url(cls, issuance_uuid):
+    def get_deeplink_url(cls, issuance_uuid, **kwargs):
         params = {
             "issuer": settings.ROOT_URL,
             "vc_request_url": urljoin(
