@@ -4,20 +4,20 @@ Verifiable Credentials API v1 views.
 import logging
 
 from django.contrib.auth import get_user_model
-from django.shortcuts import render
 from django.utils.translation import gettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import mixins, status, viewsets
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from credentials.apps.credentials.models import UserCredential
 from credentials.apps.verifiable_credentials.issuance import CredentialIssuer
-from credentials.apps.verifiable_credentials.storages import get_available_storages
-from credentials.apps.verifiable_credentials.storages.learner_credential_wallet import LCWallet
-from credentials.apps.verifiable_credentials.storages.serializers import StorageSerializer
+from credentials.apps.verifiable_credentials.serializers import StorageSerializer
+from credentials.apps.verifiable_credentials.storages import get_available_storages, get_storage
 from credentials.apps.verifiable_credentials.utils import (
     generate_base64_qr_code,
     get_user_program_credentials_data,
@@ -77,33 +77,61 @@ class InitIssuanceView(APIView):
 
     def post(self, request):
         credential_uuid = request.data.get("credential_uuid")
-        storage_id = request.data.get("storage_id", LCWallet.ID)  # NOTE: pin LCWallet for now
+        storage_id = request.data.get("storage_id")
 
-        if not all(
-            [
-                credential_uuid,
-            ]
-        ):
-            msg = _("Incomplete required data: ['credential_uuid', 'storage_id']")
+        if not credential_uuid:
+            msg = _("Mandatory data is missing")
             logger.exception(msg)
-            return Response(msg, status=status.HTTP_400_BAD_REQUEST)
+            raise ValidationError({"credential_uuid": msg})
 
         if not is_valid_uuid(credential_uuid):
             msg = _("Credential identifier must be valid UUID: ['credential_uuid']")
             logger.exception(msg)
-            return Response(msg, status=status.HTTP_400_BAD_REQUEST)
+            raise ValidationError({"credential_uuid": msg})
 
+        if not storage_id:
+            msg = _("Mandatory data is missing")
+            logger.exception(msg)
+            raise ValidationError({"storage_id": msg})
+
+        # validate given user credential exists:
+        user_credential = UserCredential.objects.filter(uuid=credential_uuid).first()
+        if not user_credential:
+            msg = _("No such user credential [%(credential_uuid)s]") % {"credential_uuid": credential_uuid}
+            logger.exception(msg)
+            raise NotFound({"credential_uuid": msg})
+
+        # validate given storage is active:
+        storage = get_storage(storage_id)
+        if not storage:
+            available_storages_ids = [storage.ID for storage in get_available_storages()]
+            msg = _(
+                "Provided storage backend ({storage_id}) isn't active. \
+                Storages: {active_storages}"
+            ).format(storage_id=storage_id, active_storages=available_storages_ids)
+            logger.exception(msg)
+            raise NotFound({"storage_id": msg})
+
+        # initiate new issuance line now:
         issuance_line = CredentialIssuer.init(
-            credential_uuid=credential_uuid,
+            user_credential=user_credential,
             storage_id=storage_id,
         )
 
-        deeplink = issuance_line.storage.get_deeplink_url(issuance_line.uuid)
+        deeplink = issuance_line.storage.get_deeplink_url(issuance_line.uuid, request=request)
 
         init_data = {
             "deeplink": deeplink,
             "qrcode": generate_base64_qr_code(deeplink),
         }
+
+        # auto-redirect to web storage:
+        if issuance_line.storage.is_web():
+            init_data.update(
+                {
+                    "redirect": True,
+                }
+            )
 
         if issuance_line.storage.is_mobile():
             init_data.update(
@@ -134,21 +162,8 @@ class IssueCredentialView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        credential_issuer = CredentialIssuer(request.data, kwargs.get("issuance_line_uuid"))
-
+        credential_issuer = CredentialIssuer(request_data=request.data, issuance_uuid=kwargs.get("issuance_line_uuid"))
         return Response({"verifiableCredential": credential_issuer.issue()}, status=status.HTTP_201_CREATED)
-
-
-class NoWalletView(APIView):
-    # permission_classes = (IsAuthenticated,)
-    permission_classes = ()
-
-    def get(self, request, *args, **kwargs):
-        return render(
-            request,
-            "verifiable_credentials/no-wallet.html",
-            context={"title": _("Verifiable Credentials issuance sandbox"), "content": request.query_params},
-        )
 
 
 class AvailableStoragesView(ListAPIView):

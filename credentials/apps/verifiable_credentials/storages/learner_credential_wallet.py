@@ -30,7 +30,7 @@ class LCWallet(MobileWallet):
     """
 
     ID = "lc_wallet"
-    VERBOSE_NAME = _("Learner Credential Wallet")
+    NAME = _("Learner Credential Wallet")
     APP_LINK_ANDROID = "https://play.google.com/store/apps/details?id=app.lcw"
     APP_LINK_IOS = "https://apps.apple.com/app/learner-credential-wallet/id1590615710"
     DEEP_LINK_URL = "dccrequest://request"
@@ -38,7 +38,7 @@ class LCWallet(MobileWallet):
     PREFERRED_DATA_MODEL = OpenBadgesDataModel
 
     @classmethod
-    def get_deeplink_url(cls, issuance_uuid):
+    def get_deeplink_url(cls, issuance_uuid, **kwargs):
         params = {
             "issuer": settings.ROOT_URL,
             "vc_request_url": urljoin(

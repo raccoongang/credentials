@@ -5,6 +5,7 @@ See specification: https://www.w3.org/TR/vc-data-model/
 """
 from enum import Enum
 
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from ..composition import BaseDataModel
@@ -26,6 +27,8 @@ class VerifiableCredentialsDataModel(BaseDataModel):  # pylint: disable=abstract
     """
 
     VERSION = 1.1
+    ID = "vc"
+    NAME = _("Verifiable Credentials Data Model v1.1")
 
     type = serializers.SerializerMethodField()
     issuer = serializers.CharField(source="issuer_id", read_only=True)

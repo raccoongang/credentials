@@ -96,6 +96,13 @@ class VCSettings:
         setattr(self, attr, val)
         return val
 
+    def reload(self):
+        for attr in self._cached_attrs:
+            delattr(self, attr)
+        self._cached_attrs.clear()
+        if hasattr(self, "_explicit_settings"):
+            delattr(self, "_explicit_settings")  # pylint: disable=literal-used-as-attribute
+
 
 vc_settings = VCSettings(None, DEFAULTS, IMPORT_STRINGS)
 
@@ -106,7 +113,7 @@ def reload_vc_settings(*args, **kwargs):
         vc_settings.reload()
 
 
-# Reload on related settings change:
+# Reload on related settings change (testing):
 setting_changed.connect(reload_vc_settings)
 
 

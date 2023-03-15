@@ -4,6 +4,7 @@ See specification: https://1edtech.github.io/openbadges-specification/ob_v3p0.ht
 """
 from enum import Enum
 
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from ..composition import BaseDataModel
@@ -58,6 +59,8 @@ class OpenBadgesDataModel(BaseDataModel):  # pylint: disable=abstract-method
     """
 
     VERSION = 3.0
+    ID = "obv3"
+    NAME = _("Open Badges Specification v3.0")
 
     type = serializers.SerializerMethodField()
     issuer = serializers.SerializerMethodField()
