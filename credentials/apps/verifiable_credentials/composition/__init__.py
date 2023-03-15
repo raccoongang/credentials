@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from rest_framework import serializers
+
 from ..settings import vc_settings
 
 
@@ -28,3 +29,5 @@ def get_data_model(model_id):
     for data_model in get_available_data_models():
         if data_model.ID == model_id:
             return data_model
+
+    return None

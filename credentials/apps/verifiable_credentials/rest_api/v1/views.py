@@ -4,7 +4,6 @@ Verifiable Credentials API v1 views.
 import logging
 
 from django.contrib.auth import get_user_model
-from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import mixins, status, viewsets
@@ -17,8 +16,8 @@ from rest_framework.views import APIView
 
 from credentials.apps.credentials.models import UserCredential
 from credentials.apps.verifiable_credentials.issuance import CredentialIssuer
-from credentials.apps.verifiable_credentials.storages import get_available_storages, get_storage
 from credentials.apps.verifiable_credentials.serializers import StorageSerializer
+from credentials.apps.verifiable_credentials.storages import get_available_storages, get_storage
 from credentials.apps.verifiable_credentials.utils import (
     generate_base64_qr_code,
     get_user_program_credentials_data,
@@ -105,10 +104,11 @@ class InitIssuanceView(APIView):
         # validate given storage is active:
         storage = get_storage(storage_id)
         if not storage:
+            available_storages_ids = [storage.ID for storage in get_available_storages()]
             msg = _(
-                f"Provided storage backend ({storage_id}) isn't active. \
-                Storages: {[storage.ID for storage in get_available_storages()]}"
-            )
+                "Provided storage backend ({storage_id}) isn't active. \
+                Storages: {active_storages}"
+            ).format(storage_id=storage_id, active_storages=available_storages_ids)
             logger.exception(msg)
             raise NotFound({"storage_id": msg})
 

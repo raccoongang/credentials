@@ -6,7 +6,6 @@ from rest_framework.exceptions import ValidationError
 
 from .models import IssuanceLine
 from .settings import vc_settings
-from .storages import get_available_storages
 from .utils import sign_with_didkit
 
 
@@ -39,7 +38,7 @@ class CredentialIssuer:
         """
         issuance_line = IssuanceLine.objects.filter(uuid=issuance_uuid).first()
         if not issuance_line:
-            msg = _(f"Couldn't find such issuance line: [{issuance_uuid}]")
+            msg = _("Couldn't find such issuance line: [{issuance_uuid}]").format(issuance_uuid=issuance_uuid)
             logger.exception(msg)
             raise ValidationError({"issuance_uuid": msg})
 

@@ -9,9 +9,9 @@ from django_extensions.db.models import TimeStampedModel
 
 from credentials.apps.credentials.models import UserCredential
 
+from .composition import get_available_data_models, get_data_model
 from .settings import vc_settings
 from .storages import get_storage
-from .composition import get_data_model, get_available_data_models
 
 
 def generate_data_model_choices():

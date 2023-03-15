@@ -10,8 +10,6 @@ from django.contrib.contenttypes.models import ContentType
 from credentials.apps.credentials.api import get_user_credentials_by_content_type
 from credentials.apps.credentials.data import UserCredentialStatus
 
-from .settings import vc_settings
-
 
 def get_user_program_credentials_data(username):
     """

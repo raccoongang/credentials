@@ -60,3 +60,5 @@ def get_storage(storage_id):
     for storage in get_available_storages():
         if storage.ID == storage_id:
             return storage
+
+    return None
