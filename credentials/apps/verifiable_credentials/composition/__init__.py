@@ -1,16 +1,35 @@
+import inspect
 from collections import OrderedDict
 
 from rest_framework import serializers
 
-from ..settings import vc_settings
 
+class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-method
 
-class BaseDataModel(serializers.Serializer):  # pylint: disable=abstract-method
     VERSION = None
     ID = None
     NAME = None
 
     id = serializers.UUIDField(format="urn", source="uuid", read_only=True)
+
+    @classmethod
+    def get_context(cls):
+        return [
+            "https://www.w3.org/2018/credentials/v1",
+        ]
+
+    @property
+    def context(self):
+        """
+        Collects all contexts.
+
+        See: https://www.w3.org/TR/vc-data-model/#contexts
+        """
+        merged_context = []
+        for base_class in reversed(inspect.getmro(type(self))):
+            if hasattr(base_class, "get_context"):
+                merged_context.extend(base_class.get_context())
+        return merged_context
 
     def to_representation(self, instance):
         credential = OrderedDict({"@context": self.context})

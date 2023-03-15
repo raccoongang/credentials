@@ -8,7 +8,7 @@ from enum import Enum
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
-from ..composition import BaseDataModel
+from ..composition import CredentialDataModel
 
 
 class Types(Enum):
@@ -21,7 +21,7 @@ class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-meth
     name = serializers.CharField(required=False, read_only=True)
 
 
-class VerifiableCredentialsDataModel(BaseDataModel):  # pylint: disable=abstract-method
+class VerifiableCredentialsDataModel(CredentialDataModel):  # pylint: disable=abstract-method
     """
     Verifiable Credentials data model.
     """
@@ -35,11 +35,13 @@ class VerifiableCredentialsDataModel(BaseDataModel):  # pylint: disable=abstract
     issuanceDate = serializers.DateTimeField(source="modified", read_only=True)
     credentialSubject = serializers.SerializerMethodField(method_name="get_subject")
 
-    @property
-    def context(self):
+    @classmethod
+    def get_context(cls):
+        """
+        See: https://www.w3.org/TR/vc-data-model/#contexts
+        """
         return [
             "https://www.w3.org/2018/credentials/v1",
-            "https://www.w3.org/2018/credentials/examples/v1",
         ]
 
     def get_type(self, issuance_line):
