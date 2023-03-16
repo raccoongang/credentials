@@ -13,7 +13,7 @@ asgiref==3.6.0
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   django
-astroid==2.14.2
+astroid==2.15.0
     # via
     #   -r requirements/dev.txt
     #   pylint
@@ -42,11 +42,11 @@ bleach==6.0.0
     #   -r requirements/production.txt
 bok-choy==1.1.1
     # via -r requirements/dev.txt
-boto3==1.26.79
+boto3==1.26.92
     # via
     #   -r requirements/production.txt
     #   django-ses
-botocore==1.29.79
+botocore==1.29.92
     # via
     #   -r requirements/production.txt
     #   boto3
@@ -62,7 +62,7 @@ cffi==1.15.1
     #   -r requirements/production.txt
     #   cryptography
     #   pynacl
-charset-normalizer==3.0.1
+charset-normalizer==3.1.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -101,10 +101,11 @@ coreschema==0.0.4
     #   drf-yasg
 coverage==7.2.1
     # via -r requirements/dev.txt
-cryptography==39.0.1
+cryptography==39.0.2
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
+    #   jwcrypto
     #   paramiko
     #   pyjwt
     #   social-auth-core
@@ -116,7 +117,12 @@ defusedxml==0.7.1
     #   -r requirements/production.txt
     #   python3-openid
     #   social-auth-core
-didkit==0.3.1
+deprecated==1.2.13
+    # via
+    #   -r requirements/dev.txt
+    #   -r requirements/production.txt
+    #   jwcrypto
+didkit==0.3.2
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -146,6 +152,7 @@ django==3.2.18
     #   django-extensions
     #   django-filter
     #   django-hijack
+    #   django-oauth-toolkit
     #   django-ses
     #   django-statici18n
     #   django-storages
@@ -194,6 +201,10 @@ django-filter==22.1
 django-hijack==2.3.0
     # via
     #   -c requirements/constraints.txt
+    #   -r requirements/dev.txt
+    #   -r requirements/production.txt
+django-oauth-toolkit==2.2.0
+    # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
 django-ratelimit==3.0.1
@@ -304,7 +315,7 @@ edx-i18n-tools==0.9.2
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   edx-credentials-themes
-edx-lint==5.3.2
+edx-lint==5.3.4
     # via -r requirements/dev.txt
 edx-opaque-keys==2.3.0
     # via
@@ -319,17 +330,17 @@ edx-toggles==5.0.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-exceptiongroup==1.1.0
+exceptiongroup==1.1.1
     # via
     #   -r requirements/dev.txt
     #   pytest
 factory-boy==3.2.1
     # via -r requirements/dev.txt
-faker==17.3.0
+faker==17.6.0
     # via
     #   -r requirements/dev.txt
     #   factory-boy
-filelock==3.9.0
+filelock==3.10.0
     # via
     #   -r requirements/dev.txt
     #   tox
@@ -392,6 +403,11 @@ jsonschema==3.2.0
     # via
     #   -r requirements/dev.txt
     #   docker-compose
+jwcrypto==1.4.2
+    # via
+    #   -r requirements/dev.txt
+    #   -r requirements/production.txt
+    #   django-oauth-toolkit
 lazy==1.5
     # via
     #   -r requirements/dev.txt
@@ -437,6 +453,7 @@ oauthlib==3.2.2
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
+    #   django-oauth-toolkit
     #   requests-oauthlib
     #   social-auth-core
 openapi-codec==1.3.2
@@ -453,7 +470,7 @@ packaging==23.0
     #   drf-yasg
     #   pytest
     #   tox
-paramiko==3.0.0
+paramiko==3.1.0
     # via
     #   -r requirements/dev.txt
     #   docker
@@ -462,7 +479,7 @@ path==16.6.0
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   edx-i18n-tools
-pathspec==0.11.0
+pathspec==0.11.1
     # via
     #   -r requirements/dev.txt
     #   black
@@ -475,7 +492,7 @@ pillow==9.4.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-platformdirs==3.0.0
+platformdirs==3.1.1
     # via
     #   -r requirements/dev.txt
     #   black
@@ -528,7 +545,7 @@ pyjwt[crypto]==2.6.0
     #   edx-drf-extensions
     #   edx-rest-api-client
     #   social-auth-core
-pylint==2.16.2
+pylint==2.17.0
     # via
     #   -r requirements/dev.txt
     #   edx-lint
@@ -568,7 +585,7 @@ pyrsistent==0.19.3
     # via
     #   -r requirements/dev.txt
     #   jsonschema
-pytest==7.2.1
+pytest==7.2.2
     # via
     #   -r requirements/dev.txt
     #   pytest-django
@@ -620,6 +637,7 @@ pyyaml==5.4.1
     #   docker-compose
     #   edx-django-release-util
     #   edx-i18n-tools
+    #   responses
 qrcode==7.4.2
     # via
     #   -r requirements/dev.txt
@@ -630,6 +648,7 @@ requests==2.28.2
     #   -r requirements/production.txt
     #   analytics-python
     #   coreapi
+    #   django-oauth-toolkit
     #   docker
     #   docker-compose
     #   edx-drf-extensions
@@ -645,7 +664,7 @@ requests-oauthlib==1.3.1
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   social-auth-core
-responses==0.22.0
+responses==0.23.1
     # via -r requirements/dev.txt
 ruamel-yaml==0.17.21
     # via
@@ -675,7 +694,7 @@ semantic-version==2.10.0
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   edx-drf-extensions
-simplejson==3.18.3
+simplejson==3.18.4
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -705,12 +724,12 @@ slumber==0.7.1
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   edx-rest-api-client
-social-auth-app-django==5.0.0
+social-auth-app-django==5.1.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   edx-auth-backends
-social-auth-core==4.3.0
+social-auth-core==4.4.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -741,10 +760,6 @@ texttable==1.6.7
     # via
     #   -r requirements/dev.txt
     #   docker-compose
-toml==0.10.2
-    # via
-    #   -r requirements/dev.txt
-    #   responses
 tomli==2.0.1
     # via
     #   -r requirements/dev.txt
@@ -760,7 +775,7 @@ tox==3.28.0
     # via
     #   -c requirements/common_constraints.txt
     #   -r requirements/dev.txt
-types-toml==0.10.8.5
+types-pyyaml==6.0.12.8
     # via
     #   -r requirements/dev.txt
     #   responses
@@ -778,7 +793,7 @@ uritemplate==4.1.1
     #   -r requirements/production.txt
     #   coreapi
     #   drf-yasg
-urllib3==1.26.14
+urllib3==1.26.15
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -787,7 +802,7 @@ urllib3==1.26.14
     #   requests
     #   responses
     #   selenium
-virtualenv==20.19.0
+virtualenv==20.21.0
     # via
     #   -r requirements/dev.txt
     #   tox
@@ -804,7 +819,9 @@ websocket-client==0.59.0
 wrapt==1.15.0
     # via
     #   -r requirements/dev.txt
+    #   -r requirements/production.txt
     #   astroid
+    #   deprecated
 xss-utils==0.4.0
     # via
     #   -r requirements/dev.txt

@@ -21,6 +21,7 @@ django-extensions
 django-filter
 django-ratelimit
 django-rest-swagger
+django-oauth-toolkit
 django-simple-history
 django-sortedm2m
 django-statici18n
