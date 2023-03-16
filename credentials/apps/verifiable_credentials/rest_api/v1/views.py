@@ -6,6 +6,7 @@ import logging
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from oauth2_provider.contrib.rest_framework import OAuth2Authentication, TokenHasScope
 from rest_framework import mixins, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import NotFound, ValidationError
@@ -155,11 +156,14 @@ class IssueCredentialView(APIView):
     """
 
     authentication_classes = (
-        JwtAuthentication,
         SessionAuthentication,
+        OAuth2Authentication,
     )
-
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (
+        IsAuthenticated,
+        TokenHasScope,
+    )
+    required_scopes = ("verifiable_credentials",)
 
     def post(self, request, *args, **kwargs):
         credential_issuer = CredentialIssuer(request_data=request.data, issuance_uuid=kwargs.get("issuance_line_uuid"))

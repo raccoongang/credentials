@@ -64,6 +64,7 @@ THIRD_PARTY_APPS = [
     "hijack",
     "xss_utils",
     "config_models",
+    "oauth2_provider",
 ]
 
 PROJECT_APPS = [
@@ -560,3 +561,12 @@ LEARNER_RECORD_MFE_RECORDS_PAGE_URL = ""
 # Plugin Django Apps
 INSTALLED_APPS.extend(get_plugin_apps(PROJECT_TYPE))
 add_plugins(__name__, PROJECT_TYPE, SettingsType.BASE)
+
+# DJANGO OAUTH TOOLKIT
+OAUTH2_PROVIDER = {
+    "SCOPES": {
+        "introspection": "Introspect token scope",
+    },
+    "RESOURCE_SERVER_INTROSPECTION_URL": "SET-ME-PLEASE",
+    "RESOURCE_SERVER_AUTH_TOKEN": "SET-ME-PLEASE",
+}
