@@ -7,54 +7,13 @@ from ..settings import vc_settings
 
 
 class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Basic credential construction machinery.
+    """
+
     VERSION = None
     ID = None
     NAME = None
-
-    id = serializers.UUIDField(format="urn", source="uuid", read_only=True)
-    type = serializers.SerializerMethodField()
-
-    @classmethod
-    def get_context(cls):
-        """
-        Provide root context for all verifiable credentials.
-
-        See: https://www.w3.org/TR/vc-data-model/#contexts
-        """
-        return [
-            "https://www.w3.org/2018/credentials/v1",
-        ]
-
-    @classmethod
-    def get_types(cls):
-        """
-        Provide root types for all verifiable credentials.
-
-        See: https://www.w3.org/TR/vc-data-model/#types
-        """
-        return [
-            "VerifiableCredential",
-        ]
-
-    @property
-    def context(self):
-        """
-        Collects all contexts.
-
-        - include default root context
-        - include data model context
-        """
-        return self._collect_hierarchically(class_method="get_context")
-
-    def get_type(self, issuance_line):
-        """
-        Collect all corresponding types.
-
-        - include default root type(s)
-        - include data model type(s)
-        - include credential-specific type(s)
-        """
-        return self._collect_hierarchically(class_method="get_types") + self.resolve_credential_type(issuance_line)
 
     def to_representation(self, instance):
         """
@@ -64,9 +23,33 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
         credential.update(super().to_representation(instance))
         return credential
 
+    @property
+    def context(self):
+        """
+        Collect contexts.
+
+        - include default root context
+        - include data model context
+        """
+        return self._collect_hierarchically(class_method="get_context")
+
+    def get_type(self, issuance_line):
+        """
+        Collect corresponding types.
+
+        - include default root type(s)
+        - include data model type(s)
+        - include credential-specific type(s)
+        """
+        data_model_types = self._collect_hierarchically(class_method="get_types")
+        credential_types = self.resolve_credential_type(issuance_line)
+        return data_model_types + credential_types
+
     def resolve_credential_type(self, issuance_line):
         """
         Map Open edX credential type to data model types.
+
+        Decides: which types should be included based on the source Open edX credential type.
         """
         credential_content_type = issuance_line.user_credential.credential_content_type.model
 
@@ -75,8 +58,15 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
             "programcertificate": [
                 "ProgramCertificate",
             ],
-            "coursecertificate": [],
+            "coursecertificate": [
+                "CourseCertificate",
+            ],
         }
+
+        # NOTE: extra types introduction requires additional context to be prepared and reachable.
+        # See: https://w3c.github.io/vc-imp-guide/#creating-new-credential-types
+        # Disabling "credential types" for now:
+        credential_content_type = None
 
         if credential_content_type not in credential_types:
             return []
@@ -99,12 +89,15 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
 
 def get_available_data_models():
     """
-    Returns currently configured verifiable credentials data models.
+    Return currently configured verifiable credentials data models.
     """
     return vc_settings.DEFAULT_DATA_MODELS
 
 
 def get_data_model(model_id):
+    """
+    Return a data model by its ID from the currently available list.
+    """
     for data_model in get_available_data_models():
         if data_model.ID == model_id:
             return data_model

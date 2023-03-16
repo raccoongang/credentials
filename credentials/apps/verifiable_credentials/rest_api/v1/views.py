@@ -15,8 +15,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from credentials.apps.credentials.models import UserCredential
-from credentials.apps.verifiable_credentials.issuance import CredentialIssuer
-from credentials.apps.verifiable_credentials.serializers import StorageSerializer
+from credentials.apps.verifiable_credentials.issuance import CredentialIssuer, serializers
 from credentials.apps.verifiable_credentials.storages import get_available_storages, get_storage
 from credentials.apps.verifiable_credentials.utils import (
     generate_base64_qr_code,
@@ -177,7 +176,7 @@ class AvailableStoragesView(ListAPIView):
         response(dict): List of available storages
     """
 
-    serializer_class = StorageSerializer
+    serializer_class = serializers.StorageSerializer
     pagination_class = None
     authentication_classes = (
         JwtAuthentication,

@@ -7,53 +7,53 @@ from enum import Enum
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
-from ..composition import CredentialDataModel
+from ..composition.verifiable_credentials import VerifiableCredentialsDataModel
 
 
-class Types(Enum):
-    VERIFIABLE_CREDENTIAL = "VerifiableCredential"
-    OPEN_BADGE_CREDENTIAL = "OpenBadgeCredential"
-    ISSUER_PROFILE = "IssuerProfile"
-    ACHIEVEMENT_SUBJECT = "AchievementSubject"
-    ACHIEVEMENT = "Achievement"
+# class Types(Enum):
+#     VERIFIABLE_CREDENTIAL = "VerifiableCredential"
+#     OPEN_BADGE_CREDENTIAL = "OpenBadgeCredential"
+#     ISSUER_PROFILE = "IssuerProfile"
+#     ACHIEVEMENT_SUBJECT = "AchievementSubject"
+#     ACHIEVEMENT = "Achievement"
 
 
-class IssuerDataModel(serializers.Serializer):  # pylint: disable=abstract-method
-    id = serializers.CharField(source="issuer_id", read_only=True)
-    type = serializers.SerializerMethodField()
-    name = serializers.SerializerMethodField()
+# class IssuerDataModel(serializers.Serializer):  # pylint: disable=abstract-method
+#     id = serializers.CharField(source="issuer_id", read_only=True)
+#     type = serializers.SerializerMethodField()
+#     name = serializers.SerializerMethodField()
 
-    def get_type(self, *args, **kwargs):
-        return [Types.ISSUER_PROFILE.value]
+#     def get_type(self, *args, **kwargs):
+#         return [Types.ISSUER_PROFILE.value]
 
-    def get_name(self, *args, **kwargs):
-        return "Example University"
-
-
-class AchievementDataModel(serializers.Serializer):  # pylint: disable=abstract-method
-    id = serializers.SerializerMethodField()
-    type = serializers.SerializerMethodField()
-
-    def get_type(self, *args, **kwargs):
-        return [Types.ACHIEVEMENT.value]
-
-    def get_id(self, issuance_line):
-        return issuance_line.user_credential.download_url
+#     def get_name(self, *args, **kwargs):
+#         return "Example University"
 
 
-class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-method
-    id = serializers.CharField(source="subject_id", read_only=True)
-    type = serializers.SerializerMethodField()
-    achievement = serializers.SerializerMethodField()
+# class AchievementDataModel(serializers.Serializer):  # pylint: disable=abstract-method
+#     id = serializers.SerializerMethodField()
+#     type = serializers.SerializerMethodField()
 
-    def get_achievement(self, issuance_line):
-        return AchievementDataModel(issuance_line).data
+#     def get_type(self, *args, **kwargs):
+#         return [Types.ACHIEVEMENT.value]
 
-    def get_type(self, *args, **kwargs):
-        return [Types.ACHIEVEMENT_SUBJECT.value]
+#     def get_id(self, issuance_line):
+#         return issuance_line.user_credential.download_url
 
 
-class OpenBadgesDataModel(CredentialDataModel):  # pylint: disable=abstract-method
+# class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-method
+#     id = serializers.CharField(source="subject_id", read_only=True)
+#     type = serializers.SerializerMethodField()
+#     achievement = serializers.SerializerMethodField()
+
+#     def get_achievement(self, issuance_line):
+#         return AchievementDataModel(issuance_line).data
+
+#     def get_type(self, *args, **kwargs):
+#         return [Types.ACHIEVEMENT_SUBJECT.value]
+
+
+class OpenBadgesDataModel(VerifiableCredentialsDataModel):  # pylint: disable=abstract-method
     """
     Open Badges data model.
     """
@@ -62,13 +62,22 @@ class OpenBadgesDataModel(CredentialDataModel):  # pylint: disable=abstract-meth
     ID = "obv3"
     NAME = _("Open Badges Specification v3.0")
 
-    issuer = serializers.SerializerMethodField()
-    issuanceDate = serializers.DateTimeField(source="modified")
-    name = serializers.SerializerMethodField()
-    credentialSubject = serializers.SerializerMethodField(method_name="get_subject")
+    # issuer = serializers.SerializerMethodField()
+    # issuanceDate = serializers.DateTimeField(source="modified")
+    # name = serializers.SerializerMethodField()
+    # credentialSubject = serializers.SerializerMethodField(method_name="get_subject")
 
     class Meta:
         read_only_fields = "__all__"
+
+    # def get_subject(self, issuance_line):
+    #     return SubjectDataModel(issuance_line).data
+
+    # def get_name(self, issuance_line):
+    #     return issuance_line.user_credential.credential_content_type.model
+
+    # def get_issuer(self, issuance_line):
+    #     return IssuerDataModel(issuance_line).data
 
     @classmethod
     def get_context(cls):
@@ -81,12 +90,3 @@ class OpenBadgesDataModel(CredentialDataModel):  # pylint: disable=abstract-meth
         return [
             "OpenBadgeCredential",
         ]
-
-    def get_subject(self, issuance_line):
-        return SubjectDataModel(issuance_line).data
-
-    def get_name(self, issuance_line):
-        return issuance_line.user_credential.credential_content_type.model
-
-    def get_issuer(self, issuance_line):
-        return IssuerDataModel(issuance_line).data

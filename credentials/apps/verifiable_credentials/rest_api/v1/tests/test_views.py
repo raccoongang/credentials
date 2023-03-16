@@ -20,7 +20,7 @@ from credentials.apps.credentials.tests.factories import (
     ProgramCertificateFactory,
     UserCredentialFactory,
 )
-from credentials.apps.verifiable_credentials.models import IssuanceLine
+from apps.verifiable_credentials.issuance.models import IssuanceLine
 from credentials.apps.verifiable_credentials.rest_api.v1.serializers import ProgramCredentialSerializer
 from credentials.apps.verifiable_credentials.settings import vc_settings
 from credentials.apps.verifiable_credentials.utils import get_user_program_credentials_data

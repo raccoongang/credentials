@@ -1,12 +1,13 @@
 import json
 import logging
 
+import didkit
+from asgiref.sync import async_to_sync
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 
+from ..settings import vc_settings
 from .models import IssuanceLine
-from .settings import vc_settings
-from .utils import sign_with_didkit
 
 
 logger = logging.getLogger(__name__)
@@ -74,12 +75,16 @@ class CredentialIssuer:
         """
         Issue a signed digital credential document by validating, composing, and signing.
         """
+        # construction (data collecting and shaping):
         composed_credential = self.compose()
-        # FIXME: disable for now
-        # verifiable_credential = self.sign(composed_credential)
+
+        # signing / structure validation:
+        verifiable_credential = self.sign(composed_credential)
+
+        # issuance line finalization:
         self._issuance_line.mark_processed()
 
-        return composed_credential
+        return verifiable_credential
 
     @classmethod
     def init(cls, *, user_credential, storage_id):
@@ -96,3 +101,8 @@ class CredentialIssuer:
             },
         )
         return issuance_line
+
+
+@async_to_sync
+async def sign_with_didkit(credential, options, issuer_key):
+    return await didkit.issue_credential(credential, options, issuer_key)  # pylint: disable=no-member
