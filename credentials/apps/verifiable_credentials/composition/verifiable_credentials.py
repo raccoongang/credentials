@@ -11,11 +11,6 @@ from rest_framework import serializers
 from ..composition import CredentialDataModel
 
 
-class Types(Enum):
-    VERIFIABLE_CREDENTIAL = "VerifiableCredential"
-    UNIVERSITY_DEGREE_CREDENTIAL = "UniversityDegreeCredential"
-
-
 class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-method
     id = serializers.CharField(source="subject_id", read_only=True)
     name = serializers.CharField(required=False, read_only=True)
@@ -30,41 +25,12 @@ class VerifiableCredentialsDataModel(CredentialDataModel):  # pylint: disable=ab
     ID = "vc"
     NAME = _("Verifiable Credentials Data Model v1.1")
 
-    type = serializers.SerializerMethodField()
-    issuer = serializers.CharField(source="issuer_id", read_only=True)
-    issuanceDate = serializers.DateTimeField(source="modified", read_only=True)
+    issuer = serializers.CharField(source="issuer_id")
+    issuanceDate = serializers.DateTimeField(source="modified")
     credentialSubject = serializers.SerializerMethodField(method_name="get_subject")
 
-    @classmethod
-    def get_context(cls):
-        """
-        See: https://www.w3.org/TR/vc-data-model/#contexts
-        """
-        return [
-            "https://www.w3.org/2018/credentials/v1",
-        ]
-
-    def get_type(self, issuance_line):
-        default_types = [Types.VERIFIABLE_CREDENTIAL.value]
-        credential_content_type = issuance_line.user_credential.credential_content_type.model
-        return default_types + self.map_credential_types(credential_content_type)
+    class Meta:
+        read_only_fields = "__all__"
 
     def get_subject(self, issuance_line):
         return SubjectDataModel(issuance_line).data
-
-    @staticmethod
-    def map_credential_types(content_type):
-        """
-        Maps Open edX credential type to data model types/
-        """
-        linked_types = {
-            "programcertificate": [
-                Types.UNIVERSITY_DEGREE_CREDENTIAL.value,  # FIXME: as example
-            ],
-            "coursecertificate": [],
-        }
-
-        if content_type not in linked_types:
-            return []
-
-        return linked_types[content_type]

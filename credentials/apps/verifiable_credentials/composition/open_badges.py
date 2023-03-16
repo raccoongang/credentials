@@ -7,7 +7,7 @@ from enum import Enum
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
-from ..composition import BaseDataModel
+from ..composition import CredentialDataModel
 
 
 class Types(Enum):
@@ -53,7 +53,7 @@ class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-meth
         return [Types.ACHIEVEMENT_SUBJECT.value]
 
 
-class OpenBadgesDataModel(BaseDataModel):  # pylint: disable=abstract-method
+class OpenBadgesDataModel(CredentialDataModel):  # pylint: disable=abstract-method
     """
     Open Badges data model.
     """
@@ -62,11 +62,25 @@ class OpenBadgesDataModel(BaseDataModel):  # pylint: disable=abstract-method
     ID = "obv3"
     NAME = _("Open Badges Specification v3.0")
 
-    type = serializers.SerializerMethodField()
     issuer = serializers.SerializerMethodField()
-    issuanceDate = serializers.DateTimeField(source="modified", read_only=True)
+    issuanceDate = serializers.DateTimeField(source="modified")
     name = serializers.SerializerMethodField()
     credentialSubject = serializers.SerializerMethodField(method_name="get_subject")
+
+    class Meta:
+        read_only_fields = "__all__"
+
+    @classmethod
+    def get_context(cls):
+        return [
+            "https://purl.imsglobal.org/spec/ob/v3p0/context.json",
+        ]
+
+    @classmethod
+    def get_types(cls):
+        return [
+            "OpenBadgeCredential",
+        ]
 
     def get_subject(self, issuance_line):
         return SubjectDataModel(issuance_line).data
@@ -76,18 +90,3 @@ class OpenBadgesDataModel(BaseDataModel):  # pylint: disable=abstract-method
 
     def get_issuer(self, issuance_line):
         return IssuerDataModel(issuance_line).data
-
-    def get_type(self, *args, **kwargs):
-        default_types = [
-            Types.VERIFIABLE_CREDENTIAL.value,
-            Types.OPEN_BADGE_CREDENTIAL.value,
-        ]
-        return default_types
-
-    @property
-    def context(self):
-        return [
-            "https://www.w3.org/2018/credentials/v1",
-            "https://www.w3.org/2018/credentials/examples/v1",
-            "https://purl.imsglobal.org/spec/ob/v3p0/context.json",
-        ]
