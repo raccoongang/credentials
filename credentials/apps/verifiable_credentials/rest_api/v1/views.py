@@ -2,8 +2,8 @@
 Verifiable Credentials API v1 views.
 """
 import logging
-import didkit
 
+import didkit
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -14,10 +14,10 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from credentials.apps.verifiable_credentials.issuance.exceptions import IssuanceException
 
 from credentials.apps.credentials.models import UserCredential
 from credentials.apps.verifiable_credentials.issuance import CredentialIssuer, serializers
+from credentials.apps.verifiable_credentials.issuance.exceptions import IssuanceException
 from credentials.apps.verifiable_credentials.storages import get_available_storages, get_storage
 from credentials.apps.verifiable_credentials.utils import (
     generate_base64_qr_code,

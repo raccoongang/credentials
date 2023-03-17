@@ -41,23 +41,21 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
         Map Open edX credential type to data model types.
 
         Decides: which types should be included based on the source Open edX credential type.
+        See:
+            https://w3c.github.io/vc-imp-guide/#creating-new-credential-types
+            https://schema.org/EducationalOccupationalCredential
         """
         credential_content_type = issuance_line.user_credential.credential_content_type.model
 
         credential_types = {
             # <openedx-credential-type>: [<verifiable-credential-type1>, <verifiable-credential-typeX>]
             "programcertificate": [
-                "ProgramCertificate",
+                "EducationalOccupationalCredential",
             ],
             "coursecertificate": [
-                "CourseCertificate",
+                "EducationalOccupationalCredential",
             ],
         }
-
-        # NOTE: extra types introduction requires additional context to be prepared and reachable.
-        # See: https://w3c.github.io/vc-imp-guide/#creating-new-credential-types
-        # Disabling "credential types" for now:
-        credential_content_type = None
 
         if credential_content_type not in credential_types:
             return []
@@ -76,24 +74,6 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
                 for value in values_list:
                     values[value] = base_class.__name__
         return list(values.keys())
-
-
-class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-method
-    id = serializers.CharField(source="subject_id")
-
-    class Meta:
-        read_only_fields = "__all__"
-
-
-class IssuerDataModel(serializers.Serializer):  # pylint: disable=abstract-method
-    id = serializers.CharField(source="issuer_id")
-    name = serializers.SerializerMethodField()
-
-    class Meta:
-        read_only_fields = "__all__"
-
-    def get_name(self, issuance_line):
-        return issuance_line.issuer_name
 
 
 def get_available_data_models():

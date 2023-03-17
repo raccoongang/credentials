@@ -7,9 +7,8 @@ from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 from rest_framework.renderers import JSONRenderer
 
-from .exceptions import IssuanceException
-
 from ..settings import vc_settings
+from .exceptions import IssuanceException
 from .models import IssuanceLine
 
 
@@ -86,10 +85,10 @@ class CredentialIssuer:
             logger.exception(err_message)
             if "expansion failed" in str(exc):
                 err_detail = _("defined property wasn't found within the linked data graph")
-            raise IssuanceException(detail=f'{err_message} [{err_detail}]')
+            raise IssuanceException(detail=f"{err_message} [{err_detail}]")
         except ValueError as exc:
             err_detail = _("identifier not recognized")
-            raise IssuanceException(detail=f'{err_message} [{err_detail}]')
+            raise IssuanceException(detail=f"{err_message} [{err_detail}]")
 
         verifiable_credential = json.loads(verifiable_credential)
         return verifiable_credential

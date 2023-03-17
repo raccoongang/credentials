@@ -1,6 +1,7 @@
 import uuid
 from unittest import skip
 
+from apps.verifiable_credentials.issuance.models import IssuanceLine
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from rest_framework import status
@@ -20,7 +21,6 @@ from credentials.apps.credentials.tests.factories import (
     ProgramCertificateFactory,
     UserCredentialFactory,
 )
-from apps.verifiable_credentials.issuance.models import IssuanceLine
 from credentials.apps.verifiable_credentials.rest_api.v1.serializers import ProgramCredentialSerializer
 from credentials.apps.verifiable_credentials.settings import vc_settings
 from credentials.apps.verifiable_credentials.utils import get_user_program_credentials_data

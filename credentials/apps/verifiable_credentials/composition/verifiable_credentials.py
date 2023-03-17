@@ -6,11 +6,8 @@ See specification: https://www.w3.org/TR/vc-data-model/
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
-from ..composition import CredentialDataModel, IssuerDataModel, SubjectDataModel
-
-
-class CredentialSchema(serializers.Serializer):  # pylint: disable=abstract-method
-    pass
+from ..composition import CredentialDataModel
+from .schemas import CredentialSubjectSchema, IssuerSchema
 
 
 class VerifiableCredentialsDataModel(CredentialDataModel):  # pylint: disable=abstract-method
@@ -29,7 +26,7 @@ class VerifiableCredentialsDataModel(CredentialDataModel):  # pylint: disable=ab
         source="uuid", format="urn", help_text="https://www.w3.org/TR/vc-data-model/#identifiers"
     )
     type = serializers.SerializerMethodField(help_text="https://www.w3.org/TR/vc-data-model/#types")
-    issuer = IssuerDataModel(source="*", help_text="https://www.w3.org/TR/vc-data-model/#issuer")
+    issuer = IssuerSchema(source="*", help_text="https://www.w3.org/TR/vc-data-model/#issuer")
     issued = serializers.DateTimeField(source="modified", help_text="https://www.w3.org/2018/credentials/#issued")
     issuanceDate = serializers.DateTimeField(
         source="modified",
@@ -39,8 +36,9 @@ class VerifiableCredentialsDataModel(CredentialDataModel):  # pylint: disable=ab
     validUntil = serializers.DateTimeField(
         source="expiration_date", help_text="https://www.w3.org/2018/credentials/#validUntil"
     )
-    credentialSubject = SubjectDataModel(source="*", help_text="https://www.w3.org/2018/credentials/#credentialSubject")
-    # credentialSchema
+    credentialSubject = CredentialSubjectSchema(
+        source="*", help_text="https://www.w3.org/2018/credentials/#credentialSubject"
+    )
 
     class Meta:
         read_only_fields = "__all__"
