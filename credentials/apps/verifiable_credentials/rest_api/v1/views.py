@@ -2,6 +2,7 @@
 Verifiable Credentials API v1 views.
 """
 import logging
+import didkit
 
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
@@ -13,6 +14,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from credentials.apps.verifiable_credentials.issuance.exceptions import IssuanceException
 
 from credentials.apps.credentials.models import UserCredential
 from credentials.apps.verifiable_credentials.issuance import CredentialIssuer, serializers
@@ -162,7 +164,11 @@ class IssueCredentialView(APIView):
 
     def post(self, request, *args, **kwargs):
         credential_issuer = CredentialIssuer(request_data=request.data, issuance_uuid=kwargs.get("issuance_line_uuid"))
-        return Response({"verifiableCredential": credential_issuer.issue()}, status=status.HTTP_201_CREATED)
+        try:
+            verifiable_credential = credential_issuer.issue()
+            return Response({"verifiableCredential": verifiable_credential}, status=status.HTTP_201_CREATED)
+        except IssuanceException as exc:
+            raise ValidationError({"issuance_issue": exc.detail})
 
 
 class AvailableStoragesView(ListAPIView):

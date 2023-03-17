@@ -78,6 +78,24 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
         return list(values.keys())
 
 
+class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-method
+    id = serializers.CharField(source="subject_id")
+
+    class Meta:
+        read_only_fields = "__all__"
+
+
+class IssuerDataModel(serializers.Serializer):  # pylint: disable=abstract-method
+    id = serializers.CharField(source="issuer_id")
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        read_only_fields = "__all__"
+
+    def get_name(self, issuance_line):
+        return issuance_line.issuer_name
+
+
 def get_available_data_models():
     """
     Return currently configured verifiable credentials data models.

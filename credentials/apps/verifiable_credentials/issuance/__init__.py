@@ -7,6 +7,8 @@ from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 from rest_framework.renderers import JSONRenderer
 
+from .exceptions import IssuanceException
+
 from ..settings import vc_settings
 from .models import IssuanceLine
 
@@ -72,10 +74,23 @@ class CredentialIssuer:
         """
         Sign the composed digital credential document.
         """
+        err_message = _("Provided data didn't validate")
+        err_detail = ""
+
         didkit_options = {}
-        verifiable_credential = sign_with_didkit(
-            composed_credential_json, json.dumps(didkit_options), vc_settings.DEFAULT_ISSUER_KEY
-        )
+        try:
+            verifiable_credential = sign_with_didkit(
+                composed_credential_json, json.dumps(didkit_options), vc_settings.DEFAULT_ISSUER_KEY
+            )
+        except didkit.DIDKitException as exc:
+            logger.exception(err_message)
+            if "expansion failed" in str(exc):
+                err_detail = _("defined property wasn't found within the linked data graph")
+            raise IssuanceException(detail=f'{err_message} [{err_detail}]')
+        except ValueError as exc:
+            err_detail = _("identifier not recognized")
+            raise IssuanceException(detail=f'{err_message} [{err_detail}]')
+
         verifiable_credential = json.loads(verifiable_credential)
         return verifiable_credential
 
@@ -130,8 +145,25 @@ class JSONLDRenderer(JSONRenderer):
         """
         Shape `data` with JSON-LD specifics.
         """
+        # exchange special symbols:
         data["@context"] = data.pop("context")
-        return data
+
+        # trim nullable values:
+        dense_data = self._hide_nullables(data)
+
+        return dense_data
+
+    def _hide_nullables(self, sparse_data):
+        """
+        Traverse dictionaries and remove empty data.
+        """
+        for key, value in sparse_data.items():
+            if isinstance(value, dict):
+                self._hide_nullables(value)
+            if not value:
+                del sparse_data[key]
+
+        return sparse_data
 
 
 @async_to_sync

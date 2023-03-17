@@ -64,6 +64,10 @@ class IssuanceLine(TimeStampedModel):
     def data_model(self):
         return get_data_model(self.data_model_id)
 
+    @property
+    def issuer_name(self):
+        return vc_settings.DEFAULT_ISSUER_NAME
+
     def construct(self):
         serializer = self.data_model(self)
         return serializer.data
