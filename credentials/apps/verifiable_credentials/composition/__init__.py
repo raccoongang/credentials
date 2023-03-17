@@ -15,16 +15,7 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
     ID = None
     NAME = None
 
-    def to_representation(self, instance):
-        """
-        Tweak some presentation details.
-        """
-        credential = OrderedDict({"@context": self.context})
-        credential.update(super().to_representation(instance))
-        return credential
-
-    @property
-    def context(self):
+    def collect_context(self, __):
         """
         Collect contexts.
 

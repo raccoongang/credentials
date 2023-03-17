@@ -28,6 +28,7 @@ DEFAULTS = {
     "DEFAULT_ISSUER_DID": None,
     "DEFAULT_ISSUER_KEY": None,
     "DEFAULT_ISSUANCE_REQUEST_SERIALIZER": "credentials.apps.verifiable_credentials.issuance.serializers.IssuanceLineSerializer",
+    "DEFAULT_RENDERER": "credentials.apps.verifiable_credentials.issuance.JSONLDRenderer",
 }
 
 # List of settings that may be in string import notation:
@@ -36,6 +37,7 @@ IMPORT_STRINGS = [
     "FORCE_DATA_MODEL",
     "DEFAULT_STORAGES",
     "DEFAULT_ISSUANCE_REQUEST_SERIALIZER",
+    "DEFAULT_RENDERER",
 ]
 
 # TODO: implement settings self-checks:

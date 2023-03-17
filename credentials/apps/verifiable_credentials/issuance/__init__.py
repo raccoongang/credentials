@@ -5,6 +5,7 @@ import didkit
 from asgiref.sync import async_to_sync
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
+from rest_framework.renderers import JSONRenderer
 
 from ..settings import vc_settings
 from .models import IssuanceLine
@@ -53,20 +54,27 @@ class CredentialIssuer:
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
+    def _render(self, data):
+        """
+        Shape raw data.
+        """
+        return vc_settings.DEFAULT_RENDERER().render(data)
+
     def compose(self):
         """
         Construct an appropriate verifiable credential for signing.
         """
         # TODO: build status entry
-        return self._issuance_line.construct()
+        credential_data = self._issuance_line.construct()
+        return self._render(credential_data)
 
-    def sign(self, composed_credential):
+    def sign(self, composed_credential_json):
         """
         Sign the composed digital credential document.
         """
         didkit_options = {}
         verifiable_credential = sign_with_didkit(
-            json.dumps(composed_credential), json.dumps(didkit_options), vc_settings.DEFAULT_ISSUER_KEY
+            composed_credential_json, json.dumps(didkit_options), vc_settings.DEFAULT_ISSUER_KEY
         )
         verifiable_credential = json.loads(verifiable_credential)
         return verifiable_credential
@@ -101,6 +109,29 @@ class CredentialIssuer:
             },
         )
         return issuance_line
+
+
+class JSONLDRenderer(JSONRenderer):
+    """
+    Renderer which serializes to JSON.
+    """
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        """
+        Render `data` into JSON, returning a string.
+
+        Addionally, updates `data` shape a bit to conform json-ld specs.
+        """
+
+        tweaked_data = self._tweak(data)
+        return super().render(tweaked_data, accepted_media_type, renderer_context).decode("utf-8")
+
+    def _tweak(self, data):
+        """
+        Shape `data` with JSON-LD specifics.
+        """
+        data["@context"] = data.pop("context")
+        return data
 
 
 @async_to_sync
