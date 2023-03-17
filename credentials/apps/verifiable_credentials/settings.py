@@ -28,7 +28,7 @@ DEFAULTS = {
     "DEFAULT_ISSUER_DID": None,
     "DEFAULT_ISSUER_KEY": None,
     "DEFAULT_ISSUER_NAME": None,
-    "DEFAULT_ISSUANCE_REQUEST_SERIALIZER": "credentials.apps.verifiable_credentials.issuance.serializers.IssuanceLineSerializer",
+    "DEFAULT_ISSUANCE_REQUEST_SERIALIZER": "credentials.apps.verifiable_credentials.issuance.serializers.IssuanceLineSerializer",  # pylint: disable=line-too-long
     "DEFAULT_RENDERER": "credentials.apps.verifiable_credentials.issuance.JSONLDRenderer",
 }
 

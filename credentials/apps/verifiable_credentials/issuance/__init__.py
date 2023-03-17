@@ -81,12 +81,12 @@ class CredentialIssuer:
             verifiable_credential = sign_with_didkit(
                 composed_credential_json, json.dumps(didkit_options), vc_settings.DEFAULT_ISSUER_KEY
             )
-        except didkit.DIDKitException as exc:
+        except didkit.DIDKitException as exc:  # pylint: disable=no-member
             logger.exception(err_message)
             if "expansion failed" in str(exc):
                 err_detail = _("defined property wasn't found within the linked data graph")
             raise IssuanceException(detail=f"{err_message} [{err_detail}]")
-        except ValueError as exc:
+        except ValueError:
             err_detail = _("identifier not recognized")
             raise IssuanceException(detail=f"{err_message} [{err_detail}]")
 

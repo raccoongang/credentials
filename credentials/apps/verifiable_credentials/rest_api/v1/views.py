@@ -3,7 +3,6 @@ Verifiable Credentials API v1 views.
 """
 import logging
 
-import didkit
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
