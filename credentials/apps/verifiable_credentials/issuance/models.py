@@ -9,9 +9,9 @@ from django_extensions.db.models import TimeStampedModel
 
 from credentials.apps.credentials.models import UserCredential
 
-from .composition import get_available_data_models, get_data_model
-from .settings import vc_settings
-from .storages import get_storage
+from ..composition import get_available_data_models, get_data_model
+from ..settings import vc_settings
+from ..storages import get_storage
 
 
 def generate_data_model_choices():
@@ -63,6 +63,10 @@ class IssuanceLine(TimeStampedModel):
     @property
     def data_model(self):
         return get_data_model(self.data_model_id)
+
+    @property
+    def issuer_name(self):
+        return vc_settings.DEFAULT_ISSUER_NAME
 
     def construct(self):
         serializer = self.data_model(self)

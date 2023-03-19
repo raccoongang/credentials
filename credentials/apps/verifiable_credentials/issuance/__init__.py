@@ -1,12 +1,15 @@
 import json
 import logging
 
+import didkit
+from asgiref.sync import async_to_sync
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
+from rest_framework.renderers import JSONRenderer
 
+from ..settings import vc_settings
+from .exceptions import IssuanceException
 from .models import IssuanceLine
-from .settings import vc_settings
-from .utils import sign_with_didkit
 
 
 logger = logging.getLogger(__name__)
@@ -52,21 +55,41 @@ class CredentialIssuer:
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
+    def _render(self, data):
+        """
+        Shape raw data.
+        """
+        return vc_settings.DEFAULT_RENDERER().render(data)
+
     def compose(self):
         """
         Construct an appropriate verifiable credential for signing.
         """
         # TODO: build status entry
-        return self._issuance_line.construct()
+        credential_data = self._issuance_line.construct()
+        return self._render(credential_data)
 
-    def sign(self, composed_credential):
+    def sign(self, composed_credential_json):
         """
         Sign the composed digital credential document.
         """
+        err_message = _("Provided data didn't validate")
+        err_detail = ""
+
         didkit_options = {}
-        verifiable_credential = sign_with_didkit(
-            json.dumps(composed_credential), json.dumps(didkit_options), vc_settings.DEFAULT_ISSUER_KEY
-        )
+        try:
+            verifiable_credential = sign_with_didkit(
+                composed_credential_json, json.dumps(didkit_options), vc_settings.DEFAULT_ISSUER_KEY
+            )
+        except didkit.DIDKitException as exc:  # pylint: disable=no-member
+            logger.exception(err_message)
+            if "expansion failed" in str(exc):
+                err_detail = _("defined property wasn't found within the linked data graph")
+            raise IssuanceException(detail=f"{err_message} [{err_detail}]")
+        except ValueError:
+            err_detail = _("identifier not recognized")
+            raise IssuanceException(detail=f"{err_message} [{err_detail}]")
+
         verifiable_credential = json.loads(verifiable_credential)
         return verifiable_credential
 
@@ -74,12 +97,16 @@ class CredentialIssuer:
         """
         Issue a signed digital credential document by validating, composing, and signing.
         """
+        # construction (data collecting and shaping):
         composed_credential = self.compose()
-        # FIXME: disable for now
-        # verifiable_credential = self.sign(composed_credential)
+
+        # signing / structure validation:
+        verifiable_credential = self.sign(composed_credential)
+
+        # issuance line finalization:
         self._issuance_line.mark_processed()
 
-        return composed_credential
+        return verifiable_credential
 
     @classmethod
     def init(cls, *, user_credential, storage_id):
@@ -96,3 +123,48 @@ class CredentialIssuer:
             },
         )
         return issuance_line
+
+
+class JSONLDRenderer(JSONRenderer):
+    """
+    Renderer which serializes to JSON.
+    """
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        """
+        Render `data` into JSON, returning a string.
+
+        Addionally, updates `data` shape a bit to conform json-ld specs.
+        """
+
+        tweaked_data = self._tweak(data)
+        return super().render(tweaked_data, accepted_media_type, renderer_context).decode("utf-8")
+
+    def _tweak(self, data):
+        """
+        Shape `data` with JSON-LD specifics.
+        """
+        # exchange special symbols:
+        data["@context"] = data.pop("context")
+
+        # trim nullable values:
+        dense_data = self._hide_nullables(data)
+
+        return dense_data
+
+    def _hide_nullables(self, sparse_data):
+        """
+        Traverse dictionaries and remove empty data.
+        """
+        for key, value in sparse_data.items():
+            if isinstance(value, dict):
+                self._hide_nullables(value)
+            if not value:
+                del sparse_data[key]
+
+        return sparse_data
+
+
+@async_to_sync
+async def sign_with_didkit(credential, options, issuer_key):
+    return await didkit.issue_credential(credential, options, issuer_key)  # pylint: disable=no-member

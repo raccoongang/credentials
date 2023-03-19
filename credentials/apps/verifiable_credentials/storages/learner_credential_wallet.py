@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from ..composition.open_badges import OpenBadgesDataModel
-from ..serializers import IssuanceLineSerializer
+from ..issuance.serializers import IssuanceLineSerializer
 from ..storages import MobileWallet
 
 

@@ -15,8 +15,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from credentials.apps.credentials.models import UserCredential
-from credentials.apps.verifiable_credentials.issuance import CredentialIssuer
-from credentials.apps.verifiable_credentials.serializers import StorageSerializer
+from credentials.apps.verifiable_credentials.issuance import CredentialIssuer, serializers
+from credentials.apps.verifiable_credentials.issuance.exceptions import IssuanceException
 from credentials.apps.verifiable_credentials.storages import get_available_storages, get_storage
 from credentials.apps.verifiable_credentials.utils import (
     generate_base64_qr_code,
@@ -163,7 +163,11 @@ class IssueCredentialView(APIView):
 
     def post(self, request, *args, **kwargs):
         credential_issuer = CredentialIssuer(request_data=request.data, issuance_uuid=kwargs.get("issuance_line_uuid"))
-        return Response({"verifiableCredential": credential_issuer.issue()}, status=status.HTTP_201_CREATED)
+        try:
+            verifiable_credential = credential_issuer.issue()
+            return Response({"verifiableCredential": verifiable_credential}, status=status.HTTP_201_CREATED)
+        except IssuanceException as exc:
+            raise ValidationError({"issuance_issue": exc.detail})
 
 
 class AvailableStoragesView(ListAPIView):
@@ -177,7 +181,7 @@ class AvailableStoragesView(ListAPIView):
         response(dict): List of available storages
     """
 
-    serializer_class = StorageSerializer
+    serializer_class = serializers.StorageSerializer
     pagination_class = None
     authentication_classes = (
         JwtAuthentication,

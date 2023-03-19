@@ -3,25 +3,14 @@ Verifiable Credentials v1.1 data model.
 
 See specification: https://www.w3.org/TR/vc-data-model/
 """
-from enum import Enum
-
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
-from ..composition import BaseDataModel
+from ..composition import CredentialDataModel
+from .schemas import CredentialSubjectSchema, IssuerSchema
 
 
-class Types(Enum):
-    VERIFIABLE_CREDENTIAL = "VerifiableCredential"
-    UNIVERSITY_DEGREE_CREDENTIAL = "UniversityDegreeCredential"
-
-
-class SubjectDataModel(serializers.Serializer):  # pylint: disable=abstract-method
-    id = serializers.CharField(source="subject_id", read_only=True)
-    name = serializers.CharField(required=False, read_only=True)
-
-
-class VerifiableCredentialsDataModel(BaseDataModel):  # pylint: disable=abstract-method
+class VerifiableCredentialsDataModel(CredentialDataModel):  # pylint: disable=abstract-method
     """
     Verifiable Credentials data model.
     """
@@ -30,39 +19,45 @@ class VerifiableCredentialsDataModel(BaseDataModel):  # pylint: disable=abstract
     ID = "vc"
     NAME = _("Verifiable Credentials Data Model v1.1")
 
-    type = serializers.SerializerMethodField()
-    issuer = serializers.CharField(source="issuer_id", read_only=True)
-    issuanceDate = serializers.DateTimeField(source="modified", read_only=True)
-    credentialSubject = serializers.SerializerMethodField(method_name="get_subject")
+    context = serializers.SerializerMethodField(
+        method_name="collect_context", help_text="https://www.w3.org/TR/vc-data-model/#contexts"
+    )
+    id = serializers.UUIDField(
+        source="uuid", format="urn", help_text="https://www.w3.org/TR/vc-data-model/#identifiers"
+    )
+    type = serializers.SerializerMethodField(help_text="https://www.w3.org/TR/vc-data-model/#types")
+    issuer = IssuerSchema(source="*", help_text="https://www.w3.org/TR/vc-data-model/#issuer")
+    issued = serializers.DateTimeField(source="modified", help_text="https://www.w3.org/2018/credentials/#issued")
+    issuanceDate = serializers.DateTimeField(
+        source="modified",
+        help_text="Deprecated (requred by the didkit for now) https://www.w3.org/2018/credentials/#issuanceDate",
+    )
+    validFrom = serializers.DateTimeField(source="modified", help_text="https://www.w3.org/2018/credentials/#validFrom")
+    validUntil = serializers.DateTimeField(
+        source="expiration_date", help_text="https://www.w3.org/2018/credentials/#validUntil"
+    )
+    credentialSubject = CredentialSubjectSchema(
+        source="*", help_text="https://www.w3.org/2018/credentials/#credentialSubject"
+    )
 
-    @property
-    def context(self):
+    class Meta:
+        read_only_fields = "__all__"
+
+    @classmethod
+    def get_context(cls):
+        """
+        Provide root context for all verifiable credentials.
+        """
         return [
             "https://www.w3.org/2018/credentials/v1",
-            "https://www.w3.org/2018/credentials/examples/v1",
+            "https://schema.org/",
         ]
 
-    def get_type(self, issuance_line):
-        default_types = [Types.VERIFIABLE_CREDENTIAL.value]
-        credential_content_type = issuance_line.user_credential.credential_content_type.model
-        return default_types + self.map_credential_types(credential_content_type)
-
-    def get_subject(self, issuance_line):
-        return SubjectDataModel(issuance_line).data
-
-    @staticmethod
-    def map_credential_types(content_type):
+    @classmethod
+    def get_types(cls):
         """
-        Maps Open edX credential type to data model types/
+        Provide root types for all verifiable credentials.
         """
-        linked_types = {
-            "programcertificate": [
-                Types.UNIVERSITY_DEGREE_CREDENTIAL.value,  # FIXME: as example
-            ],
-            "coursecertificate": [],
-        }
-
-        if content_type not in linked_types:
-            return []
-
-        return linked_types[content_type]
+        return [
+            "VerifiableCredential",
+        ]
