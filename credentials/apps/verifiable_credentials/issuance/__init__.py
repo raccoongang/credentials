@@ -113,13 +113,16 @@ class CredentialIssuer:
         """
         The very first action in verifiable credential issuance line.
         """
+        ussuer_id = IssuanceLine.resolve_issuer()
+
         issuance_line, __ = IssuanceLine.objects.get_or_create(
             user_credential=user_credential,
             storage_id=storage_id,
             processed=False,
             defaults={
-                "issuer_id": IssuanceLine.resolve_issuer(),
+                "issuer_id": ussuer_id,
                 "data_model_id": IssuanceLine.resolve_data_model(storage_id).ID,
+                "status_index": IssuanceLine.get_next_status_index(ussuer_id),
             },
         )
         return issuance_line

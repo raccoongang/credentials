@@ -113,7 +113,7 @@ class IssuanceLine(TimeStampedModel):
     @classmethod
     def get_next_status_index(cls, issuer_id):
         """
-        Return next status list position for given issuer.
+        Return next status list position for given Issuer.
         """
         last = cls.objects.filter(issuer_id=issuer_id, status_index__gte=0).last()
         if not last:
