@@ -24,6 +24,12 @@ class IssuanceLine(TimeStampedModel):
 
     .. no_pii:
     """
+    AWARDED = "awarded"
+    REVOKED = "revoked"
+    STATUS_CHOICES = [
+        (AWARDED, _("awarded")),
+        (REVOKED, _("revoked")),
+    ]
 
     # Initial data:
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -49,8 +55,15 @@ class IssuanceLine(TimeStampedModel):
         choices=generate_data_model_choices(),
     )
     expiration_date = models.DateTimeField(null=True, blank=True, db_index=True)
+    status_index = models.PositiveIntegerField(null=True, help_text=_("Defines a position in the Status List sequence"),)
+    status = models.CharField(
+        max_length=255,
+        choices=STATUS_CHOICES,
+        default=AWARDED,
+        help_text=_("Keeps track on a corresponding user credential's status"),
+    )
 
-    def __str__(self) -> str:
+    def __str__(self):
         return (
             f"IssuanceLine(user_credential={self.user_credential}, "
             f"issuer_id={self.issuer_id}, storage_id={self.storage_id})"
@@ -96,3 +109,13 @@ class IssuanceLine(TimeStampedModel):
             return vc_settings.FORCE_DATA_MODEL
 
         return get_storage(storage_id).PREFERRED_DATA_MODEL
+
+    @classmethod
+    def get_next_status_index(cls, issuer_id):
+        """
+        Return next status list position for given issuer.
+        """
+        last = cls.objects.filter(issuer_id=issuer_id, status_index__gte=0).last()
+        if not last:
+            return 0
+        return last.status_index + 1
