@@ -155,8 +155,10 @@ class JSONLDRenderer(JSONRenderer):
     def _hide_nullables(self, sparse_data):
         """
         Traverse dictionaries and remove empty data.
+
+        NOTE: Intentionally mutates incoming data.
         """
-        for key, value in sparse_data.items():
+        for key, value in sparse_data.copy().items():
             if isinstance(value, dict):
                 self._hide_nullables(value)
             if not value:
