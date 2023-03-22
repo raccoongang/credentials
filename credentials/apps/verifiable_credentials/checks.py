@@ -13,8 +13,8 @@ def vc_settings_checks(*args, **kwargs):
         - No default data models defined
         - No default storages defined
         - FORCE_DATA_MODEL is not in DEFAULT_DATA_MODELS
-        - DEFAULT_ISSUER_DID is not set
-        - DEFAULT_ISSUER_KEY is not set
+        - DEFAULT_ISSUER[DID] is not set
+        - DEFAULT_ISSUER[KEY] is not set
 
     Returns:
         List of any Errors.
@@ -48,16 +48,16 @@ def vc_settings_checks(*args, **kwargs):
             )
         )
 
-    if not vc_settings.DEFAULT_ISSUER_DID:
+    if not vc_settings.DEFAULT_ISSUER.get("ID"):
         errors.append(
             Error(
-                f"DEFAULT_ISSUER_DID is mandatory when {ENABLE_VERIFIABLE_CREDENTIALS.name} is True.",
-                hint=" Set DEFAULT_ISSUER_DID to a valid DID string.",
+                f"DEFAULT_ISSUER[DID] is mandatory when {ENABLE_VERIFIABLE_CREDENTIALS.name} is True.",
+                hint=" Set DEFAULT_ISSUER[DID] to a valid DID string.",
                 id="verifiable_credentials.E004",
             )
         )
 
-    if not vc_settings.DEFAULT_ISSUER_KEY:
+    if not vc_settings.DEFAULT_ISSUER.get("KEY"):
         errors.append(
             Error(
                 f"DEFAULT_ISSUER_KEY is mandatory when {ENABLE_VERIFIABLE_CREDENTIALS.name} is True.",

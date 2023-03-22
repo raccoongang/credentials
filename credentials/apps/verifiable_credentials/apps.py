@@ -12,5 +12,8 @@ class VerifiableCredentialsConfig(AppConfig):
         Performs initial registrations for checks, signals, etc.
         """
         if is_verifiable_credentials_enabled():
+            from . import signals  # pylint: disable=unused-import,import-outside-toplevel
             from .checks import vc_settings_checks  # pylint: disable=unused-import,import-outside-toplevel
-        from credentials.apps.verifiable_credentials import signals  # pylint: disable=unused-import,import-outside-toplevel
+            from .issuance.models import create_issuers
+
+            create_issuers()

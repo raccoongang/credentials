@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from credentials.apps.credentials.models import UserCredential
 
 from .composition.status_list import StatusListDataModel, revoke_items
-from .models import IssuanceLine
+from .issuance.models import IssuanceLine
 
 
 # def generate_status_list_on_status_revoke(instance, created, **kwargs):

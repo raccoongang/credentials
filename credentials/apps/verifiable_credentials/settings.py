@@ -29,9 +29,11 @@ DEFAULTS = {
     "DEFAULT_STORAGES": [
         "credentials.apps.verifiable_credentials.storages.learner_credential_wallet.LCWallet",
     ],
-    "DEFAULT_ISSUER_DID": None,
-    "DEFAULT_ISSUER_KEY": None,
-    "DEFAULT_ISSUER_NAME": None,
+    "DEFAULT_ISSUER": {
+        "ID": None,
+        "KEY": None,
+        "NAME": None,
+    },
     "DEFAULT_ISSUANCE_REQUEST_SERIALIZER": "credentials.apps.verifiable_credentials.issuance.serializers.IssuanceLineSerializer",  # pylint: disable=line-too-long
     "DEFAULT_RENDERER": "credentials.apps.verifiable_credentials.issuance.JSONLDRenderer",
     "STATUS_LIST": {
@@ -49,13 +51,6 @@ IMPORT_STRINGS = [
     "DEFAULT_ISSUANCE_REQUEST_SERIALIZER",
     "DEFAULT_RENDERER",
 ]
-
-# TODO: implement settings self-checks:
-# - DEFAULT_DATA_MODELS are not empty (at least 1 data model is active)
-# - FORCE_DATA_MODEL in DEFAULT_DATA_MODELS
-# - DEFAULT_STORAGES are not empty (at least 1 storage is available)
-# - DEFAULT_ISSUER_DID is set
-# - DEFAULT_ISSUER_KEY is set
 
 
 class VCSettings:

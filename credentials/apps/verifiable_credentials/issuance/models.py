@@ -119,3 +119,60 @@ class IssuanceLine(TimeStampedModel):
         if not last:
             return 0
         return last.status_index + 1
+
+
+class IssuanceConfiguration(TimeStampedModel):
+    """
+    Verifiable credentials issuer configuration.
+
+    The model stores a details needed to compose and issue verifiable credentials.
+
+    .. no_pii:
+
+    NOTE:
+        - current issuer by default has a system-wide scope;
+        - it is expected an explicit `scope` ("system"|"site"|"org"|"course") field will be used in the future;
+        - additional issuer preferences may live here as well (credential claims, storages filtering, etc.);
+    """
+
+    enabled = models.BooleanField(default=False)
+    issuer_id = models.CharField(primary_key=True, max_length=255, help_text=_("Issuer DID"))
+    issuer_key = models.JSONField(
+        help_text=_("Issuer secret key. See: https://w3c-ccg.github.io/did-method-key/#ed25519-x25519")
+    )
+    issuer_name = models.CharField(max_length=255, blank=True, null=True)
+
+    @classmethod
+    def create_issuers(cls):
+        """
+        Create issuance configuration(s) from deployment configuration.
+
+        Top level scope issuer is the must (auto-created).
+        """
+        IssuanceConfiguration.objects.get_or_create(
+            issuer_id=vc_settings.DEFAULT_ISSUER.get("ID"),
+            issuer_key=vc_settings.DEFAULT_ISSUER.get("KEY"),
+            defaults={
+                "enabled": True,
+                "issuer_name": vc_settings.DEFAULT_ISSUER.get("NAME"),
+            },
+        )
+
+
+def create_issuers():
+    """
+    Initiate issuers.
+    """
+    IssuanceConfiguration.create_issuers()
+
+
+def get_default_issuer():
+    """
+    Fetch the default issuer.
+    """
+    issuer = IssuanceConfiguration.objects.filter(enable=True).first()
+    if issuer:
+        return issuer
+
+    # NOTE: pick the first one if all are disabled for some reason.
+    IssuanceConfiguration.objects.first()
