@@ -25,7 +25,6 @@ DEFAULTS = {
         "credentials.apps.verifiable_credentials.composition.verifiable_credentials.VerifiableCredentialsDataModel",
         "credentials.apps.verifiable_credentials.composition.open_badges.OpenBadgesDataModel",
     ],
-    "FORCE_DATA_MODEL": None,
     "DEFAULT_STORAGES": [
         "credentials.apps.verifiable_credentials.storages.learner_credential_wallet.LCWallet",
     ],
@@ -35,21 +34,20 @@ DEFAULTS = {
         "NAME": None,
     },
     "DEFAULT_ISSUANCE_REQUEST_SERIALIZER": "credentials.apps.verifiable_credentials.issuance.serializers.IssuanceLineSerializer",  # pylint: disable=line-too-long
-    "DEFAULT_RENDERER": "credentials.apps.verifiable_credentials.issuance.JSONLDRenderer",
-    "STATUS_LIST": {
-        "LENGTH": 10000,
-        "PUBLIC_ROOT": "verifiable-credentials/status/status-list/2021/v1/",
-        "PUBLIC_PATH": "verifiable-credentials/status/status-list/2021/v1/",
-    }
+    "DEFAULT_RENDERER": "credentials.apps.verifiable_credentials.issuance.renderers.JSONLDRenderer",
+    "STATUS_LIST_STORAGE": "credentials.apps.verifiable_credentials.storages.status_list.StatusList2021",
+    "STATUS_LIST_DATA_MODEL": "credentials.apps.verifiable_credentials.composition.status_list.StatusListDataModel",
+    "STATUS_LIST_LENGTH": 10000,
 }
 
 # List of settings that may be in string import notation:
 IMPORT_STRINGS = [
     "DEFAULT_DATA_MODELS",
-    "FORCE_DATA_MODEL",
     "DEFAULT_STORAGES",
     "DEFAULT_ISSUANCE_REQUEST_SERIALIZER",
     "DEFAULT_RENDERER",
+    "STATUS_LIST_DATA_MODEL",
+    "STATUS_LIST_STORAGE",
 ]
 
 

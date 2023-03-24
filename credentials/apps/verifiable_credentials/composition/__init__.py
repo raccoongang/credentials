@@ -9,6 +9,8 @@ from ..settings import vc_settings
 class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Basic credential construction machinery.
+
+    NOTE: it is not intended for direct inheritance, use VerifiableCredentialsDataModel instead.
     """
 
     VERSION = None
@@ -45,10 +47,13 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
             https://w3c.github.io/vc-imp-guide/#creating-new-credential-types
             https://schema.org/EducationalOccupationalCredential
         """
+        if not issuance_line.user_credential:
+            return []
+
         credential_content_type = issuance_line.user_credential.credential_content_type.model
 
+        # configuration: Open edX internal credential type <> verifiable credential type
         credential_types = {
-            # <openedx-credential-type>: [<verifiable-credential-type1>, <verifiable-credential-typeX>]
             "programcertificate": [
                 "EducationalOccupationalCredential",
             ],
@@ -78,16 +83,26 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
 
 def get_available_data_models():
     """
-    Return currently configured verifiable credentials data models.
+    Return available for users verifiable credentials data models.
     """
-    return vc_settings.DEFAULT_DATA_MODELS
+    # NOTE(open-edx wallet): currently, Status List is available for manual issuance for the onboarding purposes.
+    return get_data_models()
+
+
+def get_data_models():
+    """
+    Return configured verifiable credentials data models.
+    """
+    return vc_settings.DEFAULT_DATA_MODELS + [
+        vc_settings.STATUS_LIST_DATA_MODEL,
+    ]
 
 
 def get_data_model(model_id):
     """
     Return a data model by its ID from the currently available list.
     """
-    for data_model in get_available_data_models():
+    for data_model in get_data_models():
         if data_model.ID == model_id:
             return data_model
 

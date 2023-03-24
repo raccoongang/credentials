@@ -53,7 +53,6 @@ class IssuanceConfigurationAdmin(admin.ModelAdmin):
     list_display = [
         "issuer_id",
         "issuer_name",
-        "issuer_key",
         "enabled",
     ]
 

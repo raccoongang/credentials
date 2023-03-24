@@ -10,19 +10,23 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import ListAPIView
-from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from credentials.apps.credentials.models import UserCredential
-from credentials.apps.verifiable_credentials.issuance import CredentialIssuer, serializers
-from credentials.apps.verifiable_credentials.issuance.exceptions import IssuanceException
+from credentials.apps.verifiable_credentials.issuance import IssuanceException
+from credentials.apps.verifiable_credentials.issuance.main import CredentialIssuer
+from credentials.apps.verifiable_credentials.issuance.serializers import StorageSerializer
 from credentials.apps.verifiable_credentials.storages import get_available_storages, get_storage
 from credentials.apps.verifiable_credentials.utils import (
-    generate_base64_qr_code, get_user_program_credentials_data, is_valid_uuid)
+    generate_base64_qr_code,
+    get_user_program_credentials_data,
+    is_valid_uuid,
+)
 
 from .serializers import ProgramCredentialSerializer
+
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +52,7 @@ class ProgramCredentialsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         """
         program_credentials = get_user_program_credentials_data(request.user.username)
 
+        # FIXME: rid of serializer?
         serializer = ProgramCredentialSerializer(program_credentials, many=True)
         return Response({"program_credentials": serializer.data})
 
@@ -159,7 +164,7 @@ class IssueCredentialView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        credential_issuer = CredentialIssuer(request_data=request.data, issuance_uuid=kwargs.get("issuance_line_uuid"))
+        credential_issuer = CredentialIssuer(data=request.data, issuance_uuid=kwargs.get("issuance_line_uuid"))
         try:
             verifiable_credential = credential_issuer.issue()
             return Response({"verifiableCredential": verifiable_credential}, status=status.HTTP_201_CREATED)
@@ -178,7 +183,7 @@ class AvailableStoragesView(ListAPIView):
         response(dict): List of available storages
     """
 
-    serializer_class = serializers.StorageSerializer
+    serializer_class = StorageSerializer
     pagination_class = None
     authentication_classes = (
         JwtAuthentication,

@@ -24,17 +24,13 @@ class IssuanceLine(TimeStampedModel):
 
     .. no_pii:
     """
-    AWARDED = "awarded"
-    REVOKED = "revoked"
-    STATUS_CHOICES = [
-        (AWARDED, _("awarded")),
-        (REVOKED, _("revoked")),
-    ]
 
     # Initial data:
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     user_credential = models.ForeignKey(
         UserCredential,
+        null=True,
+        blank=True,
         related_name="vc_issues",
         on_delete=models.PROTECT,
         help_text=_("Related Open edX learner credential"),
@@ -55,11 +51,15 @@ class IssuanceLine(TimeStampedModel):
         choices=generate_data_model_choices(),
     )
     expiration_date = models.DateTimeField(null=True, blank=True, db_index=True)
-    status_index = models.PositiveIntegerField(null=True, help_text=_("Defines a position in the Status List sequence"),)
+    status_index = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text=_("Defines a position in the Status List sequence"),
+    )
     status = models.CharField(
         max_length=255,
-        choices=STATUS_CHOICES,
-        default=AWARDED,
+        null=True,
+        blank=True,
         help_text=_("Keeps track on a corresponding user credential's status"),
     )
 
@@ -79,7 +79,7 @@ class IssuanceLine(TimeStampedModel):
 
     @property
     def issuer_name(self):
-        return vc_settings.DEFAULT_ISSUER_NAME
+        return getattr(get_issuer(self.issuer_id), "name", None)
 
     def construct(self):
         serializer = self.data_model(self)
@@ -94,20 +94,15 @@ class IssuanceLine(TimeStampedModel):
         """
         Unconditionally (for now) returns system-level Issier ID.
         """
-        return vc_settings.DEFAULT_ISSUER_DID
+        return get_default_issuer()
 
     @classmethod
     def resolve_data_model(cls, storage_id):
         """
         Data model lookup:
-        - check if there is FORCE_DATA_MODEL set
         - check current storage preference
         - or use the first one from the available ones
         """
-        # Pin data model choice no matter what:
-        if vc_settings.FORCE_DATA_MODEL is not None:
-            return vc_settings.FORCE_DATA_MODEL
-
         return get_storage(storage_id).PREFERRED_DATA_MODEL
 
     @classmethod
@@ -119,6 +114,22 @@ class IssuanceLine(TimeStampedModel):
         if not last:
             return 0
         return last.status_index + 1
+
+    @classmethod
+    def get_indicies_for_status(cls, *, issuer_id, status):
+        """
+        Status indicies with revoked credentials for given Issuer.
+        """
+        return list(
+            cls.objects.filter(
+                issuer_id=issuer_id,
+                user_credential__status=status,
+                processed=True,
+                status_index__gte=0,
+            )
+            .order_by("status_index")
+            .values_list("status_index", flat=True)
+        )
 
 
 class IssuanceConfiguration(TimeStampedModel):
@@ -141,6 +152,9 @@ class IssuanceConfiguration(TimeStampedModel):
         help_text=_("Issuer secret key. See: https://w3c-ccg.github.io/did-method-key/#ed25519-x25519")
     )
     issuer_name = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        ordering = ["enabled"]
 
     @classmethod
     def create_issuers(cls):
@@ -166,6 +180,14 @@ def create_issuers():
     IssuanceConfiguration.create_issuers()
 
 
+def get_registered_issuers():
+    """
+    Collect all levels issuers.
+    """
+    # currently, the only (system level, default) is supported.
+    return list(IssuanceConfiguration.objects.filter(enabled=True).values())
+
+
 def get_default_issuer():
     """
     Fetch the default issuer.
@@ -176,3 +198,18 @@ def get_default_issuer():
 
     # NOTE: pick the first one if all are disabled for some reason.
     IssuanceConfiguration.objects.first()
+
+
+def get_issuer(issuer_id):
+    """
+    Fetch issuer by given ID.
+    """
+    issuer = IssuanceConfiguration.objects.filter(issuer_id=issuer_id).first()
+    return issuer
+
+
+def get_revoked_indices(issuer_id):
+    """
+    Collect status indicies for verifiable credentials with revoked achievements (in given Issuer context).
+    """
+    return IssuanceLine.get_indicies_for_status(issuer_id=issuer_id, status=UserCredential.REVOKED)
