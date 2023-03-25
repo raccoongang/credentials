@@ -129,12 +129,3 @@ def regenerate_encoded_status_sequence(issuer_id):
     gzip_data = gzip.compress(status_list)
     base64_data = base64.b64encode(gzip_data)
     return base64_data.decode("utf-8")
-
-
-def revoke_items(positions):
-    """
-    Given revocation indices list issue a new status list document and publish it.
-    """
-    # re-generate byte-sequence
-    # [re]issue Status List credential
-    # [re]publish Status List credential

@@ -11,7 +11,6 @@ from rest_framework.exceptions import ValidationError
 
 from credentials.apps.credentials.constants import UserCredentialStatus
 
-from ..composition.utils import get_available_data_models
 from ..issuance import IssuanceException, sign_with_didkit
 from ..settings import vc_settings
 from ..storages.utils import get_storage
