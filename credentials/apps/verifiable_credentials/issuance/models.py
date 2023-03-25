@@ -1,10 +1,10 @@
 """
 Verifiable Credentials DB models.
 """
-from urllib.parse import urljoin
 import uuid
-from crum import get_current_request
+from urllib.parse import urljoin
 
+from crum import get_current_request
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -12,13 +12,13 @@ from django_extensions.db.models import TimeStampedModel
 
 from credentials.apps.credentials.models import UserCredential
 
-from ..composition.utils import get_available_data_models, get_data_model
+from ..composition.utils import get_data_models, get_data_model, get_available_data_models
 from ..settings import VerifiableCredentialsImproperlyConfigured, vc_settings
-from ..storages import get_storage
+from ..storages.utils import get_storage
 
 
 def generate_data_model_choices():
-    return [(data_model.ID, data_model.NAME) for data_model in get_available_data_models()]
+    return [(data_model.ID, data_model.NAME) for data_model in get_data_models()]
 
 
 class IssuanceLine(TimeStampedModel):
@@ -88,7 +88,7 @@ class IssuanceLine(TimeStampedModel):
         serializer = self.data_model(self, context=context)
         return serializer.data
 
-    def mark_processed(self):
+    def finalize(self):
         self.processed = True
         self.save()
 
@@ -112,15 +112,6 @@ class IssuanceLine(TimeStampedModel):
         Unconditionally (for now) returns system-level Issier ID.
         """
         return get_default_issuer()
-
-    @classmethod
-    def resolve_data_model(cls, storage_id):
-        """
-        Data model lookup:
-        - check current storage preference
-        - or use the first one from the available ones
-        """
-        return get_storage(storage_id).PREFERRED_DATA_MODEL
 
     @classmethod
     def get_next_status_index(cls, issuer_id):

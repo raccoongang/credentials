@@ -27,6 +27,10 @@ class BaseStorage:
         return vc_settings.DEFAULT_ISSUANCE_REQUEST_SERIALIZER(*args, **kwargs)
 
     @classmethod
+    def get_data_model(cls, *args, **kwargs):
+        return cls.PREFERRED_DATA_MODEL
+
+    @classmethod
     def get_deeplink_url(cls, issuance_uuid, **kwargs):  # pylint: disable=unused-argument
         return cls.DEEP_LINK_URL
 
@@ -47,27 +51,3 @@ class MobileWallet(BaseStorage):
 
 class WebWallet(BaseStorage):
     TYPE = StorageType.WEB
-
-
-def get_available_storages():
-    """
-    Returns available for users verifiable credentials storages.
-    """
-    return vc_settings.DEFAULT_STORAGES
-
-
-def get_storages():
-    """
-    Returns all verifiable credentials storages.
-    """
-    return get_available_storages() + [
-        vc_settings.STATUS_LIST_STORAGE,
-    ]
-
-
-def get_storage(storage_id):
-    for storage in get_storages():
-        if storage.ID == storage_id:
-            return storage
-
-    return None

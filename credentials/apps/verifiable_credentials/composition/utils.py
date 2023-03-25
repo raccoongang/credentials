@@ -8,15 +8,14 @@ def get_available_data_models():
     """
     Return available for users verifiable credentials data models.
     """
-    # NOTE(open-edx wallet): currently, Status List is available for manual issuance for the onboarding purposes.
-    return get_data_models()
+    return vc_settings.DEFAULT_DATA_MODELS
 
 
 def get_data_models():
     """
     Return configured verifiable credentials data models.
     """
-    return vc_settings.DEFAULT_DATA_MODELS + [
+    return get_available_data_models() + [
         vc_settings.STATUS_LIST_DATA_MODEL,
     ]
 

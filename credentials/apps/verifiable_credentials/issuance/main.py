@@ -11,8 +11,10 @@ from rest_framework.exceptions import ValidationError
 
 from credentials.apps.credentials.constants import UserCredentialStatus
 
+from ..composition.utils import get_available_data_models
 from ..issuance import IssuanceException, sign_with_didkit
 from ..settings import vc_settings
+from ..storages.utils import get_storage
 from .models import IssuanceLine, get_issuer
 
 
@@ -119,7 +121,7 @@ class CredentialIssuer:
         verifiable_credential = self.sign(composed_credential)
 
         # issuance line finalization:
-        self._issuance_line.mark_processed()
+        self._issuance_line.finalize()
 
         return verifiable_credential
 
@@ -130,29 +132,22 @@ class CredentialIssuer:
 
         NOTE: User credential is not provided for status list special case issuance.
         """
-
-        data_model_id = IssuanceLine.resolve_data_model(storage_id).ID
-        status = getattr(user_credential, "status", None)
-        status_index = IssuanceLine.get_next_status_index(issuer_id)
-        is_processed = [False]
+        storage = get_storage(storage_id)
+        data_model = storage.get_data_model()
 
         if issuer_id is None:
             issuer_id = IssuanceLine.resolve_issuer().issuer_id
 
-        # Status List isn't related to any specific achievement:
-        if user_credential is None:
-            status_index = None
-            is_processed = [False, True]  # there is always a single Status List line per Issuer
-
         issuance_line, __ = IssuanceLine.objects.get_or_create(
-            user_credential=user_credential,
             storage_id=storage_id,
-            processed__in=is_processed,
+            user_credential=user_credential,
             issuer_id=issuer_id,
+            processed=False,
             defaults={
-                "data_model_id": data_model_id,
-                "status_index": status_index,
-                "status": status,
+                "data_model_id": data_model.ID,
+                "status_index": IssuanceLine.get_next_status_index(issuer_id),
+                "status": getattr(user_credential, "status", None),
             },
         )
+
         return issuance_line

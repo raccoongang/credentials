@@ -20,7 +20,7 @@ from credentials.apps.verifiable_credentials.issuance.main import CredentialIssu
 from credentials.apps.verifiable_credentials.issuance.models import get_issuers
 from credentials.apps.verifiable_credentials.issuance.serializers import StorageSerializer
 from credentials.apps.verifiable_credentials.issuance.status_list import issue_status_list
-from credentials.apps.verifiable_credentials.storages import get_available_storages, get_storage
+from credentials.apps.verifiable_credentials.storages.utils import get_available_storages, get_storage
 from credentials.apps.verifiable_credentials.utils import (
     generate_base64_qr_code,
     get_user_program_credentials_data,
