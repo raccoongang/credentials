@@ -12,7 +12,7 @@ from django_extensions.db.models import TimeStampedModel
 
 from credentials.apps.credentials.models import UserCredential
 
-from ..composition.utils import get_data_models, get_data_model, get_available_data_models
+from ..composition.utils import get_data_model, get_data_models
 from ..settings import VerifiableCredentialsImproperlyConfigured, vc_settings
 from ..storages.utils import get_storage
 

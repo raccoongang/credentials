@@ -32,3 +32,5 @@ def issue_status_list(issuer_id):
     except IssuanceException:
         msg = _("Status List generation failed: [{issuer_id}]").format(issuer_id=issuance_line.issuer_id)
         logger.exception(msg)
+
+    return None

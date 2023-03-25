@@ -11,7 +11,7 @@ from . import CredentialDataModel
 STATUS_LIST_PURPOSE = "revocation"
 
 
-class StatusEntrySchema(serializers.Serializer):
+class StatusEntrySchema(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Status List 2021 Entry model.
 
@@ -31,7 +31,7 @@ class StatusEntrySchema(serializers.Serializer):
         return issuance_line.get_status_list_url(hash_str=issuance_line.status_index)
 
 
-class StatusList2021EntryMixin(serializers.Serializer):
+class StatusList2021EntryMixin(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Include Status List 2021 entry.
     """
@@ -69,7 +69,7 @@ class StatusListSubjectSchema(serializers.Serializer):  # pylint: disable=abstra
         return regenerate_encoded_status_sequence(issuer_id=issuance_line.issuer_id)
 
 
-class StatusListDataModel(CredentialDataModel):
+class StatusListDataModel(CredentialDataModel):  # pylint: disable=abstract-method
     """
     Status List 2021 Credential model.
 
@@ -119,7 +119,7 @@ def regenerate_encoded_status_sequence(issuer_id):
     - compress
     - encode
     """
-    from ..issuance.models import get_revoked_indices
+    from ..issuance.models import get_revoked_indices  # pylint: disable=import-outside-toplevel
 
     status_list = bytearray(vc_settings.STATUS_LIST_LENGTH)
 

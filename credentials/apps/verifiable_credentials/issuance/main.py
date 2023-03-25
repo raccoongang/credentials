@@ -91,7 +91,6 @@ class CredentialIssuer:
         Sign the composed digital credential document.
         """
         err_message = _("Provided data didn't validate")
-        err_detail = ""
 
         didkit_options = {}
         issuer_key = get_issuer(self._issuance_line.issuer_id).issuer_key
@@ -104,8 +103,6 @@ class CredentialIssuer:
         except ValueError as exc:
             logger.exception(err_message)
             raise IssuanceException(detail=f"{err_message} [{exc}]")
-        except Exception:
-            logger.exception(err_message)
 
         return json.loads(verifiable_credential)
 

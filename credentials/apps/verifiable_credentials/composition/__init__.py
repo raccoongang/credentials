@@ -69,7 +69,7 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
         credential_types = self.resolve_credential_type(issuance_line)
         return data_model_types + credential_types
 
-    def resolve_credential_type(self, issuance_line):
+    def resolve_credential_type(self, issuance_line):  # pylint: disable=unused-argument
         """
         Map Open edX credential type to data model types.
 
@@ -79,7 +79,6 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
             https://schema.org/EducationalOccupationalCredential
         """
         return []
-
 
     def _collect_hierarchically(self, class_method):
         """

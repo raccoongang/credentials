@@ -18,6 +18,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.signals import setting_changed
 from django.utils.module_loading import import_string
 
+
 logger = logging.getLogger(__name__)
 
 DEFAULTS = {
@@ -157,4 +158,3 @@ class VerifiableCredentialsImproperlyConfigured(ImproperlyConfigured):
     """
     Verifiable Credentials settings are somehow improperly configured.
     """
-    pass

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from .issuance.models import IssuanceLine, IssuanceConfiguration
+from .issuance.models import IssuanceConfiguration, IssuanceLine
 from .toggles import is_verifiable_credentials_enabled
 
 
@@ -48,6 +48,7 @@ class IssuanceConfigurationAdmin(admin.ModelAdmin):
     """
     Issuance configuration admin setup.
     """
+
     form = IssuanceConfigurationForm
 
     list_display = [
@@ -58,6 +59,7 @@ class IssuanceConfigurationAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
 
 if is_verifiable_credentials_enabled():
     admin.site.register(IssuanceLine, IssuanceLineAdmin)
