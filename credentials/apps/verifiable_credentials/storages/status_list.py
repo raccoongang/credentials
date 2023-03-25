@@ -1,6 +1,7 @@
 """
 Status List 2021 storage.
 """
+
 from django.utils.translation import gettext as _
 
 from ..settings import vc_settings
@@ -14,9 +15,4 @@ class StatusList2021(BaseStorage):
 
     ID = "vc_status_list_2021"
     NAME = _("Status List 2021")
-
     PREFERRED_DATA_MODEL = vc_settings.STATUS_LIST_DATA_MODEL
-
-    @classmethod
-    def get_deeplink_url(cls, issuance_uuid, **kwargs):
-        pass

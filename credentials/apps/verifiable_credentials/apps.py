@@ -15,7 +15,5 @@ class VerifiableCredentialsConfig(AppConfig):
             from . import signals  # pylint: disable=unused-import,import-outside-toplevel
             from .checks import vc_settings_checks  # pylint: disable=unused-import,import-outside-toplevel
             from .issuance.models import create_issuers
-            from .issuance.status_list import issue_status_lists
 
             create_issuers()
-            issue_status_lists()

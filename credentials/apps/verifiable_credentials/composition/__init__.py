@@ -3,19 +3,50 @@ from collections import OrderedDict
 
 from rest_framework import serializers
 
-from ..settings import vc_settings
+from .schemas import IssuerSchema
 
 
 class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Basic credential construction machinery.
-
-    NOTE: it is not intended for direct inheritance, use VerifiableCredentialsDataModel instead.
     """
 
     VERSION = None
     ID = None
     NAME = None
+
+    context = serializers.SerializerMethodField(
+        method_name="collect_context", help_text="https://www.w3.org/TR/vc-data-model/#contexts"
+    )
+    type = serializers.SerializerMethodField(help_text="https://www.w3.org/TR/vc-data-model/#types")
+    issuer = IssuerSchema(source="*", help_text="https://www.w3.org/TR/vc-data-model/#issuer")
+    issued = serializers.DateTimeField(source="modified", help_text="https://www.w3.org/2018/credentials/#issued")
+    issuanceDate = serializers.DateTimeField(
+        source="modified",
+        help_text="Deprecated (requred by the didkit for now) https://www.w3.org/2018/credentials/#issuanceDate",
+    )
+    validFrom = serializers.DateTimeField(source="modified", help_text="https://www.w3.org/2018/credentials/#validFrom")
+    validUntil = serializers.DateTimeField(
+        source="expiration_date", help_text="https://www.w3.org/2018/credentials/#validUntil"
+    )
+
+    @classmethod
+    def get_context(cls):
+        """
+        Provide root context for all verifiable credentials.
+        """
+        return [
+            "https://www.w3.org/2018/credentials/v1",
+        ]
+
+    @classmethod
+    def get_types(cls):
+        """
+        Provide root types for all verifiable credentials.
+        """
+        return [
+            "VerifiableCredential",
+        ]
 
     def collect_context(self, __):
         """
@@ -79,31 +110,3 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
                 for value in values_list:
                     values[value] = base_class.__name__
         return list(values.keys())
-
-
-def get_available_data_models():
-    """
-    Return available for users verifiable credentials data models.
-    """
-    # NOTE(open-edx wallet): currently, Status List is available for manual issuance for the onboarding purposes.
-    return get_data_models()
-
-
-def get_data_models():
-    """
-    Return configured verifiable credentials data models.
-    """
-    return vc_settings.DEFAULT_DATA_MODELS + [
-        vc_settings.STATUS_LIST_DATA_MODEL,
-    ]
-
-
-def get_data_model(model_id):
-    """
-    Return a data model by its ID from the currently available list.
-    """
-    for data_model in get_data_models():
-        if data_model.ID == model_id:
-            return data_model
-
-    return None

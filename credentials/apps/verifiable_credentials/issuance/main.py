@@ -5,8 +5,11 @@ import json
 import logging
 
 import didkit
+from crum import get_current_request
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
+
+from credentials.apps.credentials.constants import UserCredentialStatus
 
 from ..issuance import IssuanceException, sign_with_didkit
 from ..settings import vc_settings
@@ -31,10 +34,15 @@ class CredentialIssuer:
         - composed verifiable credential signing
     """
 
-    def __init__(self, *, data, issuance_uuid):
+    INACTIVE_STATUSES = [
+        UserCredentialStatus.REVOKED,
+    ]
+
+    def __init__(self, *, issuance_uuid, data=None):
         self._issuance_line = self._pickup_issuance_line(issuance_uuid)
         self._storage = self._issuance_line.storage
-        self._validate(data)
+        if data is not None:
+            self._validate(data)
 
     def _pickup_issuance_line(self, issuance_uuid):
         """
@@ -46,13 +54,21 @@ class CredentialIssuer:
             logger.exception(msg)
             raise ValidationError({"issuance_uuid": msg})
 
+        # double check credential is still active:
+        if issuance_line.status in self.INACTIVE_STATUSES:
+            msg = _("Seems credential isn't active anymore: [{credential_id}]").format(
+                credential_id=issuance_line.user_credential.uuid
+            )
+            logger.warning(msg)
+            raise ValidationError({"reason": msg})
+
         return issuance_line
 
-    def _validate(self, initial_data):
+    def _validate(self, additional_data):
         """
         Check incoming request data and update issuance line if needed.
         """
-        serializer = self._storage.get_request_serializer(self._issuance_line, data=initial_data, partial=True)
+        serializer = self._storage.get_request_serializer(self._issuance_line, data=additional_data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -66,8 +82,7 @@ class CredentialIssuer:
         """
         Construct an appropriate verifiable credential for signing.
         """
-        # FIXME: build status entry
-        credential_data = self._issuance_line.construct()
+        credential_data = self._issuance_line.construct(context={"request": get_current_request()})
         return self._render(credential_data)
 
     def sign(self, composed_credential_json):
@@ -84,15 +99,14 @@ class CredentialIssuer:
             verifiable_credential = sign_with_didkit(composed_credential_json, json.dumps(didkit_options), issuer_key)
         except didkit.DIDKitException as exc:  # pylint: disable=no-member
             logger.exception(err_message)
-            if "expansion failed" in str(exc):
-                err_detail = _("defined property wasn't found within the linked data graph")
-            raise IssuanceException(detail=f"{err_message} [{err_detail}]")
-        except ValueError:
-            err_detail = _("identifier not recognized")
-            raise IssuanceException(detail=f"{err_message} [{err_detail}]")
+            raise IssuanceException(detail=f"{err_message} [{exc}]")
+        except ValueError as exc:
+            logger.exception(err_message)
+            raise IssuanceException(detail=f"{err_message} [{exc}]")
+        except Exception:
+            logger.exception(err_message)
 
-        verifiable_credential = json.loads(verifiable_credential)
-        return verifiable_credential
+        return json.loads(verifiable_credential)
 
     def issue(self):
         """
@@ -120,20 +134,22 @@ class CredentialIssuer:
         data_model_id = IssuanceLine.resolve_data_model(storage_id).ID
         status = getattr(user_credential, "status", None)
         status_index = IssuanceLine.get_next_status_index(issuer_id)
+        is_processed = [False]
 
         if issuer_id is None:
-            issuer_id = IssuanceLine.resolve_issuer()
+            issuer_id = IssuanceLine.resolve_issuer().issuer_id
 
-        # special case - Status List isn't related to any specific achievement:
+        # Status List isn't related to any specific achievement:
         if user_credential is None:
             status_index = None
+            is_processed = [False, True]  # there is always a single Status List line per Issuer
 
         issuance_line, __ = IssuanceLine.objects.get_or_create(
             user_credential=user_credential,
             storage_id=storage_id,
-            processed=False,
+            processed__in=is_processed,
+            issuer_id=issuer_id,
             defaults={
-                "issuer_id": issuer_id,
                 "data_model_id": data_model_id,
                 "status_index": status_index,
                 "status": status,

@@ -1,16 +1,19 @@
 """
 Verifiable Credentials DB models.
 """
+from urllib.parse import urljoin
 import uuid
+from crum import get_current_request
 
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
 from credentials.apps.credentials.models import UserCredential
 
-from ..composition import get_available_data_models, get_data_model
-from ..settings import vc_settings
+from ..composition.utils import get_available_data_models, get_data_model
+from ..settings import VerifiableCredentialsImproperlyConfigured, vc_settings
 from ..storages import get_storage
 
 
@@ -81,13 +84,27 @@ class IssuanceLine(TimeStampedModel):
     def issuer_name(self):
         return getattr(get_issuer(self.issuer_id), "name", None)
 
-    def construct(self):
-        serializer = self.data_model(self)
+    def construct(self, context):
+        serializer = self.data_model(self, context=context)
         return serializer.data
 
     def mark_processed(self):
         self.processed = True
         self.save()
+
+    def get_status_list_url(self, hash_str=None):
+        request = get_current_request()
+        if not request:
+            return None
+
+        base_url = request.build_absolute_uri().split(request.path)[0]
+        status_list_url = urljoin(
+            base_url, reverse("verifiable_credentials:api:v1:status-list-2021-v1", kwargs={"issuer_id": self.issuer_id})
+        )
+        if hash_str is None:
+            return status_list_url
+
+        return f"{status_list_url}#{hash_str}"
 
     @classmethod
     def resolve_issuer(cls):
@@ -163,7 +180,7 @@ class IssuanceConfiguration(TimeStampedModel):
 
         Top level scope issuer is the must (auto-created).
         """
-        IssuanceConfiguration.objects.get_or_create(
+        return IssuanceConfiguration.objects.get_or_create(
             issuer_id=vc_settings.DEFAULT_ISSUER.get("ID"),
             issuer_key=vc_settings.DEFAULT_ISSUER.get("KEY"),
             defaults={
@@ -177,27 +194,34 @@ def create_issuers():
     """
     Initiate issuers.
     """
-    IssuanceConfiguration.create_issuers()
+    return IssuanceConfiguration.create_issuers()
 
 
-def get_registered_issuers():
+def get_active_issuers():
     """
-    Collect all levels issuers.
+    Collect all enabled issuers' ids.
     """
     # currently, the only (system level, default) is supported.
-    return list(IssuanceConfiguration.objects.filter(enabled=True).values())
+    return list(IssuanceConfiguration.objects.filter(enabled=True).values_list("issuer_id", flat=True))
+
+
+def get_issuers():
+    """
+    Collect all issuers' ids.
+    """
+    # currently, the only (system level, default) is supported.
+    return list(IssuanceConfiguration.objects.values_list("issuer_id", flat=True))
 
 
 def get_default_issuer():
     """
     Fetch the default issuer.
     """
-    issuer = IssuanceConfiguration.objects.filter(enable=True).first()
-    if issuer:
-        return issuer
-
-    # NOTE: pick the first one if all are disabled for some reason.
-    IssuanceConfiguration.objects.first()
+    issuer = IssuanceConfiguration.objects.filter(enabled=True).first()
+    if not issuer:
+        msg = _("There are no enabled Issuance Configurations for some reason! At least one must be always active.")
+        raise VerifiableCredentialsImproperlyConfigured(msg)
+    return issuer
 
 
 def get_issuer(issuer_id):

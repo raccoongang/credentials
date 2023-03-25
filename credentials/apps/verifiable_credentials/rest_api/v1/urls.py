@@ -18,6 +18,7 @@ urlpatterns = [
         name="credentials-issue",
     ),
     path(r"storages/", views.AvailableStoragesView.as_view(), name="storages"),
+    path(r"status-list/2021/v1/<str:issuer_id>/", views.StatusList2021View.as_view(), name="status-list-2021-v1"),
 ]
 
 urlpatterns += router.urls
