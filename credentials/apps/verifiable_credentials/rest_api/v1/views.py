@@ -27,8 +27,6 @@ from credentials.apps.verifiable_credentials.utils import (
     is_valid_uuid,
 )
 
-from .serializers import ProgramCredentialSerializer
-
 
 logger = logging.getLogger(__name__)
 
@@ -53,10 +51,7 @@ class ProgramCredentialsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             response(dict): Information about the user's program credentials
         """
         program_credentials = get_user_program_credentials_data(request.user.username)
-
-        # FIXME: rid of serializer?
-        serializer = ProgramCredentialSerializer(program_credentials, many=True)
-        return Response({"program_credentials": serializer.data})
+        return Response({"program_credentials": program_credentials})
 
 
 class InitIssuanceView(APIView):
