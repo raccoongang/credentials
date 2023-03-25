@@ -30,6 +30,35 @@ class VerifiableCredentialsDataModel(StatusList2021EntryMixin, CredentialDataMod
     class Meta:
         read_only_fields = "__all__"
 
+    def resolve_credential_type(self, issuance_line):
+        """
+        Map Open edX credential type to data model types.
+
+        Decides: which types should be included based on the source Open edX credential type.
+        See:
+            https://w3c.github.io/vc-imp-guide/#creating-new-credential-types
+            https://schema.org/EducationalOccupationalCredential
+        """
+        if not issuance_line.user_credential:
+            return []
+
+        credential_content_type = issuance_line.user_credential.credential_content_type.model
+
+        # configuration: Open edX internal credential type <> verifiable credential type
+        credential_types = {
+            "programcertificate": [
+                "EducationalOccupationalCredential",
+            ],
+            "coursecertificate": [
+                "EducationalOccupationalCredential",
+            ],
+        }
+
+        if credential_content_type not in credential_types:
+            return []
+
+        return credential_types[credential_content_type]
+
     @classmethod
     def get_context(cls):
         """

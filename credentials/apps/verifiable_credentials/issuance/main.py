@@ -141,11 +141,11 @@ class CredentialIssuer:
             storage_id=storage_id,
             user_credential=user_credential,
             issuer_id=issuer_id,
-            processed=False,
+            processed=not bool(user_credential),
             defaults={
                 "data_model_id": data_model.ID,
-                "status_index": IssuanceLine.get_next_status_index(issuer_id),
-                "status": getattr(user_credential, "status", None),
+                "status_index": user_credential and IssuanceLine.get_next_status_index(issuer_id),
+                "status": user_credential and user_credential.status,
             },
         )
 

@@ -78,25 +78,8 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
             https://w3c.github.io/vc-imp-guide/#creating-new-credential-types
             https://schema.org/EducationalOccupationalCredential
         """
-        if not issuance_line.user_credential:
-            return []
+        return []
 
-        credential_content_type = issuance_line.user_credential.credential_content_type.model
-
-        # configuration: Open edX internal credential type <> verifiable credential type
-        credential_types = {
-            "programcertificate": [
-                "EducationalOccupationalCredential",
-            ],
-            "coursecertificate": [
-                "EducationalOccupationalCredential",
-            ],
-        }
-
-        if credential_content_type not in credential_types:
-            return []
-
-        return credential_types[credential_content_type]
 
     def _collect_hierarchically(self, class_method):
         """
