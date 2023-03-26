@@ -162,7 +162,7 @@ class IssuanceConfiguration(TimeStampedModel):
     issuer_name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        ordering = ["enabled"]
+        ordering = ["enabled", "created"]
 
     @classmethod
     def create_issuers(cls):
@@ -171,7 +171,7 @@ class IssuanceConfiguration(TimeStampedModel):
 
         Top level scope issuer is the must (auto-created).
         """
-        return IssuanceConfiguration.objects.get_or_create(
+        return IssuanceConfiguration.objects.update_or_create(
             issuer_id=vc_settings.DEFAULT_ISSUER.get("ID"),
             issuer_key=vc_settings.DEFAULT_ISSUER.get("KEY"),
             defaults={
@@ -208,7 +208,7 @@ def get_default_issuer():
     """
     Fetch the default issuer.
     """
-    issuer = IssuanceConfiguration.objects.filter(enabled=True).first()
+    issuer = IssuanceConfiguration.objects.filter(enabled=True).last()
     if not issuer:
         msg = _("There are no enabled Issuance Configurations for some reason! At least one must be always active.")
         raise VerifiableCredentialsImproperlyConfigured(msg)

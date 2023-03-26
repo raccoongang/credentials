@@ -30,9 +30,9 @@ DEFAULTS = {
         "credentials.apps.verifiable_credentials.storages.learner_credential_wallet.LCWallet",
     ],
     "DEFAULT_ISSUER": {
-        "ID": None,
-        "KEY": None,
-        "NAME": None,
+        "ID": "generate-me-with-didkit-lib",
+        "KEY": "generate-me-with-didkit-lib",
+        "NAME": "Default (system-wide)",
     },
     "DEFAULT_ISSUANCE_REQUEST_SERIALIZER": "credentials.apps.verifiable_credentials.issuance.serializers.IssuanceLineSerializer",  # pylint: disable=line-too-long
     "DEFAULT_RENDERER": "credentials.apps.verifiable_credentials.issuance.renderers.JSONLDRenderer",
