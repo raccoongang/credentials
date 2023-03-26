@@ -54,7 +54,7 @@ STATICFILES_STORAGE = None
 ENABLE_VERIFIABLE_CREDENTIALS = True
 VERIFIABLE_CREDENTIALS = {
     "DEFAULT_ISSUER": {
-        "DID": "test-issuer-did",
+        "ID": "test-issuer-did",
         "KEY": "test-issuer-key",
         "NAME": "test-issuer-name",
     }

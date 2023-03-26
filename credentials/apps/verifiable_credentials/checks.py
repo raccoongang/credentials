@@ -12,7 +12,7 @@ def vc_settings_checks(*args, **kwargs):
     Raises compatibility Errors upon:
         - No default data models defined
         - No default storages defined
-        - DEFAULT_ISSUER[DID] is not set
+        - DEFAULT_ISSUER[ID] is not set
         - DEFAULT_ISSUER[KEY] is not set
 
     Returns:
@@ -41,8 +41,8 @@ def vc_settings_checks(*args, **kwargs):
     if not vc_settings.DEFAULT_ISSUER.get("ID"):
         errors.append(
             Error(
-                f"DEFAULT_ISSUER[DID] is mandatory when {ENABLE_VERIFIABLE_CREDENTIALS.name} is True.",
-                hint=" Set DEFAULT_ISSUER[DID] to a valid DID string.",
+                f"DEFAULT_ISSUER[ID] is mandatory when {ENABLE_VERIFIABLE_CREDENTIALS.name} is True.",
+                hint=" Set DEFAULT_ISSUER[ID] to a valid DID string.",
                 id="verifiable_credentials.E004",
             )
         )
