@@ -12,9 +12,8 @@ def vc_settings_checks(*args, **kwargs):
     Raises compatibility Errors upon:
         - No default data models defined
         - No default storages defined
-        - FORCE_DATA_MODEL is not in DEFAULT_DATA_MODELS
-        - DEFAULT_ISSUER_DID is not set
-        - DEFAULT_ISSUER_KEY is not set
+        - DEFAULT_ISSUER[ID] is not set
+        - DEFAULT_ISSUER[KEY] is not set
 
     Returns:
         List of any Errors.
@@ -39,29 +38,20 @@ def vc_settings_checks(*args, **kwargs):
             )
         )
 
-    if vc_settings.FORCE_DATA_MODEL and vc_settings.FORCE_DATA_MODEL not in vc_settings.DEFAULT_DATA_MODELS:
+    if not vc_settings.DEFAULT_ISSUER.get("ID"):
         errors.append(
             Error(
-                "FORCE_DATA_MODEL is not in DEFAULT_DATA_MODELS.",
-                hint="Add FORCE_DATA_MODEL to DEFAULT_DATA_MODELS setting or remove FORCE_DATA_MODEL setting.",
-                id="verifiable_credentials.E002",
-            )
-        )
-
-    if not vc_settings.DEFAULT_ISSUER_DID:
-        errors.append(
-            Error(
-                f"DEFAULT_ISSUER_DID is mandatory when {ENABLE_VERIFIABLE_CREDENTIALS.name} is True.",
-                hint=" Set DEFAULT_ISSUER_DID to a valid DID string.",
+                f"DEFAULT_ISSUER[ID] is mandatory when {ENABLE_VERIFIABLE_CREDENTIALS.name} is True.",
+                hint=" Set DEFAULT_ISSUER[ID] to a valid DID string.",
                 id="verifiable_credentials.E004",
             )
         )
 
-    if not vc_settings.DEFAULT_ISSUER_KEY:
+    if not vc_settings.DEFAULT_ISSUER.get("KEY"):
         errors.append(
             Error(
-                f"DEFAULT_ISSUER_KEY is mandatory when {ENABLE_VERIFIABLE_CREDENTIALS.name} is True.",
-                hint="Set DEFAULT_ISSUER_KEY to a valid key string.",
+                f"DEFAULT_ISSUER[KEY] is mandatory when {ENABLE_VERIFIABLE_CREDENTIALS.name} is True.",
+                hint="Set DEFAULT_ISSUER[KEY] to a valid key string.",
                 id="verifiable_credentials.E005",
             )
         )

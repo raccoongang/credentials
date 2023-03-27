@@ -11,42 +11,45 @@ This module provides the `vc_setting` object, that is used to access
 Verifiable Credentials settings, checking for explicit settings first, then falling
 back to the defaults.
 """
+import logging
+
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.signals import setting_changed
 from django.utils.module_loading import import_string
 
+
+logger = logging.getLogger(__name__)
 
 DEFAULTS = {
     "DEFAULT_DATA_MODELS": [
         "credentials.apps.verifiable_credentials.composition.verifiable_credentials.VerifiableCredentialsDataModel",
         "credentials.apps.verifiable_credentials.composition.open_badges.OpenBadgesDataModel",
     ],
-    "FORCE_DATA_MODEL": None,
     "DEFAULT_STORAGES": [
         "credentials.apps.verifiable_credentials.storages.learner_credential_wallet.LCWallet",
     ],
-    "DEFAULT_ISSUER_DID": None,
-    "DEFAULT_ISSUER_KEY": None,
-    "DEFAULT_ISSUER_NAME": None,
+    "DEFAULT_ISSUER": {
+        "ID": "generate-me-with-didkit-lib",
+        "KEY": "generate-me-with-didkit-lib",
+        "NAME": "Default (system-wide)",
+    },
     "DEFAULT_ISSUANCE_REQUEST_SERIALIZER": "credentials.apps.verifiable_credentials.issuance.serializers.IssuanceLineSerializer",  # pylint: disable=line-too-long
-    "DEFAULT_RENDERER": "credentials.apps.verifiable_credentials.issuance.JSONLDRenderer",
+    "DEFAULT_RENDERER": "credentials.apps.verifiable_credentials.issuance.renderers.JSONLDRenderer",
+    "STATUS_LIST_STORAGE": "credentials.apps.verifiable_credentials.storages.status_list.StatusList2021",
+    "STATUS_LIST_DATA_MODEL": "credentials.apps.verifiable_credentials.composition.status_list.StatusListDataModel",
+    "STATUS_LIST_LENGTH": 10000,
 }
 
 # List of settings that may be in string import notation:
 IMPORT_STRINGS = [
     "DEFAULT_DATA_MODELS",
-    "FORCE_DATA_MODEL",
     "DEFAULT_STORAGES",
     "DEFAULT_ISSUANCE_REQUEST_SERIALIZER",
     "DEFAULT_RENDERER",
+    "STATUS_LIST_DATA_MODEL",
+    "STATUS_LIST_STORAGE",
 ]
-
-# TODO: implement settings self-checks:
-# - DEFAULT_DATA_MODELS are not empty (at least 1 data model is active)
-# - FORCE_DATA_MODEL in DEFAULT_DATA_MODELS
-# - DEFAULT_STORAGES are not empty (at least 1 storage is available)
-# - DEFAULT_ISSUER_DID is set
-# - DEFAULT_ISSUER_KEY is set
 
 
 class VCSettings:
@@ -147,4 +150,11 @@ def import_from_string(val, setting_name):
             e.__class__.__name__,
             e,
         )
-        raise ImportError(msg)
+        logger.exception(msg)
+        raise VerifiableCredentialsImproperlyConfigured(msg)
+
+
+class VerifiableCredentialsImproperlyConfigured(ImproperlyConfigured):
+    """
+    Verifiable Credentials settings are somehow improperly configured.
+    """

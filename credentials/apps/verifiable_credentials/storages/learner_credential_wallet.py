@@ -9,6 +9,7 @@ from ..issuance.serializers import IssuanceLineSerializer
 from ..storages import MobileWallet
 
 
+# FIXME - review this
 class LearnerCredentialWalletRequest(IssuanceLineSerializer):
     """
     Specific storage adapter.
@@ -42,7 +43,7 @@ class LCWallet(MobileWallet):
         params = {
             "issuer": settings.ROOT_URL,
             "vc_request_url": urljoin(
-                settings.ROOT_URL,
+                settings.ROOT_URL,  # FIXME provide context from view / crum
                 reverse(
                     "verifiable_credentials:api:v1:credentials-issue",
                     kwargs={"issuance_line_uuid": issuance_uuid},

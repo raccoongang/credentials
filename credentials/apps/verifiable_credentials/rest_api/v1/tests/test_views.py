@@ -4,7 +4,6 @@ from unittest import skip
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from rest_framework import status
-from rest_framework.test import APIRequestFactory
 
 from credentials.apps.catalog.tests.factories import (
     CourseFactory,
@@ -21,7 +20,6 @@ from credentials.apps.credentials.tests.factories import (
     UserCredentialFactory,
 )
 from credentials.apps.verifiable_credentials.issuance.models import IssuanceLine
-from credentials.apps.verifiable_credentials.rest_api.v1.serializers import ProgramCredentialSerializer
 from credentials.apps.verifiable_credentials.settings import vc_settings
 from credentials.apps.verifiable_credentials.utils import get_user_program_credentials_data
 
@@ -68,14 +66,6 @@ class ProgramCredentialsViewTests(SiteMixin, TestCase):
             credential=self.program_cert,
         )
 
-    def serialize_program_credentials(self):
-        request = APIRequestFactory(SERVER_NAME=self.site.domain).get("/")
-        return ProgramCredentialSerializer(
-            get_user_program_credentials_data(self.user.username),
-            context={"request": request},
-            many=True,
-        ).data
-
     def test_deny_unauthenticated_user(self):
         self.client.logout()
         response = self.client.get("/verifiable_credentials/api/v1/program_credentials/")
@@ -92,7 +82,7 @@ class ProgramCredentialsViewTests(SiteMixin, TestCase):
         self.client.login(username=self.user.username, password=USER_PASSWORD)
         response = self.client.get("/verifiable_credentials/api/v1/program_credentials/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["program_credentials"], self.serialize_program_credentials())
+        self.assertEqual(response.data["program_credentials"], get_user_program_credentials_data(self.user.username))
 
 
 class InitIssuanceViewTestCase(SiteMixin, TestCase):

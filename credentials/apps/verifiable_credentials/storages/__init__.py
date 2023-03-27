@@ -8,7 +8,7 @@ class StorageType(Enum):
     WEB = "web"
 
 
-class BaseWallet:
+class BaseStorage:
     """Base Class for Verifiable Credentials wallets.
     This class provides a blueprint for implementing wallet for Verifiable Credentials.
     """
@@ -27,6 +27,10 @@ class BaseWallet:
         return vc_settings.DEFAULT_ISSUANCE_REQUEST_SERIALIZER(*args, **kwargs)
 
     @classmethod
+    def get_data_model(cls, *args, **kwargs):
+        return cls.PREFERRED_DATA_MODEL
+
+    @classmethod
     def get_deeplink_url(cls, issuance_uuid, **kwargs):  # pylint: disable=unused-argument
         return cls.DEEP_LINK_URL
 
@@ -39,26 +43,11 @@ class BaseWallet:
         return cls.TYPE == StorageType.WEB
 
 
-class MobileWallet(BaseWallet):
+class MobileWallet(BaseStorage):
     TYPE = StorageType.MOBILE
     APP_LINK_ANDROID = None
     APP_LINK_IOS = None
 
 
-class WebWallet(BaseWallet):
+class WebWallet(BaseStorage):
     TYPE = StorageType.WEB
-
-
-def get_available_storages():
-    """
-    Returns currently configured verifiable credentials storages.
-    """
-    return vc_settings.DEFAULT_STORAGES
-
-
-def get_storage(storage_id):
-    for storage in get_available_storages():
-        if storage.ID == storage_id:
-            return storage
-
-    return None
