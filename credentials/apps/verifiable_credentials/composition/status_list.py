@@ -18,8 +18,10 @@ class StatusEntrySchema(serializers.Serializer):  # pylint: disable=abstract-met
     See: https://w3c.github.io/vc-status-list-2021/#statuslist2021entry
     """
 
+    TYPE = "StatusList2021Entry"
+
     id = serializers.SerializerMethodField()
-    type = serializers.CharField(default="StatusList2021Entry")
+    type = serializers.CharField(default=TYPE)
     statusPurpose = serializers.CharField(default=STATUS_LIST_PURPOSE)
     statusListIndex = serializers.CharField(source="status_index")
     statusListCredential = serializers.CharField(source="get_status_list_url")
@@ -54,8 +56,14 @@ class StatusList2021EntryMixin(serializers.Serializer):  # pylint: disable=abstr
 
 
 class StatusListSubjectSchema(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Status List 2021 credential subject.
+    """
+
+    TYPE = "StatusList2021"
+
     id = serializers.SerializerMethodField()
-    type = serializers.CharField(default="StatusList2021")
+    type = serializers.CharField(default=TYPE)
     statusPurpose = serializers.CharField(default=STATUS_LIST_PURPOSE)
     encodedList = serializers.SerializerMethodField(method_name="get_encoded_list")
 
@@ -71,7 +79,7 @@ class StatusListSubjectSchema(serializers.Serializer):  # pylint: disable=abstra
 
 class StatusListDataModel(CredentialDataModel):  # pylint: disable=abstract-method
     """
-    Status List 2021 Credential model.
+    Status List 2021 verifiable credential.
 
     See: https://w3c.github.io/vc-status-list-2021/#statuslist2021credential
     """

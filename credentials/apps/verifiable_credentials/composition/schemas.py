@@ -15,6 +15,9 @@ class EducationalOccupationalProgramSchema(serializers.Serializer):  # pylint: d
     name = serializers.CharField(source="user_credential.credential.program.title")
     description = serializers.CharField(source="user_credential.credential.program_uuid")
 
+    class Meta:
+        read_only_fields = "__all__"
+
 
 class EducationalOccupationalCredentialSchema(serializers.Serializer):  # pylint: disable=abstract-method
     """
@@ -28,6 +31,9 @@ class EducationalOccupationalCredentialSchema(serializers.Serializer):  # pylint
     description = serializers.CharField(source="user_credential.uuid")
     program = EducationalOccupationalProgramSchema(source="*")
 
+    class Meta:
+        read_only_fields = "__all__"
+
 
 class CredentialSubjectSchema(serializers.Serializer):  # pylint: disable=abstract-method
     id = serializers.CharField(source="subject_id")
@@ -39,10 +45,7 @@ class CredentialSubjectSchema(serializers.Serializer):  # pylint: disable=abstra
 
 class IssuerSchema(serializers.Serializer):  # pylint: disable=abstract-method
     id = serializers.CharField(source="issuer_id")
-    name = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField(source="issuer_name")
 
     class Meta:
         read_only_fields = "__all__"
-
-    def get_name(self, issuance_line):
-        return issuance_line.issuer_name
