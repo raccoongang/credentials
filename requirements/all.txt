@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-analytics-python==1.4.0
+analytics-python==1.4.post1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -13,7 +13,7 @@ asgiref==3.6.0
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   django
-astroid==2.15.0
+astroid==2.15.1
     # via
     #   -r requirements/dev.txt
     #   pylint
@@ -42,11 +42,11 @@ bleach==6.0.0
     #   -r requirements/production.txt
 bok-choy==1.1.1
     # via -r requirements/dev.txt
-boto3==1.26.93
+boto3==1.26.99
     # via
     #   -r requirements/production.txt
     #   django-ses
-botocore==1.29.93
+botocore==1.29.99
     # via
     #   -r requirements/production.txt
     #   boto3
@@ -101,7 +101,7 @@ coreschema==0.0.4
     #   drf-yasg
 coverage==7.2.2
     # via -r requirements/dev.txt
-cryptography==39.0.2
+cryptography==40.0.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -139,7 +139,6 @@ django==3.2.18
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   django-appconf
-    #   django-config-models
     #   django-cors-headers
     #   django-crum
     #   django-debug-toolbar
@@ -167,10 +166,6 @@ django-appconf==1.0.5
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   django-statici18n
-django-config-models==2.3.0
-    # via
-    #   -r requirements/dev.txt
-    #   -r requirements/production.txt
 django-cors-headers==3.14.0
     # via
     #   -r requirements/dev.txt
@@ -187,7 +182,7 @@ django-extensions==3.2.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-django-filter==22.1
+django-filter==23.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -239,7 +234,6 @@ djangorestframework==3.14.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-    #   django-config-models
     #   django-rest-swagger
     #   drf-jwt
     #   drf-yasg
@@ -287,11 +281,10 @@ edx-django-sites-extensions==4.0.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-edx-django-utils==5.2.0
+edx-django-utils==5.3.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-    #   django-config-models
     #   edx-drf-extensions
     #   edx-rest-api-client
     #   edx-toggles
@@ -325,11 +318,11 @@ exceptiongroup==1.1.1
     #   pytest
 factory-boy==3.2.1
     # via -r requirements/dev.txt
-faker==17.6.0
+faker==18.3.1
     # via
     #   -r requirements/dev.txt
     #   factory-boy
-filelock==3.10.0
+filelock==3.10.7
     # via
     #   -r requirements/dev.txt
     #   tox
@@ -354,7 +347,7 @@ idna==3.4
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   requests
-importlib-metadata==6.0.0
+importlib-metadata==6.1.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -400,7 +393,7 @@ lazy-object-proxy==1.9.0
     # via
     #   -r requirements/dev.txt
     #   astroid
-markdown==3.4.1
+markdown==3.4.3
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -426,7 +419,7 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-newrelic==8.7.0
+newrelic==8.7.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -475,7 +468,7 @@ pillow==9.4.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-platformdirs==3.1.1
+platformdirs==3.2.0
     # via
     #   -r requirements/dev.txt
     #   black
@@ -528,7 +521,7 @@ pyjwt[crypto]==2.6.0
     #   edx-drf-extensions
     #   edx-rest-api-client
     #   social-auth-core
-pylint==2.17.0
+pylint==2.17.1
     # via
     #   -r requirements/dev.txt
     #   edx-lint
@@ -601,7 +594,7 @@ python3-openid==3.2.0
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   social-auth-core
-pytz==2022.7.1
+pytz==2023.2
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -749,7 +742,7 @@ tomli==2.0.1
     #   pylint
     #   pytest
     #   tox
-tomlkit==0.11.6
+tomlkit==0.11.7
     # via
     #   -r requirements/dev.txt
     #   pylint
