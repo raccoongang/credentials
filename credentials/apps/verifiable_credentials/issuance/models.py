@@ -13,7 +13,7 @@ from django_extensions.db.models import TimeStampedModel
 from credentials.apps.credentials.models import UserCredential
 
 from ..composition.utils import get_data_model, get_data_models
-from ..settings import VerifiableCredentialsImproperlyConfigured, vc_settings
+from ..settings import vc_settings
 from ..storages.utils import get_storage
 
 
@@ -82,6 +82,7 @@ class IssuanceLine(TimeStampedModel):
 
     @property
     def issuer_name(self):
+        from .utils import get_issuer
         return getattr(get_issuer(self.issuer_id), "name", None)
 
     def construct(self, context):
@@ -111,6 +112,7 @@ class IssuanceLine(TimeStampedModel):
         """
         Unconditionally (for now) returns system-level Issier ID.
         """
+        from .utils import get_default_issuer
         return get_default_issuer()
 
     @classmethod
@@ -179,52 +181,3 @@ class IssuanceConfiguration(TimeStampedModel):
                 "issuer_name": vc_settings.DEFAULT_ISSUER.get("NAME"),
             },
         )
-
-
-def create_issuers():
-    """
-    Initiate issuers.
-    """
-    return IssuanceConfiguration.create_issuers()
-
-
-def get_active_issuers():
-    """
-    Collect all enabled issuers' ids.
-    """
-    # currently, the only (system level, default) is supported.
-    return list(IssuanceConfiguration.objects.filter(enabled=True).values_list("issuer_id", flat=True))
-
-
-def get_issuers():
-    """
-    Collect all issuers' ids.
-    """
-    # currently, the only (system level, default) is supported.
-    return list(IssuanceConfiguration.objects.values_list("issuer_id", flat=True))
-
-
-def get_default_issuer():
-    """
-    Fetch the default issuer.
-    """
-    issuer = IssuanceConfiguration.objects.filter(enabled=True).last()
-    if not issuer:
-        msg = _("There are no enabled Issuance Configurations for some reason! At least one must be always active.")
-        raise VerifiableCredentialsImproperlyConfigured(msg)
-    return issuer
-
-
-def get_issuer(issuer_id):
-    """
-    Fetch issuer by given ID.
-    """
-    issuer = IssuanceConfiguration.objects.filter(issuer_id=issuer_id).first()
-    return issuer
-
-
-def get_revoked_indices(issuer_id):
-    """
-    Collect status indicies for verifiable credentials with revoked achievements (in given Issuer context).
-    """
-    return IssuanceLine.get_indicies_for_status(issuer_id=issuer_id, status=UserCredential.REVOKED)

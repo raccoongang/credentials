@@ -12,9 +12,10 @@ from rest_framework.exceptions import ValidationError
 from credentials.apps.credentials.constants import UserCredentialStatus
 
 from ..issuance import IssuanceException, sign_with_didkit
+from ..issuance.utils import get_issuer
 from ..settings import vc_settings
 from ..storages.utils import get_storage
-from .models import IssuanceLine, get_issuer
+from .models import IssuanceLine
 
 
 logger = logging.getLogger(__name__)

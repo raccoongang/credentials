@@ -2,7 +2,7 @@
 
 from django.db import migrations
 
-from credentials.apps.verifiable_credentials.issuance.models import create_issuers
+from credentials.apps.verifiable_credentials.issuance.utils import create_issuers
 
 
 def make_default_issuers(apps, schema_editor):
