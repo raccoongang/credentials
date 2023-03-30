@@ -1,6 +1,7 @@
 """
 Issuance utils.
 """
+# pylint: disable=cyclic-import
 from django.utils.translation import gettext as _
 
 from credentials.apps.credentials.models import UserCredential

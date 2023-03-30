@@ -7,7 +7,7 @@ import logging
 from django.core.management import BaseCommand
 from django.utils.translation import gettext as _
 
-from credentials.apps.verifiable_credentials.issuance.models import create_issuers
+from credentials.apps.verifiable_credentials.issuance.utils import create_issuers
 from credentials.apps.verifiable_credentials.toggles import (
     ENABLE_VERIFIABLE_CREDENTIALS,
     is_verifiable_credentials_enabled,

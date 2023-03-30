@@ -82,7 +82,8 @@ class IssuanceLine(TimeStampedModel):
 
     @property
     def issuer_name(self):
-        from .utils import get_issuer
+        from .utils import get_issuer  # pylint: disable=import-outside-toplevel
+
         return getattr(get_issuer(self.issuer_id), "name", None)
 
     def construct(self, context):
@@ -112,7 +113,8 @@ class IssuanceLine(TimeStampedModel):
         """
         Unconditionally (for now) returns system-level Issier ID.
         """
-        from .utils import get_default_issuer
+        from .utils import get_default_issuer  # pylint: disable=import-outside-toplevel
+
         return get_default_issuer()
 
     @classmethod

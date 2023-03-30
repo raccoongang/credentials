@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from urllib import parse
 
 from .issuance.models import IssuanceConfiguration, IssuanceLine
 from .issuance.utils import get_issuers
@@ -51,7 +50,7 @@ class IssuanceLineAdmin(admin.ModelAdmin):
     search_fields = ("uuid",)
 
     @admin.display(description="issuer id")
-    def get_issuer_id(obj, issiance_line):
+    def get_issuer_id(self, issiance_line):
         limit = 30
         if len(issiance_line.issuer_id) > limit:
             return f"{issiance_line.issuer_id[:limit]}..."
