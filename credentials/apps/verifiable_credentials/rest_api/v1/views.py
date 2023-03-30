@@ -17,9 +17,9 @@ from rest_framework.views import APIView
 from credentials.apps.credentials.models import UserCredential
 from credentials.apps.verifiable_credentials.issuance import IssuanceException
 from credentials.apps.verifiable_credentials.issuance.main import CredentialIssuer
-from credentials.apps.verifiable_credentials.issuance.models import get_issuers
 from credentials.apps.verifiable_credentials.issuance.serializers import StorageSerializer
 from credentials.apps.verifiable_credentials.issuance.status_list import issue_status_list
+from credentials.apps.verifiable_credentials.issuance.utils import get_issuer_ids
 from credentials.apps.verifiable_credentials.storages.utils import get_available_storages, get_storage
 from credentials.apps.verifiable_credentials.utils import (
     generate_base64_qr_code,
@@ -204,7 +204,7 @@ class StatusList2021View(APIView):
     def get(self, request, *args, **kwargs):
         issuer_id = kwargs["issuer_id"]
 
-        if issuer_id not in get_issuers():
+        if issuer_id not in get_issuer_ids():
             msg = _("Can't find an Issuer with such ID [{issuer_id}]").format(issuer_id=issuer_id)
             logger.exception(msg)
             raise NotFound({"reason": msg})

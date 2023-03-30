@@ -45,7 +45,7 @@ class CredentialSubjectSchema(serializers.Serializer):  # pylint: disable=abstra
 
 class IssuerSchema(serializers.Serializer):  # pylint: disable=abstract-method
     id = serializers.CharField(source="issuer_id")
-    name = serializers.SerializerMethodField(source="issuer_name")
+    name = serializers.CharField(source="issuer_name")
 
     class Meta:
         read_only_fields = "__all__"

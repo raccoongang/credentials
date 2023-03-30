@@ -127,7 +127,7 @@ def regenerate_encoded_status_sequence(issuer_id):
     - compress
     - encode
     """
-    from ..issuance.models import get_revoked_indices  # pylint: disable=import-outside-toplevel
+    from ..issuance.utils import get_revoked_indices  # pylint: disable=import-outside-toplevel
 
     status_list = bytearray(vc_settings.STATUS_LIST_LENGTH)
 
