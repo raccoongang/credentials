@@ -20,6 +20,7 @@ from credentials.apps.verifiable_credentials.issuance.main import CredentialIssu
 from credentials.apps.verifiable_credentials.issuance.serializers import StorageSerializer
 from credentials.apps.verifiable_credentials.issuance.status_list import issue_status_list
 from credentials.apps.verifiable_credentials.issuance.utils import get_issuer_ids
+from credentials.apps.verifiable_credentials.permissions import VerifiablePresentation
 from credentials.apps.verifiable_credentials.storages.utils import get_available_storages, get_storage
 from credentials.apps.verifiable_credentials.utils import (
     generate_base64_qr_code,
@@ -117,7 +118,7 @@ class InitIssuanceView(APIView):
             storage_id=storage_id,
         )
 
-        deeplink = issuance_line.storage.get_deeplink_url(issuance_line.uuid, request=request)
+        deeplink = issuance_line.storage.get_deeplink_url(issuance_line)
 
         init_data = {
             "deeplink": deeplink,
@@ -157,8 +158,7 @@ class IssueCredentialView(APIView):
         JwtAuthentication,
         SessionAuthentication,
     )
-
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated | VerifiablePresentation,)
 
     def post(self, request, *args, **kwargs):
         try:
@@ -199,7 +199,7 @@ class StatusList2021View(APIView):
     GET: /verifiable_credentials/api/v1/status-list/2021/v1/<issuer-ID>/
     """
 
-    permission_classes = [AllowAny]
+    permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
         issuer_id = kwargs["issuer_id"]

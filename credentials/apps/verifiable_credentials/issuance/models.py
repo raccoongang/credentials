@@ -81,6 +81,10 @@ class IssuanceLine(TimeStampedModel):
         return get_data_model(self.data_model_id)
 
     @property
+    def data_model_name(self):
+        return self.data_model and self.data_model.NAME
+
+    @property
     def issuer_name(self):
         from .utils import get_issuer  # pylint: disable=import-outside-toplevel
 
