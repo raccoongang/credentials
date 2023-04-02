@@ -11,7 +11,9 @@ from .schemas import CredentialSubjectSchema
 from .status_list import StatusList2021EntryMixin
 
 
-class VerifiableCredentialsDataModel(StatusList2021EntryMixin, CredentialDataModel):  # pylint: disable=abstract-method
+class VerifiableCredentialsDataModel(
+        #StatusList2021EntryMixin,
+        CredentialDataModel):  # pylint: disable=abstract-method
     """
     Verifiable Credentials data model.
     """
@@ -59,11 +61,11 @@ class VerifiableCredentialsDataModel(StatusList2021EntryMixin, CredentialDataMod
 
         return credential_types[credential_content_type]
 
-    @classmethod
-    def get_context(cls):
-        """
-        Provide root context for all verifiable credentials.
-        """
-        return [
-            "https://w3id.org/dcc/v1",
-        ]
+   # @classmethod
+   # def get_context(cls):
+   #     """
+   #     Provide root context for all verifiable credentials.
+   #     """
+   #     return [
+   #         "https://schema.org/"
+   #     ]

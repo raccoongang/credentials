@@ -15,9 +15,10 @@ def get_data_models():
     """
     Return configured verifiable credentials data models.
     """
-    return get_available_data_models() + [
-        vc_settings.STATUS_LIST_DATA_MODEL,
-    ]
+    return get_available_data_models()
+# + [
+#         vc_settings.STATUS_LIST_DATA_MODEL,
+#     ]
 
 
 def get_data_model(model_id):
