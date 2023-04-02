@@ -11,7 +11,7 @@ class EducationalOccupationalProgramSchema(serializers.Serializer):  # pylint: d
 
     TYPE = "EducationalOccupationalProgram"
 
-    id = serializers.CharField(default=TYPE, help_text="https://schema.org/EducationalOccupationalProgram")
+    id = serializers.CharField(source="user_credential.credential.program_uuid")
     name = serializers.CharField(source="user_credential.credential.program.title")
     description = serializers.CharField(source="user_credential.credential.program_uuid")
 
@@ -26,7 +26,6 @@ class EducationalOccupationalCredentialSchema(serializers.Serializer):  # pylint
 
     TYPE = "EducationalOccupationalCredential"
 
-    id = serializers.CharField(default=TYPE, help_text="https://schema.org/EducationalOccupationalCredential")
     name = serializers.CharField(source="user_credential.credential.title")
     description = serializers.CharField(source="user_credential.uuid")
     program = EducationalOccupationalProgramSchema(source="*")
@@ -36,8 +35,11 @@ class EducationalOccupationalCredentialSchema(serializers.Serializer):  # pylint
 
 
 class CredentialSubjectSchema(serializers.Serializer):  # pylint: disable=abstract-method
+    type = serializers.CharField(default=TYPE, help_text="https://schema.org/EducationalOccupationalCredential")
     id = serializers.CharField(source="subject_id")
     hasCredential = EducationalOccupationalCredentialSchema(source="*")
+    type = serializers.CharField(default="schema:Person")
+    name = serializers.CharField(source="user_credential.username") # TODO: change to full name
 
     class Meta:
         read_only_fields = "__all__"
@@ -46,6 +48,7 @@ class CredentialSubjectSchema(serializers.Serializer):  # pylint: disable=abstra
 class IssuerSchema(serializers.Serializer):  # pylint: disable=abstract-method
     id = serializers.CharField(source="issuer_id")
     name = serializers.CharField(source="issuer_name")
+    type = serializers.CharField(default="Issuer")
 
     class Meta:
         read_only_fields = "__all__"

@@ -153,18 +153,14 @@ class IssueCredentialView(APIView):
     https://w3c-ccg.github.io/vc-api/#issue-credential
     """
 
-    authentication_classes = (
-        JwtAuthentication,
-        SessionAuthentication,
-    )
-
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
         try:
             credential_issuer = CredentialIssuer(data=request.data, issuance_uuid=kwargs.get("issuance_line_uuid"))
             verifiable_credential = credential_issuer.issue()
-            return Response({"verifiableCredential": verifiable_credential}, status=status.HTTP_201_CREATED)
+            response = credential_issuer.prepare_response(verifiable_credential)
+            return Response(response, status=status.HTTP_201_CREATED)
         except IssuanceException as exc:
             raise ValidationError({"issuance_issue": exc.detail})
 

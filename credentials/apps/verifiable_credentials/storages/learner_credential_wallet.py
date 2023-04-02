@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from ..composition.open_badges import OpenBadgesDataModel
+from ..issuance.models import IssuanceLine
 from ..issuance.serializers import IssuanceLineSerializer
 from ..storages import MobileWallet
 
@@ -21,7 +22,7 @@ class LearnerCredentialWalletRequest(IssuanceLineSerializer):
         """
         Maps storage-specific request properties to the unified verifiable credential source data.
         """
-        self.swap_value(data, "holder", "holder_id")
+        self.swap_value(data, "holder", "subject_id")
         return super().to_internal_value(data)
 
 
@@ -41,7 +42,7 @@ class LCWallet(MobileWallet):
     @classmethod
     def get_deeplink_url(cls, issuance_uuid, **kwargs):
         params = {
-            "issuer": settings.ROOT_URL,
+            "issuer": IssuanceLine.objects.get(uuid=issuance_uuid).issuer_id,
             "vc_request_url": urljoin(
                 settings.ROOT_URL,  # FIXME provide context from view / crum
                 reverse(
@@ -50,5 +51,6 @@ class LCWallet(MobileWallet):
                 ),
             ),
             "challenge": issuance_uuid,
+            "auth_type": "bearer"
         }
         return f"{cls.DEEP_LINK_URL}?{urlencode(params)}"
