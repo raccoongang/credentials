@@ -160,7 +160,6 @@ class IssueCredentialView(APIView):
             credential_issuer = CredentialIssuer(data=request.data, issuance_uuid=kwargs.get("issuance_line_uuid"))
             verifiable_credential = credential_issuer.issue()
             response = credential_issuer.prepare_response(verifiable_credential)
-            import pdb; pdb.set_trace
             return Response(response, status=status.HTTP_201_CREATED)
         except IssuanceException as exc:
             raise ValidationError({"issuance_issue": exc.detail})
