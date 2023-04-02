@@ -65,5 +65,5 @@ class VerifiableCredentialsDataModel(StatusList2021EntryMixin, CredentialDataMod
         Provide root context for all verifiable credentials.
         """
         return [
-            "https://schema.org/",
+            "https://w3id.org/dcc/v1",
         ]

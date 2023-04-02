@@ -11,6 +11,7 @@ class EducationalOccupationalProgramSchema(serializers.Serializer):  # pylint: d
 
     TYPE = "EducationalOccupationalProgram"
 
+    type = serializers.CharField(default=TYPE, help_text="https://schema.org/EducationalOccupationalCredential")
     id = serializers.CharField(source="user_credential.credential.program_uuid")
     name = serializers.CharField(source="user_credential.credential.program.title")
     description = serializers.CharField(source="user_credential.credential.program_uuid")
@@ -24,17 +25,17 @@ class EducationalOccupationalCredentialSchema(serializers.Serializer):  # pylint
     Defines Open edX user credential.
     """
 
-    TYPE = "EducationalOccupationalCredential"
-
     name = serializers.CharField(source="user_credential.credential.title")
     description = serializers.CharField(source="user_credential.uuid")
-    program = EducationalOccupationalProgramSchema(source="*")
+    awardedOnCompletionOf = EducationalOccupationalProgramSchema(source="*")
 
     class Meta:
         read_only_fields = "__all__"
 
 
 class CredentialSubjectSchema(serializers.Serializer):  # pylint: disable=abstract-method
+    TYPE = "EducationalOccupationalCredential"
+
     type = serializers.CharField(default=TYPE, help_text="https://schema.org/EducationalOccupationalCredential")
     id = serializers.CharField(source="subject_id")
     hasCredential = EducationalOccupationalCredentialSchema(source="*")

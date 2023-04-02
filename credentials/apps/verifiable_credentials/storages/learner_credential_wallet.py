@@ -54,3 +54,7 @@ class LCWallet(MobileWallet):
             "auth_type": "bearer"
         }
         return f"{cls.DEEP_LINK_URL}?{urlencode(params)}"
+
+    @classmethod
+    def prepare_response(cls, composed_credential_json, **kwargs):
+        return composed_credential_json

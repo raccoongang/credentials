@@ -124,8 +124,8 @@ class CredentialIssuer:
 
     def prepare_response(self, composed_credential_json):
         if hasattr(self._storage, "prepare_response"): # TODO: change to serializer?
-            return self._storage.prepare_response()
-        return composed_credential_json
+            return self._storage.prepare_response(composed_credential_json)
+        return {"verifiableCredential": composed_credential_json}
         
     @classmethod
     def init(cls, *, storage_id, user_credential=None, issuer_id=None):
