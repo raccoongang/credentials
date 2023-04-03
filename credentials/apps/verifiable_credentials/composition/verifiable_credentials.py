@@ -6,12 +6,11 @@ See specification: https://www.w3.org/TR/vc-data-model/
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
-from . import CredentialDataModel
 from .schemas import CredentialSubjectSchema
-from .status_list import StatusList2021EntryMixin
+from .status_list import CredentialWithStatusList2021DataModel
 
 
-class VerifiableCredentialsDataModel(StatusList2021EntryMixin, CredentialDataModel):  # pylint: disable=abstract-method
+class VerifiableCredentialsDataModel(CredentialWithStatusList2021DataModel):  # pylint: disable=abstract-method
     """
     Verifiable Credentials data model.
     """

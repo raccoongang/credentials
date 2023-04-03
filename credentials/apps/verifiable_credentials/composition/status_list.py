@@ -55,6 +55,17 @@ class StatusList2021EntryMixin(serializers.Serializer):  # pylint: disable=abstr
         ]
 
 
+class StatusListIssuerSchema(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Bare Issuer for Status List.
+    """
+
+    id = serializers.CharField(source="issuer_id")
+
+    class Meta:
+        read_only_fields = "__all__"
+
+
 class StatusListSubjectSchema(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Status List 2021 credential subject.
@@ -91,6 +102,7 @@ class StatusListDataModel(CredentialDataModel):  # pylint: disable=abstract-meth
     id = serializers.CharField(
         source="get_status_list_url", help_text="https://www.w3.org/TR/vc-data-model/#identifiers"
     )
+    issuer = StatusListIssuerSchema(source="*")
     credentialSubject = StatusListSubjectSchema(
         source="*", help_text="https://www.w3.org/2018/credentials/#credentialSubject"
     )
@@ -115,6 +127,12 @@ class StatusListDataModel(CredentialDataModel):  # pylint: disable=abstract-meth
         return [
             "StatusList2021Credential",
         ]
+
+
+class CredentialWithStatusList2021DataModel(StatusList2021EntryMixin, CredentialDataModel):  # pylint: disable=abstract-method
+    """
+    Extended with Status List 2021 Entry credential data model.
+    """
 
 
 def regenerate_encoded_status_sequence(issuer_id):
