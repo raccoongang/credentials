@@ -81,10 +81,24 @@ class IssuanceLine(TimeStampedModel):
         return get_data_model(self.data_model_id)
 
     @property
+    def data_model_name(self):
+        return self.data_model and self.data_model.NAME
+
+    @property
     def issuer_name(self):
         from .utils import get_issuer  # pylint: disable=import-outside-toplevel
 
-        return getattr(get_issuer(self.issuer_id), "name", None)
+        return getattr(get_issuer(self.issuer_id), "issuer_name", None)
+
+    def credential_name(self):
+        """
+        Map internal credential types to verbose labels (source models do not provide those).
+        """
+        credential_types = {
+            "programcertificate": _("Program Certificate"),
+            "coursecertificate": _("Course Certificate"),
+        }
+        return credential_types.get(self.user_credential.credential_content_type.model)
 
     def construct(self, context):
         serializer = self.data_model(self, context=context)
