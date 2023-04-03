@@ -44,7 +44,6 @@ class CredentialSubjectSchema(serializers.Serializer):  # pylint: disable=abstra
 
 
 class IssuerSchema(serializers.Serializer):  # pylint: disable=abstract-method
-
     TYPE = "Profile"
 
     id = serializers.CharField(source="issuer_id")

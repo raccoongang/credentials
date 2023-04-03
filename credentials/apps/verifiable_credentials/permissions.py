@@ -22,20 +22,21 @@ class VerifiablePresentation(BasePermission):
             "type": [
                 "VerifiablePresentation"
             ],
-            "holder": "did:key:z6MkfkiUAL4tWoDAjNFWJsDbZRZCGuYsdhqd5GWpnY7mGpAQ",
+            "holder": "<issuer-did>",
             "proof": {
                 "type": "Ed25519Signature2020",
                 "created": "2023-04-03T13:18:05Z",
-                "verificationMethod": "did:key:z6MkfkiUAL4tWoDAjNFWJsDbZRZCGuYsdhqd5GWpnY7mGpAQ#z6MkfkiUAL4tWoDAjNFWJsDbZRZCGuYsdhqd5GWpnY7mGpAQ",
+                "verificationMethod": "<issuer-did>",
                 "proofPurpose": "authentication",
                 "challenge": "c44c45c6-e6e1-4db1-ac2d-413aa0eaf438",
-                "proofValue": "z5B2bRwmvzoAfJ8JnsnnXCdAMBk28nW9NY8eVm83HSq92MkA8rCq2SVx58pwYiTzZFQNb2hHt3NEc1DQwUY2jvrsC"
+                "proofValue": "z5B2bRwmvzoAfJ8JnsnnXCdAMBk28nW9NY8eVm83HSq92MkA8rCq2SVx58pwYiTzZFQNb2hHt3NEc1DQ..."
             }
         }
         """
 
         try:
-            if 'VerifiablePresentation' in request.data["type"]:
+            if "VerifiablePresentation" in request.data["type"]:
                 return True
         except (KeyError, TypeError, IndexError):
-            return False
+            pass
+        return False

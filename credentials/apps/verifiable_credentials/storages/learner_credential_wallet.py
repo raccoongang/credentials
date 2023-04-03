@@ -1,14 +1,10 @@
 from urllib.parse import urlencode, urljoin
 
 from crum import get_current_request
-from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from ..composition.verifiable_credentials import VerifiableCredentialsDataModel
-
 from ..composition.open_badges import OpenBadgesDataModel
-from ..issuance.serializers import IssuanceLineSerializer
 from ..storages import MobileWallet
 
 
@@ -25,7 +21,6 @@ class LCWallet(MobileWallet):
     DEEP_LINK_URL = "dccrequest://request"
 
     PREFERRED_DATA_MODEL = OpenBadgesDataModel
-    # PREFERRED_DATA_MODEL = VerifiableCredentialsDataModel
 
     @classmethod
     def get_deeplink_url(cls, issuance_line, **kwargs):
@@ -33,8 +28,7 @@ class LCWallet(MobileWallet):
         if not request:
             return None
 
-        # issuance_base_url = request.build_absolute_uri().split(request.path)[0]
-        issuance_base_url = "http://8825-92-118-76-214.ngrok.io/"
+        issuance_base_url = request.build_absolute_uri().split(request.path)[0]
 
         params = {
             "issuer": issuance_line.issuer_id,
