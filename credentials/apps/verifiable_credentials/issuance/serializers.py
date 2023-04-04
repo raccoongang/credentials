@@ -20,7 +20,7 @@ class IssuanceLineSerializer(serializers.ModelSerializer):
         read_only_fields = ["uuid", "user_credential", "processed", "issuer_id", "storage_id"]
 
     @staticmethod
-    def swap_value(data: dict, source_key: str, target_key: str) -> None:
+    def swap_value(data, source_key, target_key):
         data[target_key] = data.pop(source_key)
 
 

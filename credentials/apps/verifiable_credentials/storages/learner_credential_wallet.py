@@ -5,7 +5,27 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from ..composition.open_badges import OpenBadgesDataModel
+from ..issuance.models import IssuanceLine
+from ..issuance.serializers import IssuanceLineSerializer
 from ..storages import MobileWallet
+
+
+class LCWalletRequest(IssuanceLineSerializer):
+    """
+    Specific storage adapter.
+    Another storage may not provide expected shape for issuance request (field names, structure).
+    """
+
+    class Meta:
+        model = IssuanceLine
+        fields = ["subject_id",]
+
+    def to_internal_value(self, data):
+        """
+        Maps storage-specific request properties to the unified verifiable credential source data.
+        """
+        self.swap_value(data, "holder", "subject_id")
+        return super().to_internal_value(data)
 
 
 class LCWallet(MobileWallet):
@@ -21,6 +41,7 @@ class LCWallet(MobileWallet):
     DEEP_LINK_URL = "dccrequest://request"
 
     PREFERRED_DATA_MODEL = OpenBadgesDataModel
+    ISSUANCE_REQUEST_SERIALIZER = LCWalletRequest
 
     @classmethod
     def get_deeplink_url(cls, issuance_line, **kwargs):

@@ -1,19 +1,27 @@
 """
 Verifiable credentials specific permissions.
 """
+import json
+import logging
+
+import didkit
 from rest_framework.permissions import BasePermission
+
+from .issuance import didkit_verify_presentation
+
+
+logger = logging.getLogger(__name__)
 
 
 class VerifiablePresentation(BasePermission):
     """
-    Allow based on provided verifiable credential.
+    Allow based on provided verifiable presentation ("authentication" purpose only).
     """
 
     def has_permission(self, request, view):
         """
         If a verifiable presentation with a proofPurpose "authentication" provided - validate it and decide.
 
-        FIXME: validate with didkit
         {
             "@context": [
                 "https://www.w3.org/2018/credentials/v1",
@@ -33,10 +41,20 @@ class VerifiablePresentation(BasePermission):
             }
         }
         """
+        presentation = request.data
+
+        if not presentation.get("proof", {}).get("proofPurpose") == "authentication":
+            return False
+
+        # presentation verification:
+        presentation_json = json.dumps(presentation)
+        proof_options_json = json.dumps({})
 
         try:
-            if "VerifiablePresentation" in request.data["type"]:
-                return True
-        except (KeyError, TypeError, IndexError):
+            result = didkit_verify_presentation(presentation_json, proof_options_json)
+            logger.debug("Verifiable presentiation authN result: (%s)", result)
+            return True
+        except didkit.DIDKitException:  # pylint: disable=no-member
             pass
+
         return False
