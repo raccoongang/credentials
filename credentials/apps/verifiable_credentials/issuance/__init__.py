@@ -17,7 +17,6 @@ async def didkit_verify_presentation(presentation, proof_options):
     return await didkit.verify_presentation(presentation, proof_options)  # pylint: disable=no-member
 
 
-
 class IssuanceException(Exception):
     """
     Outlines a general error during a verifiable credential issuance.

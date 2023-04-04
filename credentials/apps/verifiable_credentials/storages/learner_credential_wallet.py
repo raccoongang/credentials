@@ -18,7 +18,9 @@ class LCWalletRequest(IssuanceLineSerializer):
 
     class Meta:
         model = IssuanceLine
-        fields = ["subject_id",]
+        fields = [
+            "subject_id",
+        ]
 
     def to_internal_value(self, data):
         """

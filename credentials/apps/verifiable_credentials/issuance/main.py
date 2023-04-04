@@ -70,7 +70,6 @@ class CredentialIssuer:
         """
         Check incoming request data and update issuance line if needed.
         """
-        breakpoint()
         serializer = self._storage.get_request_serializer(self._issuance_line, data=additional_data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -98,7 +97,9 @@ class CredentialIssuer:
         issuer_key = get_issuer(self._issuance_line.issuer_id).issuer_key
 
         try:
-            verifiable_credential_json = didkit_issue_credential(composed_credential_json, json.dumps(didkit_options), issuer_key)
+            verifiable_credential_json = didkit_issue_credential(
+                composed_credential_json, json.dumps(didkit_options), issuer_key
+            )
         except didkit.DIDKitException as exc:  # pylint: disable=no-member
             logger.exception(err_message)
             raise IssuanceException(detail=f"{err_message} [{exc}]")
@@ -111,17 +112,16 @@ class CredentialIssuer:
     def verify(self, verifiable_credential_json):
         """
         Check if issued verifiable credentials actually passes verification.
+
+        didkit verification example (JSON): '{"checks":["proof"],"warnings":[],"errors":[]}'
         """
         err_message = _("Issued verifiable credential can't be verified!")
 
         proof_options = json.dumps({})
 
         try:
-            """
-            verification_result = '{"checks":["proof"],"warnings":[],"errors":[]}'
-            """
             verification_result = didkit_verify_credential(verifiable_credential_json, proof_options)
-            logger.debug('Verifiable credential passed verifiacation: (%s)', verification_result)
+            logger.debug("Verifiable credential passed verifiacation: (%s)", verification_result)
         except didkit.DIDKitException as exc:  # pylint: disable=no-member
             logger.exception(err_message)
             raise IssuanceException(detail=f"{err_message} [{exc}]")
