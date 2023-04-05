@@ -11,7 +11,7 @@ from rest_framework.exceptions import ValidationError
 
 from credentials.apps.credentials.constants import UserCredentialStatus
 
-from ..issuance import IssuanceException, sign_with_didkit
+from ..issuance import IssuanceException, didkit_issue_credential, didkit_verify_credential
 from ..issuance.utils import get_issuer
 from ..settings import vc_settings
 from ..storages.utils import get_storage
@@ -97,7 +97,9 @@ class CredentialIssuer:
         issuer_key = get_issuer(self._issuance_line.issuer_id).issuer_key
 
         try:
-            verifiable_credential = sign_with_didkit(composed_credential_json, json.dumps(didkit_options), issuer_key)
+            verifiable_credential_json = didkit_issue_credential(
+                composed_credential_json, json.dumps(didkit_options), issuer_key
+            )
         except didkit.DIDKitException as exc:  # pylint: disable=no-member
             logger.exception(err_message)
             raise IssuanceException(detail=f"{err_message} [{exc}]")
@@ -105,7 +107,24 @@ class CredentialIssuer:
             logger.exception(err_message)
             raise IssuanceException(detail=f"{err_message} [{exc}]")
 
-        return json.loads(verifiable_credential)
+        return verifiable_credential_json
+
+    def verify(self, verifiable_credential_json):
+        """
+        Check if issued verifiable credentials actually passes verification.
+
+        didkit verification example (JSON): '{"checks":["proof"],"warnings":[],"errors":[]}'
+        """
+        err_message = _("Issued verifiable credential can't be verified!")
+
+        proof_options = json.dumps({})
+
+        try:
+            verification_result = didkit_verify_credential(verifiable_credential_json, proof_options)
+            logger.debug("Verifiable credential passed verifiacation: (%s)", verification_result)
+        except didkit.DIDKitException as exc:  # pylint: disable=no-member
+            logger.exception(err_message)
+            raise IssuanceException(detail=f"{err_message} [{exc}]")
 
     def issue(self):
         """
@@ -115,12 +134,15 @@ class CredentialIssuer:
         composed_credential = self.compose()
 
         # signing / structure validation:
-        verifiable_credential = self.sign(composed_credential)
+        verifiable_credential_json = self.sign(composed_credential)
+
+        # check it's verifiable:
+        self.verify(verifiable_credential_json)
 
         # issuance line finalization:
         self._issuance_line.finalize()
 
-        return verifiable_credential
+        return json.loads(verifiable_credential_json)
 
     @classmethod
     def init(cls, *, storage_id, user_credential=None, issuer_id=None):

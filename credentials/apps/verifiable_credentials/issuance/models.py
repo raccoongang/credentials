@@ -66,6 +66,10 @@ class IssuanceLine(TimeStampedModel):
         help_text=_("Keeps track on a corresponding user credential's status"),
     )
 
+    class Meta:
+        ordering = ("created",)
+        unique_together = ("issuer_id", "status_index")
+
     def __str__(self):
         return (
             f"IssuanceLine(user_credential={self.user_credential}, "
@@ -136,7 +140,7 @@ class IssuanceLine(TimeStampedModel):
         """
         Return next status list position for given Issuer.
         """
-        last = cls.objects.filter(issuer_id=issuer_id, status_index__gte=0).last()
+        last = cls.objects.filter(issuer_id=issuer_id, status_index__gte=0).order_by("status_index").last()
         if not last:
             return 0
         return last.status_index + 1
@@ -180,7 +184,7 @@ class IssuanceConfiguration(TimeStampedModel):
     issuer_name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        ordering = ["enabled", "created"]
+        ordering = ("enabled", "created")
 
     @classmethod
     def create_issuers(cls):
