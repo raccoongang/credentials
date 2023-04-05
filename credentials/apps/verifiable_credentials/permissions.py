@@ -8,6 +8,7 @@ import didkit
 from rest_framework.permissions import BasePermission
 
 from .issuance import didkit_verify_presentation
+from .issuance.models import IssuanceLine
 
 
 logger = logging.getLogger(__name__)
@@ -22,6 +23,7 @@ class VerifiablePresentation(BasePermission):
         """
         If a verifiable presentation with a proofPurpose "authentication" provided - validate it and decide.
 
+        AuthN presentation example (based on the Learner Recored Wallet implementation):
         {
             "@context": [
                 "https://www.w3.org/2018/credentials/v1",
@@ -30,7 +32,7 @@ class VerifiablePresentation(BasePermission):
             "type": [
                 "VerifiablePresentation"
             ],
-            "holder": "<issuer-did>",
+            "holder": "<holder-did>",
             "proof": {
                 "type": "Ed25519Signature2020",
                 "created": "2023-04-03T13:18:05Z",
@@ -43,7 +45,11 @@ class VerifiablePresentation(BasePermission):
         """
         presentation = request.data
 
-        if not presentation.get("proof", {}).get("proofPurpose") == "authentication":
+        # validate proof
+        proof = presentation.get("proof", {})
+        if not proof.get("proofPurpose") == "authentication":
+            return False
+        if not IssuanceLine.objects.exists(uuid=proof.get("challenge")):
             return False
 
         # presentation verification:
@@ -53,7 +59,6 @@ class VerifiablePresentation(BasePermission):
         try:
             result = didkit_verify_presentation(presentation_json, proof_options_json)
             logger.debug("Verifiable presentiation authN result: (%s)", result)
-            return True
         except didkit.DIDKitException:  # pylint: disable=no-member
             pass
 
