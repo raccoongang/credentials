@@ -93,7 +93,9 @@ class CredentialIssuer:
         """
         err_message = _("Provided data didn't validate")
 
-        didkit_options = {}
+        didkit_options = {
+            "type": "Ed25519Signature2020", # TODO: Add abstraction to configure didkit_options on a storage level
+        }
         issuer_key = get_issuer(self._issuance_line.issuer_id).issuer_key
 
         try:
