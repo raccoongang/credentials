@@ -11,8 +11,8 @@ from rest_framework.exceptions import ValidationError
 
 from credentials.apps.credentials.constants import UserCredentialStatus
 
-from ..issuance import IssuanceException, didkit_issue_credential, didkit_verify_credential
-from ..issuance.utils import get_issuer
+from ..issuance import IssuanceException
+from ..issuance.utils import didkit_issue_credential, didkit_verify_credential, get_issuer
 from ..settings import vc_settings
 from ..storages.utils import get_storage
 from .models import IssuanceLine
@@ -90,11 +90,15 @@ class CredentialIssuer:
     def sign(self, composed_credential_json):
         """
         Sign the composed digital credential document.
+
+        NOTE:
+        -   currently, the Ed25519Signature2020 Linked Data Proof suite is used exclusively (is LC Wallet expected);
+        -   future wallets/storages integration may bring another's approaches support;
         """
         err_message = _("Provided data didn't validate")
 
         didkit_options = {
-            "type": "Ed25519Signature2020",  # TODO: Add abstraction to configure didkit_options on a storage level
+            "type": "Ed25519Signature2020",
         }
         issuer_key = get_issuer(self._issuance_line.issuer_id).issuer_key
 
