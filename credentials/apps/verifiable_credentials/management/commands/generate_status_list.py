@@ -21,5 +21,5 @@ class Command(BaseCommand):
         parser.add_argument("issuer_id", type=str, help="The issuer DID")
 
     def handle(self, *args, **options):
-        issuer_id = options.get("issuer_did")
+        issuer_id = options.get("issuer_id")
         print(json.dumps(issue_status_list(issuer_id), indent=4))
