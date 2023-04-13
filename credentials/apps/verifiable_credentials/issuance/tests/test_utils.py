@@ -1,4 +1,4 @@
-from unittest import TestCase, mock
+from unittest import mock
 
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
@@ -51,6 +51,7 @@ class UtilsIssuanceTestCase(SiteMixin, TestCase):
             credential=self.program_cert,
         )
         self.issuance_line = IssuanceLineFactory.create(
+            issuer_id="issuer-id",
             user_credential=self.program_user_credential,
             status_index=5,
             storage_id=LCWallet.ID,
@@ -59,7 +60,10 @@ class UtilsIssuanceTestCase(SiteMixin, TestCase):
             issuer_id=self.issuance_line.issuer_id,
         )
         self.inactive_issuance_line = IssuanceLineFactory.create(
-            user_credential=self.program_user_credential, status_index=6, status=UserCredentialStatus.REVOKED
+            user_credential=self.program_user_credential,
+            status_index=6,
+            status=UserCredentialStatus.REVOKED,
+            issuer_id="inactive-issuer-id",
         )
 
     @mock.patch("credentials.apps.verifiable_credentials.issuance.utils.IssuanceConfiguration.create_issuers")
@@ -68,18 +72,16 @@ class UtilsIssuanceTestCase(SiteMixin, TestCase):
         mock_create_issuers.assert_called_once()
 
     def test_get_active_issuers(self):
-        IssuanceConfigurationFactory.create_batch(2)
+        IssuanceConfigurationFactory.create(issuer_id="new-issuer-id")
         active_issuers = get_active_issuers()
-        self.assertEqual(len(active_issuers), 4)
-        self.assertEqual(active_issuers, ["test-issuer-did", "issuer-id-2", "2", "3"])
+        self.assertEqual(len(active_issuers), 3)
+        # test-issuer-did - created from settings with `create_issuers`, issuer-id - from setup
+        self.assertEqual(active_issuers, ["test-issuer-did", "issuer-id", "new-issuer-id"])
 
     def test_get_issuer_ids(self):
-        IssuanceConfigurationFactory.create_batch(2)
         issuer_ids = get_issuer_ids()
-        self.assertEqual(len(issuer_ids), 4)
-        # FIXME: probably caused some cache or incorrect setup
-        # issuer ids 5 and 6 after couple test re-runs become 8 and 9
-        # self.assertEqual(issuer_ids, ['test-issuer-did', 'issuer-id-4', '5', '6'])
+        self.assertEqual(len(issuer_ids), 2)
+        self.assertEqual(issuer_ids, ["test-issuer-did", "issuer-id"])
 
     def test_get_default_issuer_exists(self):
         default_issuer = get_default_issuer()
@@ -94,10 +96,9 @@ class UtilsIssuanceTestCase(SiteMixin, TestCase):
             get_default_issuer()
 
     def test_get_issuer(self):
-        issuer = get_issuer("issuer-id-2")
-        # FIXME: the same story from `test_get_issuer_ids`
-        # IssuanceConfiguration with issuer-id-2 become issuer-id-8
-        # self.assertEqual(issuer, self.issuance_configuration)
+        issuer = get_issuer("issuer-id")
+        self.assertEqual(type(issuer), IssuanceConfiguration)
+        self.assertEqual(issuer.issuer_id, "issuer-id")
 
     @mock.patch("credentials.apps.verifiable_credentials.issuance.utils.IssuanceConfiguration.get_indicies_for_status")
     def get_revoked_indices(self, mock_get_indicies_for_status):

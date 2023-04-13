@@ -2,9 +2,6 @@ import logging
 from unittest import mock
 
 from django.test import TestCase, override_settings
-from django.utils.translation import gettext as _
-
-from credentials.apps.verifiable_credentials.toggles import ENABLE_VERIFIABLE_CREDENTIALS
 
 from ..commands.create_default_issuer import Command as CreateDefaultIssuerCommand
 

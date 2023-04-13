@@ -1,6 +1,6 @@
 import json
 import uuid
-from unittest import TestCase, mock
+from unittest import mock
 
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
@@ -69,13 +69,15 @@ class MainIssuanceTestCase(SiteMixin, TestCase):
 
     def test_init_class_with_correct_issuance_line(self):
         credential_issuer = CredentialIssuer(issuance_uuid=self.issuance_line.uuid)
-        self.assertEqual(credential_issuer._issuance_line, self.issuance_line)
-        self.assertEqual(credential_issuer._storage, self.issuance_line.storage)
+        self.assertEqual(credential_issuer._issuance_line, self.issuance_line)  # pylint: disable=protected-access
+        self.assertEqual(credential_issuer._storage, self.issuance_line.storage)  # pylint: disable=protected-access
 
     def test_init_class_with_correct_issuance_line_with_correct_data(self):
         data = {"holder": "test-holder-id"}
         credential_issuer = CredentialIssuer(issuance_uuid=self.issuance_line.uuid, data=data)
-        self.assertEqual(credential_issuer._issuance_line.subject_id, "test-holder-id")
+        self.assertEqual(
+            credential_issuer._issuance_line.subject_id, "test-holder-id"  # pylint: disable=protected-access
+        )
 
     def test_init_issuance(self):
         issuance_line = CredentialIssuer.init(

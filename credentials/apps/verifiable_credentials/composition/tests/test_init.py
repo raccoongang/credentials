@@ -13,7 +13,7 @@ class CredentialDataModelTestCase(TestCase):
         self.assertEqual(credential_type, [])
 
     def test_collect_hierarchically(self):
-        values = CredentialDataModel()._collect_hierarchically("get_types")
+        values = CredentialDataModel()._collect_hierarchically("get_types")  # pylint: disable=protected-access
         self.assertEqual(values, ["VerifiableCredential"])
 
     def test_serialization(self):
