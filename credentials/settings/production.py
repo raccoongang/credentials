@@ -2,8 +2,10 @@ from os import environ
 
 import yaml
 
+from edx_django_utils.plugins import add_plugins
 from credentials.settings.base import *
 from credentials.settings.utils import get_env_setting, get_logger_config
+from credentials.apps.plugins.constants import PROJECT_TYPE, SettingsType
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -26,6 +28,9 @@ FILE_STORAGE_BACKEND = {}
 EMAIL_BACKEND = "django_ses.SESBackend"
 AWS_SES_REGION_NAME = environ.get("AWS_SES_REGION_NAME", "us-east-1")
 AWS_SES_REGION_ENDPOINT = environ.get("AWS_SES_REGION_ENDPOINT", "email.us-east-1.amazonaws.com")
+
+# Inject plugin settings before the configuration file overrides (so it is possible to manage those settings via environment).
+add_plugins(__name__, PROJECT_TYPE, SettingsType.PRODUCTION)
 
 CONFIG_FILE = get_env_setting("CREDENTIALS_CFG")
 with open(CONFIG_FILE, encoding="utf-8") as f:
