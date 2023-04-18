@@ -7,8 +7,8 @@ import logging
 import didkit
 from rest_framework.permissions import BasePermission
 
-from .issuance.utils import didkit_verify_presentation
 from .issuance.models import IssuanceLine
+from .issuance.utils import didkit_verify_presentation
 
 
 logger = logging.getLogger(__name__)
