@@ -5,7 +5,6 @@ Remove issuer configuration by its Issuer ID.
 import logging
 
 from django.core.management import BaseCommand
-from django.utils.translation import gettext as _
 
 from credentials.apps.verifiable_credentials.issuance.models import IssuanceConfiguration
 
