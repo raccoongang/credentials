@@ -33,6 +33,7 @@ edx-django-release-util
 edx-django-sites-extensions
 edx-django-utils
 edx-drf-extensions
+edx-event-bus-kafka
 edx-opaque-keys
 edx-rest-api-client
 edx-toggles
@@ -49,4 +50,4 @@ xss-utils
 
 
 # TODO Install in configuration
-git+https://github.com/openedx/credentials-themes.git@0.2.2#egg=edx_credentials_themes==0.2.2
+git+https://github.com/openedx/credentials-themes.git@0.2.11#egg=edx_credentials_themes==0.2.11
