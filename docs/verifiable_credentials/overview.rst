@@ -3,6 +3,8 @@ Verifiable Credentials
 
 An optional feature that allows issuance of the `Verifiable Credentials`_ based on the Open edX achievements.
 
+    **Verifiable credentials are the digital future of our lives.** Any physical achievement, credential, license document is a matter of a verifiable credential substitution/mirroring.
+
 Currently, the following verifiable credentials specifications are supported:
 
 - Credentials data models:
