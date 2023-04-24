@@ -31,7 +31,7 @@ Credentials status information
 .. note::
     Status information allows instant checks to figure out if the presented verifiable credential is still valid and actual.
 
-**Status List v2021** is a special kind of verifiable credential. It serves as a mechanism of verification for issued verifiable credentials (meaning, it does not carry achievement information itself but it is a registry of statuses for all created achievement-related verifiable credentials).
+`Status List v2021`_ is a special kind of verifiable credential. It serves as a mechanism of verification for issued verifiable credentials (meaning, it does not carry achievement information itself but it is a registry of statuses for all created achievement-related verifiable credentials).
 
 - `Verifiable Credential Status List v2021`_
 
@@ -55,3 +55,4 @@ Both `data models`_ and `storages`_ may be implemented as a Credentials IDA inst
 .. _Raccoon Gang : https://raccoongang.com
 .. _Learner Credential Wallet: https://lcw.app
 .. _DRF: https://www.django-rest-framework.org/
+.. _Status List v2021: components.html#status-list-api

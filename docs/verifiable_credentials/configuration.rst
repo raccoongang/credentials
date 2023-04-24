@@ -3,6 +3,20 @@ Configuration
 
 Verifiable Credentials feature is optional. It is disabled by default.
 
+Learner Record micro-frontend
+-----------------------------
+
+The most of configuration is related to the Credentials IDA (`verifiable_credentials` app), but there are few UI-related settings.
+
+``ENABLE_VERIFIABLE_CREDENTIALS`` (boolean) - enables feature appearance (extra routes)
+
+``SUPPORT_URL_VERIFIABLE_CREDENTIALS`` (URL string) - footer support link
+
+Verifiable Credentials application
+----------------------------------
+
+``ENABLE_VERIFIABLE_CREDENTIALS`` (boolean) - main feature flag
+
 The feature introduces its own set of default settings which are namespaced in the VERIFIABLE_CREDENTIALS setting, like this:
 
 .. code-block:: python
