@@ -100,7 +100,7 @@ class UtilsIssuanceTestCase(SiteMixin, TestCase):
         self.assertEqual(type(issuer), IssuanceConfiguration)
         self.assertEqual(issuer.issuer_id, "issuer-id")
 
-    @mock.patch("credentials.apps.verifiable_credentials.issuance.utils.IssuanceConfiguration.get_indicies_for_status")
-    def get_revoked_indices(self, mock_get_indicies_for_status):
+    @mock.patch("credentials.apps.verifiable_credentials.issuance.utils.IssuanceLine.get_indicies_for_status")
+    def test_get_revoked_indices(self, mock_get_indicies_for_status):
         get_revoked_indices("test-issuer-id")
         mock_get_indicies_for_status.assert_called_once()

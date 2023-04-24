@@ -2,9 +2,11 @@ import json
 import uuid
 from unittest import mock
 
+import didkit
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from rest_framework.exceptions import ValidationError
+from testfixtures import LogCapture
 
 from credentials.apps.catalog.tests.factories import (
     CourseFactory,
@@ -22,6 +24,11 @@ from credentials.apps.verifiable_credentials.issuance.tests.factories import (
     IssuanceLineFactory,
 )
 from credentials.apps.verifiable_credentials.storages.learner_credential_wallet import LCWallet
+
+from .. import IssuanceException
+
+
+LOGGER_NAME = "credentials.apps.verifiable_credentials.issuance.main"
 
 
 class MainIssuanceTestCase(SiteMixin, TestCase):
@@ -93,13 +100,30 @@ class MainIssuanceTestCase(SiteMixin, TestCase):
         self.assertEqual(issuance_line.data_model_id, LCWallet.PREFERRED_DATA_MODEL.ID)
         self.assertEqual(issuance_line.status_index, 0)
 
-    def test_sign(self):
-        with mock.patch(
-            "credentials.apps.verifiable_credentials.issuance.main.didkit_issue_credential",
-            return_value={"test-property": "test-value"},
-        ):
-            signed_credential = CredentialIssuer(issuance_uuid=self.issuance_line.uuid).sign({})
-            self.assertEqual(signed_credential, {"test-property": "test-value"})
+    @mock.patch("credentials.apps.verifiable_credentials.issuance.main.didkit_issue_credential")
+    def test_sign(self, mock_didkit_issue_credential):
+        mock_didkit_issue_credential.return_value = {"test-property": "test-value"}
+        signed_credential = CredentialIssuer(issuance_uuid=self.issuance_line.uuid).sign({})
+        self.assertEqual(signed_credential, {"test-property": "test-value"})
+
+    @mock.patch("credentials.apps.verifiable_credentials.issuance.main.didkit_issue_credential")
+    def test_sign_failure(self, mock_didkit_issue_credential):
+        mock_didkit_issue_credential.side_effect = didkit.DIDKitException  # pylint: disable=no-member
+        with self.assertRaises(IssuanceException):
+            CredentialIssuer(issuance_uuid=self.issuance_line.uuid).sign({})
+
+        mock_didkit_issue_credential.side_effect = ValueError
+        with self.assertRaises(IssuanceException):
+            CredentialIssuer(issuance_uuid=self.issuance_line.uuid).sign({})
+
+    @mock.patch("credentials.apps.verifiable_credentials.issuance.main.didkit_verify_credential")
+    def test_verify(self, mock_didkit_verify_credential):
+        mock_didkit_verify_credential.return_value = {"result": "test-result"}
+        with LogCapture() as log_capture:
+            CredentialIssuer(issuance_uuid=self.issuance_line.uuid).verify({})
+            log_capture.check(
+                (LOGGER_NAME, "DEBUG", "Verifiable credential passed verifiacation: ({'result': 'test-result'})"),
+            )
 
     @mock.patch("credentials.apps.verifiable_credentials.issuance.main.CredentialIssuer.compose")
     @mock.patch("credentials.apps.verifiable_credentials.issuance.main.CredentialIssuer.sign")
