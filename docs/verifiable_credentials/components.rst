@@ -29,12 +29,12 @@ Application section includes:
 .. image:: ../_static/images/verifiable_credentials-admin-section.png
         :alt: Admin section
 
-Currently, there is a single Issuer configuration is active in a moment of time:
+Currently, only a single Issuer configuration can be active in a moment of time:
 
 .. image:: ../_static/images/verifiable_credentials-issuer-configuration.png
         :alt: Issuance Configurations
 
-Issuance configuration describes an Issuer - Organization/University/School on behalf of which verifiable credentials are created. Issuer's ID becomes a part of a verifiable credential and a cryptographic proof is generated with the help of Issuer's private key. Each Issuer has a verbose name. It can be deactivated with a switch.
+Issuance configuration describes an Issuer - Organization/University/School on behalf of which verifiable credentials are created. Issuer's ID becomes a part of a verifiable credential and a cryptographic proof is generated with the help of Issuer's private key. Each Issuer has a verbose name. It can be deactivated (checkbox).
 
 .. note::
     Private key itself is a secret that is generated with the help of a cryptographic software.

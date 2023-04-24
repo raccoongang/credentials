@@ -5,13 +5,10 @@ An optional feature that allows issuance of the `Verifiable Credentials`_ based 
 
     **Verifiable credentials are the digital future of our lives.** Any physical achievement, credential, license document is a matter of a verifiable credential substitution/mirroring.
 
-Currently, the following verifiable credentials specifications are supported:
+Please, see `Extensibility`_ section for the list of supported:
 
-- Credentials data models:
-    - `Verifiable Credentials Data Model v1.1`_
-    - `Open Badges Specification v3.0`_
-- Credentials status information:
-    - `Verifiable Credential Status List v2021`_
+- verifiable credential specifications (data models)
+- digital wallets (storages)
 
 ----
 
@@ -25,6 +22,4 @@ Currently, the following verifiable credentials specifications are supported:
    tech_details
 
 .. _Verifiable Credentials: https://en.wikipedia.org/wiki/Verifiable_credentials
-.. _Verifiable Credentials Data Model v1.1: https://www.w3.org/TR/vc-data-model-1.1/
-.. _Open Badges Specification v3.0: https://1edtech.github.io/openbadges-specification/ob_v3p0.html
-.. _Verifiable Credential Status List v2021: https://w3c.github.io/vc-status-list-2021/
+.. _Extensibility: extensibility.html
