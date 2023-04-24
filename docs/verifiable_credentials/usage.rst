@@ -50,5 +50,12 @@ The Open edX users with administrator rights are able to manage/monitor the Veri
 .. note::
     Please, see the `Verifiable Credentials application`_ for details.
 
+Relying Parties
+---------------
+
+Third-parties whom a verifiable credential is presented want to ensure the current status of such artifact. That's where the `Status List`_ mechanism comes into play.
+
+
 .. _Learner Record micro-frontend: components.html#learner-record-microfrontend
 .. _Verifiable Credentials application: components.html#verifiable-credentials-application
+.. _Status List: components.html#status-list-api

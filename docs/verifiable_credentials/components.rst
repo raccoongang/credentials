@@ -70,8 +70,103 @@ The Verifiable Credentials feature extends the `Learner Record MFE`_ with additi
 .. note::
     Currently, a single (built-in) storage backend is implemented out of the box (`Learner Credential Wallet`_). In this case the only storage option is available by default, so "Create" action button won't have a dropdown. Additional storages appear under the "Create with" dropdown automatically once configured.
 
+Status List API
+---------------
+
+There are a plenty of reasons verifiable credential may be already invalid, inactive or disposed:
+
+- revocation
+- implicit expiration
+- a lot of other purposes
+
+Open edX maintains status for internal credentials ("awarded", "revoked").
+
+.. note::
+    Once a Program Certificate X is revoked - **all** verifiable credentials which were issued based on that achievement must become revoked as well.
+
+Public Status List API allows instant verifiable credentials checks. Each issuer maintains its own statuses sequence. Every issued verifiable credential takes a unique position in that sequence.
+
+.. code-block:: sh
+
+    # Status List API endpoint:
+    GET <credentials-ida-host>/verifiable_credentials/api/v1/status-list/2021/v1/<issuer-id>/
+
+    # Example:
+    https://credentials.example.com/verifiable_credentials/api/v1/status-list/2021/v1/did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id/
+
+A full set of status-related information is baked into a verifiable credential:
+
+- where to find status list API endpoint
+- what's the exact status position in a sequence
+
+.. note::
+    See Status List v2021 approach `Privacy Considerations`_
+
+Status List example
+~~~~~~~~~~~~~~~~~~~
+
+Status List itself is a verifiable credential. But it serves a different purpose.
+
+.. code-block:: sh
+
+    # specific Issuer's status list:
+
+    {
+    "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://w3id.org/vc/status-list/2021/v1"
+    ],
+    "type": [
+        "VerifiableCredential",
+        "StatusList2021Credential"
+    ],
+    "credentialSubject": {
+        "type": "StatusList2021",
+        "statusPurpose": "revocation",
+        "encodedList": "H4sIAAiZRmQC/+3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAODfAC7KO00QJwAA"
+    },
+    "issuer": {
+        "id": "did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id"
+    },
+    "issuanceDate": "2023-04-24T14:58:16Z",
+    "proof": {
+        "@context": [
+            "https://w3id.org/security/suites/ed25519-2020/v1"
+        ],
+        "type": "Ed25519Signature2020",
+        "proofPurpose": "assertionMethod",
+        "proofValue": "zacJarQvmhhQ66t3EWcjawnR9k84sR8ToBs79ffgJyEiwaFdrcLUhE4ZCxWd7uRPEhz9BHtsbj2HCpwuktFYExL9",
+        "verificationMethod": "did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id#z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id",
+        "created": "2023-04-24T14:58:16.893Z"
+    },
+    "validFrom": "2023-04-24T14:58:16Z",
+    "issued": "2023-04-24T14:58:16Z"
+    }
+
+Status Entry example
+~~~~~~~~~~~~~~~~~~~~
+
+Every verifiable credential carries its status list "registration" info.
+
+.. code-block:: sh
+
+    # specific verifiable credential status section:
+
+    "credentialStatus": {
+        "id": "https://credentials.example.com/verifiable_credentials/api/v1/status-list/2021/v1/did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id/#15",
+        "type": "StatusList2021Entry",
+        "statusListCredential": "https://credentials.example.com/verifiable_credentials/api/v1/status-list/2021/v1/did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id/",
+        "statusPurpose": "revocation",
+        "statusListIndex": "15"
+    },
+
+Also see related `management command`_
+
+
 .. _Verifiable Credentials application: https://github.com/openedx/credentials/tree/master/credentials/apps/verifiable_credentials
 .. _Learner Record MFE: https://github.com/openedx/frontend-app-learner-record
 .. _Extensibility: extensibility.html
 .. _decentralized identifier: https://en.wikipedia.org/wiki/Decentralized_identifier
 .. _Learner Credential Wallet: https://lcw.app/
+.. _Privacy Considerations: https://w3c.github.io/vc-status-list-2021/#privacy-considerations
+.. _management command: configuration.html#status-list-helper

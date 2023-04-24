@@ -8,9 +8,27 @@ The feature introduces its own set of default settings which are namespaced in t
 .. code-block:: python
 
     VERIFIABLE_CREDENTIALS = {
-        'setting_1': 'value_1',
-        'setting_2': 'value_2',
+        'DEFAULT_DATA_MODELS': [
+            "credentials.apps.verifiable_credentials.composition.open_badges.OpenBadgesDataModel",
+        ],
+        "STATUS_LIST_LENGTH": 50000,
+        "DEFAULT_ISSUER": {
+            "NAME": "The University of the Digital Future",
+            "KEY": '{"kty":"OKP","crv":"Ed25519","x":"IGUT8E_aRNzLqouWO4zdeZ6l4CEXsVmJDOpOQS69m7o","d":"vn8xgdO5Ki3zlvRNc2nUqcj50Ise1Vl1tlbs9DUL-hg"}',
+            "ID": "did:key:z6MkgdiV7pVPCapM8oUwfhxBwYZgh8dXkHkJykSAc4DHKD7X",
+        },
     }
+
+Such configuration overrides the corresponding built-in settings:
+
+1. Data models list narrowed down to a single specification
+2. Status list length extended to 50K positions
+3. Default issuer configured with concrete credentials
+
+Built-in values
+---------------
+
+There is a set of built-in predefined settings:
 
 .. code-block:: python
 
@@ -73,7 +91,7 @@ A private secret key (JWK) which is used for verifiable credentials issuance (pr
 ID
 ~~
 
-A unique issuer decentralized identifier (created from a private key, `example`_)
+A unique issuer decentralized identifier (created from a private key, `example`_).
 
 Status List configuration
 -------------------------
@@ -99,11 +117,58 @@ Data model
 
 A data model class (allows status list implementation override).
 
+----
 
 Other settings are available for advanced tweaks but usually are not meant to be configured:
 
 - Default issuance request serializer (incoming issuance request parsing)
 - Default renderer (outgoing verifiable credential presentation)
+
+Management commands
+-------------------
+
+There are a couple of service commands available for the verifiable_credentials application.
+
+Issuer credentials helper
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Generates private key for Issuer (JWK) and a decentralized identifier (DID) based on that key.**
+
+.. code-block:: sh
+
+    root@credentials:/edx/app/credentials/credentials# ./manage.py generate_issuer_credentials
+    >> {'did': 'did:key:z6MkgdiV7pVPCapM8oUwfhxBwYZgh8dXkHkJykSAc4DHKD7X',
+ 'private_key': '{"kty":"OKP","crv":"Ed25519","x":"IGUT8E_aRNzLqouWO4zdeZ6l4CEXsVmJDOpOQS69m7o","d":"vn8xgdO5Ki3zlvRNc2nUqcj50Ise1Vl1tlbs9DUL-hg"}'}
+
+Issuer configuration helpers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Create initial Issuance Configuration based on deployment issuer(s) setup.**
+
+.. code-block:: sh
+
+    root@credentials:/edx/app/credentials/credentials# ./manage.py create_default_issuer
+
+Initial Issuance configuration is created based on VERIFIABLE_CREDENTIALS[DEFAULT_ISSUER] via data migration during the first deployment. Helper allows manually repeat that is needed (Additional configurations can be created from django admin interface).
+
+**Remove Issuance Configuration based on Issuer ID.**
+
+.. code-block:: sh
+
+    root@credentials:/edx/app/credentials/credentials# ./manage.py remove_issuance_configuration did:key:z6MkgdiV7pVPCapM8oUwfhxBwYZgh8dXkHkJykSAc4DHKD7X
+
+Issuance configuration delete operation is forbidden in admin interface (only deactivation is available). This tool allows to cleanup configurations list if needed.
+
+Status List helper
+~~~~~~~~~~~~~~~~~~
+
+**Generate Status List 2021 verifiable credential**
+
+.. code-block:: sh
+
+    root@credentials:/edx/app/credentials/credentials# ./manage.py generate_status_list did:key:z6MkgdiV7pVPCapM8oUwfhxBwYZgh8dXkHkJykSAc4DHKD7X
+
+Allows Status List verifiable credential generation (for a given Issuer ID).
 
 .. _data models set: extensibility.html#data-models
 .. _storages set: extensibility.html#storages
