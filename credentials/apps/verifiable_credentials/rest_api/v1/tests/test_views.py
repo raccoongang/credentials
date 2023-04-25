@@ -149,6 +149,36 @@ class InitIssuanceViewTestCase(SiteMixin, TestCase):
             self.assertIn(property_name, response.data)
             self.assertIsNotNone(response.data.get(property_name))
 
+    def test_post_with_incorrect_data(self):
+        self.authenticate_user(self.user)
+        response = self.client.post(
+            self.url_path, data=json.dumps({"storage_id": "test-storage-id"}), content_type=JSON_CONTENT_TYPE
+        )
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(
+            self.url_path,
+            data=json.dumps({"credential_uuid": "non-valid-credential-id"}),
+            content_type=JSON_CONTENT_TYPE,
+        )
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(
+            self.url_path,
+            data=json.dumps({"credential_uuid": "c9bf9e57-1685-4c89-bafb-ff5af830be8a"}),
+            content_type=JSON_CONTENT_TYPE,
+        )
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(
+            self.url_path,
+            data=json.dumps(
+                {"credential_uuid": "c9bf9e57-1685-4c89-bafb-ff5af830be8a", "storage_id": "test-storage-id"}
+            ),
+            content_type=JSON_CONTENT_TYPE,
+        )
+        self.assertEqual(response.status_code, 404)
+
 
 class IssueCredentialViewTestCase(SiteMixin, TestCase):
     def setUp(self):
