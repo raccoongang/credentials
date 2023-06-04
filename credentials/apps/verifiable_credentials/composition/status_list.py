@@ -130,7 +130,8 @@ class StatusListDataModel(CredentialDataModel):  # pylint: disable=abstract-meth
 
 
 class CredentialWithStatusList2021DataModel(
-    StatusList2021EntryMixin, CredentialDataModel
+    StatusList2021EntryMixin, 
+    CredentialDataModel
 ):  # pylint: disable=abstract-method
     """
     Extended with Status List 2021 Entry credential data model.
