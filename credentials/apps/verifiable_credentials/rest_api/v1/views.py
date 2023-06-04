@@ -210,7 +210,7 @@ class StatusList2021View(APIView):
             raise NotFound({"reason": msg})
 
         try:
-            status_list = issue_status_list(issuer_id=kwargs["issuer_id"])
+            status_list = issue_status_list(issuer_id=issuer_id)
             return Response(status_list)
         except IssuanceException as exc:
             raise ValidationError({"reason": exc.detail})
