@@ -14,6 +14,8 @@ from rest_framework.test import APIRequestFactory
 from credentials.apps.api.v2.serializers import (
     CourseCertificateSerializer,
     CredentialField,
+    SignatoryListField,
+    SignatorySerializer,
     UserCredentialAttributeSerializer,
     UserCredentialCreationSerializer,
     UserCredentialSerializer,
@@ -25,8 +27,10 @@ from credentials.apps.credentials.models import CourseCertificate
 from credentials.apps.credentials.tests.factories import (
     CourseCertificateFactory,
     ProgramCertificateFactory,
+    SignatoryFactory,
     UserCredentialAttributeFactory,
     UserCredentialFactory,
+    create_image,
 )
 from credentials.apps.records.tests.factories import UserGradeFactory
 
@@ -295,6 +299,73 @@ class UserCredentialSerializerTests(TestCase):
         self.assertEqual(actual, expected)
 
 
+class SignatorySerializerTests(SiteMixin, TestCase):
+    def test_create_signatory(self):
+        signatory = SignatoryFactory()
+        actual = SignatorySerializer(signatory).data
+        expected = {
+            "name": signatory.name,
+            "title": signatory.title,
+            "organization": signatory.organization_name_override,
+            "image": signatory.image.url,
+        }
+        self.assertEqual(actual, expected)
+
+    def test_create_signatory_with_missing_image(self):
+        signatory = SignatoryFactory(image=None)
+        actual = SignatorySerializer(signatory).data
+        expected = {
+            "name": signatory.name,
+            "title": signatory.title,
+            "organization": signatory.organization_name_override,
+            "image": None,
+        }
+        self.assertEqual(actual, expected)
+
+    def test_validation(self):
+        png_image = create_image("png")
+        data = {"image": png_image, "name": "signatory 1", "organization": "edX", "title": "title"}
+        actual = SignatorySerializer(data=data).is_valid()
+        self.assertTrue(actual)
+
+    def test_validation_with_wrong_image_extension(self):
+        jpg_image = create_image("jpg")
+        data = {"image": jpg_image, "name": "signatory 1", "organization": "edX", "title": "title"}
+        actual = SignatorySerializer(data=data).is_valid()
+
+        self.assertFalse(actual)
+
+
+class SignatoryListFieldTests(SiteMixin, TestCase):
+    def test_populate_signatories(self):
+        png_image = create_image("png")
+        signatories_data = [
+            {
+                "image": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.png",
+                "name": "signatory 1",
+                "organization": "edX",
+                "title": "title",
+            },
+            {
+                "image": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image+1.png",
+                "name": "signatory 2",
+                "organization": "edX",
+                "title": "title",
+            },
+        ]
+        files = {
+            "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.png": png_image,
+            "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image+1.png": png_image,
+        }
+        actual = SignatoryListField.populate_signatories(signatories_data, files)
+        expected = [
+            {"image": png_image, "name": "signatory 1", "organization": "edX", "title": "title"},
+            {"image": png_image, "name": "signatory 2", "organization": "edX", "title": "title"},
+        ]
+
+        self.assertEqual(list(actual), expected)
+
+
 class CourseCertificateSerializerTests(SiteMixin, TestCase):
     def test_create_course_certificate(self):
         course_run = CourseRunFactory()
@@ -309,6 +380,30 @@ class CourseCertificateSerializerTests(SiteMixin, TestCase):
             "certificate_type": course_certificate.certificate_type,
             "certificate_available_date": course_certificate.certificate_available_date,
             "is_active": course_certificate.is_active,
+            "signatories": [],
+            "title": course_certificate.title,
+        }
+        self.assertEqual(actual, expected)
+
+    def test_create_course_certificate_with_signatories(self):
+        course_run = CourseRunFactory()
+        course_certificate = CourseCertificateFactory(site=self.site, course_run=course_run)
+        signatory = SignatoryFactory()
+        course_certificate.signatories.add(signatory)
+        request = APIRequestFactory(site=self.site).get("/")
+
+        actual = CourseCertificateSerializer(course_certificate, context={"request": request}).data
+        expected_signatories_data = [SignatorySerializer(signatory, context={"request": request}).data]
+        expected = {
+            "id": course_certificate.id,
+            "site": self.site.id,
+            "course_id": course_certificate.course_id,
+            "course_run": course_certificate.course_run.key,
+            "certificate_type": course_certificate.certificate_type,
+            "certificate_available_date": course_certificate.certificate_available_date,
+            "is_active": course_certificate.is_active,
+            "signatories": expected_signatories_data,
+            "title": course_certificate.title,
         }
         self.assertEqual(actual, expected)
 
@@ -325,19 +420,22 @@ class CourseCertificateSerializerTests(SiteMixin, TestCase):
             "certificate_type": course_certificate.certificate_type,
             "certificate_available_date": course_certificate.certificate_available_date,
             "is_active": course_certificate.is_active,
+            "signatories": [],
+            "title": course_certificate.title,
         }
         self.assertEqual(actual, expected)
 
     def test_create_without_course_run_raises_warning(self):
         # even though you can create an entry without a course run,
         # we want to make sure we are logging a warning when it is missing
+        data = {
+            "course_id": "DemoCourse0",
+            "certificate_type": "verified",
+            "is_active": True,
+            "certificate_available_date": None,
+        }
         with self.assertLogs(level=WARNING):
-            Request = namedtuple("Request", ["site"])
-            CourseCertificateSerializer(context={"request": Request(site=self.site)}).create(
-                validated_data={
-                    "course_id": "DemoCourse0",
-                    "certificate_type": "verified",
-                    "is_active": True,
-                    "certificate_available_date": None,
-                }
+            Request = namedtuple("Request", ["site", "data", "FILES"])
+            CourseCertificateSerializer(context={"request": Request(site=self.site, data=data, FILES=None)}).create(
+                validated_data=data
             )

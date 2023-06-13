@@ -23,7 +23,7 @@ from credentials.apps.api.v2.views import CredentialRateThrottle
 from credentials.apps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
 from credentials.apps.core.tests.factories import USER_PASSWORD, UserFactory
 from credentials.apps.core.tests.mixins import SiteMixin
-from credentials.apps.credentials.models import UserCredential
+from credentials.apps.credentials.models import CourseCertificate, UserCredential
 from credentials.apps.credentials.tests.factories import (
     CourseCertificateFactory,
     ProgramCertificateFactory,
@@ -697,3 +697,115 @@ class UsernameReplacementViewTests(JwtMixin, APITestCase):
         response = self.call_api(self.service_user, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected_response)
+
+
+class CourseCertificateViewSetTests(SiteMixin, APITestCase):
+    """Tests CourseCertificateViewSet"""
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.superuser = UserFactory(is_staff=True, is_superuser=True)
+        self.url = "/api/v2/course_certificates/"
+        self.certificate = CourseCertificateFactory()
+        self.certificate_data = {
+            "id": self.certificate.id,
+            "site": self.certificate.site.id,
+            "course_id": self.certificate.course_id,
+            "course_run": self.certificate.course_run,
+            "certificate_type": self.certificate.certificate_type,
+            "certificate_available_date": self.certificate.certificate_available_date,
+            "is_active": self.certificate.is_active,
+            "signatories": list(self.certificate.signatories.all()),
+            "title": self.certificate.title,
+        }
+        self.valid_data = {
+            "course_id": "course-v1:edX+DemoX+Demo_Course",
+            "certificate_type": "honor",
+            "title": "Name of the certificate",
+            "signatories": [
+                """{
+                    "image": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.png",
+                    "name": "signatory 1",
+                    "organization": "edX",
+                    "title": "title",
+                }""",
+                """{
+                    "image": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image+1.png",
+                    "name": "signatory 2",
+                    "organization": "edX",
+                    "title": "title",
+                }""",
+            ],
+            "is_active": True,
+        }
+
+    def authenticate_user(self, user):
+        """Login as the given user."""
+        self.client.logout()
+        self.client.login(username=user.username, password=USER_PASSWORD)
+
+    def test_get_for_anonymous(self):
+        params = {"course_id": self.certificate.course_id, "certificate_type": self.certificate.certificate_type}
+        response = self.client.get(self.url, data=params)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, self.certificate_data)
+
+    def test_get_for_staff(self):
+        self.authenticate_user(self.superuser)
+        params = {"course_id": self.certificate.course_id, "certificate_type": self.certificate.certificate_type}
+        response = self.client.get(self.url, data=params)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, self.certificate_data)
+
+    def test_post_for_anonymous(self):
+        response = self.client.post(self.url, data=self.valid_data)
+        self.assertEqual(response.status_code, 401)
+
+    def test_post_for_staff(self):
+        self.authenticate_user(self.superuser)
+        response = self.client.post(self.url, data=self.valid_data)
+        self.assertEqual(response.status_code, 201)
+
+    def test_post_for_staff_with_blank_signatories(self):
+        self.authenticate_user(self.superuser)
+        data = {
+            "course_id": "course-v1:edX+DemoX+Demo_Course",
+            "certificate_type": "honor",
+            "title": "Name of the certificate",
+            # NOTE: In tests, parsers do not work properly, unlike real queries.
+            # It is in this form that data comes from the studio when creating
+            # a certificate configuration without signatures.
+            # This is the case for this test.
+            "signatories": ["image", "name", "organization", "title"],
+            "is_active": True,
+        }
+        response = self.client.post(self.url, data=data, files={})
+        self.assertEqual(response.status_code, 201)
+
+    def test_delete_for_anonymous(self):
+        data = {
+            "course_id": self.certificate.course_id,
+            "certificate_type": self.certificate.certificate_type,
+            "title": self.certificate.title,
+            "signatories": [],
+            "is_active": True,
+        }
+        self.assertEqual(CourseCertificate.objects.first(), self.certificate)
+        response = self.client.delete(self.url, data=data)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(CourseCertificate.objects.first(), self.certificate)
+
+    def test_delete_for_staff(self):
+        self.authenticate_user(self.superuser)
+        data = {
+            "course_id": self.certificate.course_id,
+            "certificate_type": self.certificate.certificate_type,
+            "title": self.certificate.title,
+            "signatories": [],
+            "is_active": True,
+        }
+        self.assertEqual(CourseCertificate.objects.first(), self.certificate)
+        response = self.client.delete(self.url, data=data)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(CourseCertificate.objects.first(), None)
