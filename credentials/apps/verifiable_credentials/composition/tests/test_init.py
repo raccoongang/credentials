@@ -27,7 +27,10 @@ class CredentialDataModelTestCase(TestCase):
         }
         serialized_data = CredentialDataModel(data).data
         expected_data = {
-            "context": ["https://www.w3.org/2018/credentials/v1"],
+            "context": [
+                "https://www.w3.org/2018/credentials/v1",
+                "https://w3id.org/security/suites/ed25519-2020/v1",
+            ],
             "type": ["VerifiableCredential"],
             "issuer": {"id": "456", "name": "Test Issuer", "type": "Profile"},
             "issued": "2022-04-01T12:00:00Z",
