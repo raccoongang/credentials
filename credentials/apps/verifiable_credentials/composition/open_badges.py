@@ -20,16 +20,20 @@ class AchievementSchema(serializers.Serializer):  # pylint: disable=abstract-met
 
     id = serializers.CharField(source="user_credential.uuid")
     type = serializers.CharField(default=TYPE)
-    name = serializers.CharField(source="user_credential.credential.title")
-    description = serializers.SerializerMethodField(source="user_credential.credential.program.title")
+    # name = serializers.CharField(source="user_credential.credential.programcertificate.program.title")
+    # description = serializers.SerializerMethodField(source="user_credential.credential.program_details")
+    # criteria = serializers.SerializerMethodField()
 
     class Meta:
         read_only_fields = "__all__"
 
     def get_description(self, issuance_line):
-        return (
-            issuance_line.user_credential.attributes.filter(name="description").values_list("value", flat=True).first()
-        )
+        return str(issuance_line.user_credential.credential.program_details.__dict__)
+
+    # def get_criteria(self, issuance_line):
+    #     return {
+    #         "narrative": f"The recipient successfully passed the program {issuance_line.user_credential.credential.program.title}"
+    #     }
 
 
 class CredentialSubjectSchema(serializers.Serializer):  # pylint: disable=abstract-method
@@ -69,12 +73,18 @@ class OpenBadgesDataModel(CredentialWithStatusList2021DataModel):  # pylint: dis
 
     @classmethod
     def get_context(cls):
+        """
+        Extends `context` property with the model-specific entry.
+        """
         return [
             "https://purl.imsglobal.org/spec/ob/v3p0/context.json",
         ]
 
     @classmethod
     def get_types(cls):
+        """
+        Extends `type` property with the model-specific entry.
+        """
         return [
             "OpenBadgeCredential",
         ]
@@ -83,6 +93,8 @@ class OpenBadgesDataModel(CredentialWithStatusList2021DataModel):  # pylint: dis
 class OpenBadges301DataModel(OpenBadgesDataModel):  # pylint: disable=abstract-method
     """
     Open Badges data model.
+
+    NOTE: for example purposes, for now.
     """
 
     VERSION = "3.0.1"

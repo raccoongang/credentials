@@ -94,15 +94,34 @@ class IssuanceLine(TimeStampedModel):
 
         return getattr(get_issuer(self.issuer_id), "issuer_name", None)
 
+    @property
     def credential_name(self):
         """
         Map internal credential types to verbose labels (source models do not provide those).
         """
-        credential_types = {
-            "programcertificate": _("Program Certificate"),
-            "coursecertificate": _("Course Certificate"),
+        if credential_title := self.user_credential.credential.title:
+            return credential_title
+
+        program_certificate_name = (
+            _("Program Certificate")
+            if not self.program
+            else _("Program Certificate for passing a program {program_title}").format(program_title=self.program.title)
+        )
+        course_certificate = _("Course Certificate")
+
+        type_to_name = {
+            "programcertificate": program_certificate_name,
+            "coursecertificate": course_certificate,
         }
-        return credential_types.get(self.user_credential.credential_content_type.model)
+        return type_to_name.get(self.credential_type)
+
+    @property
+    def credential_type(self):
+        return self.user_credential.credential_content_type.model
+
+    @property
+    def program(self):
+        return getattr(self.user_credential.credential, "program", None)
 
     def construct(self, context):
         serializer = self.data_model(self, context=context)
@@ -119,7 +138,11 @@ class IssuanceLine(TimeStampedModel):
 
         base_url = request.build_absolute_uri().split(request.path)[0]
         status_list_url = urljoin(
-            base_url, reverse("verifiable_credentials:api:v1:status-list-2021-v1", kwargs={"issuer_id": self.issuer_id})
+            base_url,
+            reverse(
+                "verifiable_credentials:api:v1:status-list-2021-v1",
+                kwargs={"issuer_id": self.issuer_id},
+            ),
         )
         if hash_str is None:
             return status_list_url
