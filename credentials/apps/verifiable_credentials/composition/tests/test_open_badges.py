@@ -129,9 +129,7 @@ class TestOpenBadgesDataModel:
         """
         Credential Subject Achievement `description` property.
         """
-        expected_description = "Program certificate is granted on program TestProgram1 completion offered by TestOrg1, \
-            TestOrg2, in collaboration with TestPlatformName1. The TestProgram1 program includes 2 course(s)\
-                (, with total 10 Hours of effort required to complete it.)"
+        expected_description = "Program certificate is granted on program TestProgram1 completion offered by TestOrg1, TestOrg2, in collaboration with TestPlatformName1. The TestProgram1 program includes 2 course(s) (, with total 10 Hours of effort required to complete it.)"  # pylint: disable=line-too-long
 
         composed_obv3 = OpenBadgesDataModel(issuance_line).data
 
@@ -144,9 +142,7 @@ class TestOpenBadgesDataModel:
         """
         Credential Subject Achievement `criteria` property.
         """
-        expected_narrative_value = "TestUser1 FullName successfully completed all courses and received passing grades \
-            for a Professional Certificate in TestProgram1 a program offered by TestOrg1, TestOrg2, \
-                in collaboration with TestPlatformName1."
+        expected_narrative_value = "TestUser1 FullName successfully completed all courses and received passing grades for a Professional Certificate in TestProgram1 a program offered by TestOrg1, TestOrg2, in collaboration with TestPlatformName1."  # pylint: disable=line-too-long
         monkeypatch.setattr(issuance_line.user_credential, "username", user.username)
 
         composed_obv3 = OpenBadgesDataModel(issuance_line).data
