@@ -1,3 +1,4 @@
+# pylint: disable=unused-argument,redefined-outer-name
 """
 Pytest: Verifiable Credentials base testing config/fixtures.
 """

@@ -1,18 +1,7 @@
 import pytest
 from django.test import TestCase
-from django.utils.translation import gettext as _
 
-from credentials.apps.catalog.tests.factories import OrganizationFactory, ProgramFactory
-from credentials.apps.core.tests.factories import UserFactory
-from credentials.apps.credentials.tests.factories import ProgramCertificateFactory
-
-from ...issuance.tests.factories import IssuanceLineFactory
-from ..open_badges import (
-    AchievementSchema,
-    CredentialSubjectSchema,
-    OpenBadges301DataModel,
-    OpenBadgesDataModel,
-)
+from ..open_badges import AchievementSchema, CredentialSubjectSchema, OpenBadges301DataModel, OpenBadgesDataModel
 
 
 class OpenBadgesTestCase(TestCase):
@@ -37,10 +26,7 @@ class TestOpenBadgesDataModel:
         Predefined for Program certificate value is used as `name` property.
         """
         expected_default_name = "Program certificate for passing a program TestProgram1"
-        # program = ProgramFactory(title="Some Program")
-        # issuance_line = IssuanceLineFactory(
-        #     user_credential__credential__program_id=program.id
-        # )
+
         composed_obv3 = OpenBadgesDataModel(issuance_line).data
 
         assert composed_obv3["name"] == expected_default_name
@@ -137,22 +123,30 @@ class TestOpenBadgesDataModel:
         assert composed_obv3["credentialSubject"]["achievement"]["name"] == expected_overridden_name
 
     @pytest.mark.django_db
-    def test_credential_subject_achievement_description(self, issuance_line, user_credential, site_configuration):
+    def test_credential_subject_achievement_description(
+        self, issuance_line, user_credential, site_configuration
+    ):  # pylint: disable=unused-argument
         """
         Credential Subject Achievement `description` property.
         """
-        expected_description = "Program certificate is granted on program TestProgram1 completion offered by TestOrg1, TestOrg2, in collaboration with TestPlatformName1. The TestProgram1 program includes 2 course(s)(, with total 10 Hours of effort required to complete it.)"
+        expected_description = "Program certificate is granted on program TestProgram1 completion offered by TestOrg1, \
+            TestOrg2, in collaboration with TestPlatformName1. The TestProgram1 program includes 2 course(s)\
+                (, with total 10 Hours of effort required to complete it.)"
 
         composed_obv3 = OpenBadgesDataModel(issuance_line).data
 
         assert composed_obv3["credentialSubject"]["achievement"]["description"] == expected_description
 
     @pytest.mark.django_db
-    def test_credential_subject_achievement_criteria(self, monkeypatch, issuance_line, user, site_configuration):
+    def test_credential_subject_achievement_criteria(
+        self, monkeypatch, issuance_line, user, site_configuration
+    ):  # pylint: disable=unused-argument
         """
         Credential Subject Achievement `criteria` property.
         """
-        expected_narrative_value = "TestUser1 FullName successfully completed all courses and received passing grades for a Professional Certificate in TestProgram1 a program offered by TestOrg1, TestOrg2, in collaboration with TestPlatformName1."
+        expected_narrative_value = "TestUser1 FullName successfully completed all courses and received passing grades \
+            for a Professional Certificate in TestProgram1 a program offered by TestOrg1, TestOrg2, \
+                in collaboration with TestPlatformName1."
         monkeypatch.setattr(issuance_line.user_credential, "username", user.username)
 
         composed_obv3 = OpenBadgesDataModel(issuance_line).data
