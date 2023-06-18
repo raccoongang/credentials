@@ -20,8 +20,8 @@ class AchievementSchema(serializers.Serializer):  # pylint: disable=abstract-met
 
     id = serializers.CharField(source="user_credential.uuid")
     type = serializers.CharField(default=TYPE)
-    # name = serializers.CharField(source="user_credential.credential.programcertificate.program.title")
-    # description = serializers.SerializerMethodField(source="user_credential.credential.program_details")
+    name = serializers.CharField(source="credential_name")
+    description = serializers.CharField(source="credential_description")
     # criteria = serializers.SerializerMethodField()
 
     class Meta:
@@ -45,6 +45,7 @@ class CredentialSubjectSchema(serializers.Serializer):  # pylint: disable=abstra
 
     id = serializers.CharField(source="subject_id")
     type = serializers.CharField(default=TYPE)
+    name = serializers.CharField(source="subject_fullname")
     achievement = AchievementSchema(source="*")
 
     class Meta:
