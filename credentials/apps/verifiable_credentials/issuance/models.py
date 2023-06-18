@@ -132,11 +132,11 @@ class IssuanceLine(TimeStampedModel):
         Verifiable credential achievement description resolution.
         """
         program_certificate_description = _(
-            "{credential_type} is granted on program {program_title} completion offered by {organization}, in collaboration with {platform_name}. The {program_title} program includes {course_count} course(s)(, with total {hours_of_effort} Hours of effort required to complete it.)"
+            "{credential_type} is granted on program {program_title} completion offered by {organizations}, in collaboration with {platform_name}. The {program_title} program includes {course_count} course(s)(, with total {hours_of_effort} Hours of effort required to complete it.)"
         ).format(
             credential_type=self.credential_verbose_type,
             program_title=self.program.title,
-            organization=", ".join(list(self.program.authoring_organizations.values_list("name", flat=True))),
+            organizations=", ".join(list(self.program.authoring_organizations.values_list("name", flat=True))),
             platform_name=self.platform_name,
             course_count=self.program.course_runs.count(),
             hours_of_effort=self.program.total_hours_of_effort,
@@ -146,6 +146,25 @@ class IssuanceLine(TimeStampedModel):
             "coursecertificate": "",
         }
         return capitalize_first(type_to_description.get(self.credential_content_type))
+
+    @property
+    def credential_narrative(self):
+        """
+        Verifiable credential achievement criteria narrative.
+        """
+        program_certificate_narrative = _(
+            "{recipient_fullname} successfully completed all courses and received passing grades for a Professional Certificate in {program_title} a program offered by {organizations}, in collaboration with {platform_name}."
+        ).format(
+            recipient_fullname=self.subject_fullname or _("recipient"),
+            program_title=self.program.title,
+            organizations=", ".join(list(self.program.authoring_organizations.values_list("name", flat=True))),
+            platform_name=self.platform_name,
+        )
+        type_to_narrative = {
+            "programcertificate": program_certificate_narrative,
+            "coursecertificate": "",
+        }
+        return capitalize_first(type_to_narrative.get(self.credential_content_type))
 
     @property
     def credential_content_type(self):

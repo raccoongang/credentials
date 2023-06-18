@@ -22,7 +22,7 @@ class AchievementSchema(serializers.Serializer):  # pylint: disable=abstract-met
     type = serializers.CharField(default=TYPE)
     name = serializers.CharField(source="credential_name")
     description = serializers.CharField(source="credential_description")
-    # criteria = serializers.SerializerMethodField()
+    criteria = serializers.SerializerMethodField()
 
     class Meta:
         read_only_fields = "__all__"
@@ -30,10 +30,10 @@ class AchievementSchema(serializers.Serializer):  # pylint: disable=abstract-met
     def get_description(self, issuance_line):
         return str(issuance_line.user_credential.credential.program_details.__dict__)
 
-    # def get_criteria(self, issuance_line):
-    #     return {
-    #         "narrative": f"The recipient successfully passed the program {issuance_line.user_credential.credential.program.title}"
-    #     }
+    def get_criteria(self, issuance_line):
+        return {
+            "narrative": issuance_line.credential_narrative,
+        }
 
 
 class CredentialSubjectSchema(serializers.Serializer):  # pylint: disable=abstract-method

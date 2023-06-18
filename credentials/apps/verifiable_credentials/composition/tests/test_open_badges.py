@@ -7,7 +7,12 @@ from credentials.apps.core.tests.factories import UserFactory
 from credentials.apps.credentials.tests.factories import ProgramCertificateFactory
 
 from ...issuance.tests.factories import IssuanceLineFactory
-from ..open_badges import AchievementSchema, CredentialSubjectSchema, OpenBadges301DataModel, OpenBadgesDataModel
+from ..open_badges import (
+    AchievementSchema,
+    CredentialSubjectSchema,
+    OpenBadges301DataModel,
+    OpenBadgesDataModel,
+)
 
 
 class OpenBadgesTestCase(TestCase):
@@ -141,3 +146,15 @@ class TestOpenBadgesDataModel:
         composed_obv3 = OpenBadgesDataModel(issuance_line).data
 
         assert composed_obv3["credentialSubject"]["achievement"]["description"] == expected_description
+
+    @pytest.mark.django_db
+    def test_credential_subject_achievement_criteria(self, monkeypatch, issuance_line, user, site_configuration):
+        """
+        Credential Subject Achievement `criteria` property.
+        """
+        expected_narrative_value = "TestUser1 FullName successfully completed all courses and received passing grades for a Professional Certificate in TestProgram1 a program offered by TestOrg1, TestOrg2, in collaboration with TestPlatformName1."
+        monkeypatch.setattr(issuance_line.user_credential, "username", user.username)
+
+        composed_obv3 = OpenBadgesDataModel(issuance_line).data
+
+        assert composed_obv3["credentialSubject"]["achievement"]["criteria"]["narrative"] == expected_narrative_value
