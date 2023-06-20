@@ -131,15 +131,23 @@ class IssuanceLine(TimeStampedModel):
         """
         Verifiable credential achievement description resolution.
         """
+        effort_portion = (
+            _(", with total {hours_of_effort} Hours of effort required to complete it").format(
+                hours_of_effort=self.program.total_hours_of_effort
+            )
+            if self.program.total_hours_of_effort
+            else ""
+        )
+
         program_certificate_description = _(
-            "{credential_type} is granted on program {program_title} completion offered by {organizations}, in collaboration with {platform_name}. The {program_title} program includes {course_count} course(s) (, with total {hours_of_effort} Hours of effort required to complete it.)"  # pylint: disable=line-too-long
+            "{credential_type} is granted on program {program_title} completion offered by {organizations}, in collaboration with {platform_name}. The {program_title} program includes {course_count} course(s){effort_info}."  # pylint: disable=line-too-long
         ).format(
             credential_type=self.credential_verbose_type,
             program_title=self.program.title,
             organizations=", ".join(list(self.program.authoring_organizations.values_list("name", flat=True))),
             platform_name=self.platform_name,
             course_count=self.program.course_runs.count(),
-            hours_of_effort=self.program.total_hours_of_effort,
+            effort_info=effort_portion,
         )
         type_to_description = {
             "programcertificate": program_certificate_description,

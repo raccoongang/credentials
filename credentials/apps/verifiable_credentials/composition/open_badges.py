@@ -27,9 +27,6 @@ class AchievementSchema(serializers.Serializer):  # pylint: disable=abstract-met
     class Meta:
         read_only_fields = "__all__"
 
-    def get_description(self, issuance_line):
-        return str(issuance_line.user_credential.credential.program_details.__dict__)
-
     def get_criteria(self, issuance_line):
         return {
             "narrative": issuance_line.credential_narrative,
@@ -95,7 +92,7 @@ class OpenBadges301DataModel(OpenBadgesDataModel):  # pylint: disable=abstract-m
     """
     Open Badges data model.
 
-    NOTE: for example purposes, for now.
+    NOTE: this is an example of extending data model with future specs.
     """
 
     VERSION = "3.0.1"

@@ -124,12 +124,26 @@ class TestOpenBadgesDataModel:
 
     @pytest.mark.django_db
     def test_credential_subject_achievement_description(
-        self, issuance_line, user_credential, site_configuration
+        self, monkeypatch, issuance_line, user_credential, site_configuration
     ):  # pylint: disable=unused-argument
         """
         Credential Subject Achievement `description` property.
         """
-        expected_description = "Program certificate is granted on program TestProgram1 completion offered by TestOrg1, TestOrg2, in collaboration with TestPlatformName1. The TestProgram1 program includes 2 course(s) (, with total 10 Hours of effort required to complete it.)"  # pylint: disable=line-too-long
+        expected_description = "Program certificate is granted on program TestProgram1 completion offered by TestOrg1, TestOrg2, in collaboration with TestPlatformName1. The TestProgram1 program includes 2 course(s)."  # pylint: disable=line-too-long
+        monkeypatch.setattr(issuance_line.user_credential.credential.program, "total_hours_of_effort", None)
+
+        composed_obv3 = OpenBadgesDataModel(issuance_line).data
+
+        assert composed_obv3["credentialSubject"]["achievement"]["description"] == expected_description
+
+    @pytest.mark.django_db
+    def test_credential_subject_achievement_description_with_effort(
+        self, issuance_line, user_credential, site_configuration
+    ):  # pylint: disable=unused-argument
+        """
+        Credential Subject Achievement `description` property (Program Certificate with Effort specified).
+        """
+        expected_description = "Program certificate is granted on program TestProgram1 completion offered by TestOrg1, TestOrg2, in collaboration with TestPlatformName1. The TestProgram1 program includes 2 course(s), with total 10 Hours of effort required to complete it."  # pylint: disable=line-too-long
 
         composed_obv3 = OpenBadgesDataModel(issuance_line).data
 
