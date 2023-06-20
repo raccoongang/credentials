@@ -61,9 +61,6 @@ class IssuanceLineTestCase(SiteMixin, TestCase):
         self.issuance_line.issuer_name  # pylint: disable=pointless-statement
         mock_get_issuer.assert_called_with(self.issuance_line.issuer_id)
 
-    def test_credential_name(self):
-        self.assertEqual(self.issuance_line.credential_name(), "Program Certificate")
-
     def test_finalize(self):
         self.issuance_line.processed = False
         self.issuance_line.save()

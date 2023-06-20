@@ -20,16 +20,17 @@ class AchievementSchema(serializers.Serializer):  # pylint: disable=abstract-met
 
     id = serializers.CharField(source="user_credential.uuid")
     type = serializers.CharField(default=TYPE)
-    name = serializers.CharField(source="user_credential.credential.title")
-    description = serializers.SerializerMethodField(source="user_credential.credential.program.title")
+    name = serializers.CharField(source="credential_name")
+    description = serializers.CharField(source="credential_description")
+    criteria = serializers.SerializerMethodField()
 
     class Meta:
         read_only_fields = "__all__"
 
-    def get_description(self, issuance_line):
-        return (
-            issuance_line.user_credential.attributes.filter(name="description").values_list("value", flat=True).first()
-        )
+    def get_criteria(self, issuance_line):
+        return {
+            "narrative": issuance_line.credential_narrative,
+        }
 
 
 class CredentialSubjectSchema(serializers.Serializer):  # pylint: disable=abstract-method
@@ -41,6 +42,7 @@ class CredentialSubjectSchema(serializers.Serializer):  # pylint: disable=abstra
 
     id = serializers.CharField(source="subject_id")
     type = serializers.CharField(default=TYPE)
+    name = serializers.CharField(source="subject_fullname")
     achievement = AchievementSchema(source="*")
 
     class Meta:
@@ -69,12 +71,18 @@ class OpenBadgesDataModel(CredentialWithStatusList2021DataModel):  # pylint: dis
 
     @classmethod
     def get_context(cls):
+        """
+        Extends `context` property with the model-specific entry.
+        """
         return [
             "https://purl.imsglobal.org/spec/ob/v3p0/context.json",
         ]
 
     @classmethod
     def get_types(cls):
+        """
+        Extends `type` property with the model-specific entry.
+        """
         return [
             "OpenBadgeCredential",
         ]
@@ -83,6 +91,8 @@ class OpenBadgesDataModel(CredentialWithStatusList2021DataModel):  # pylint: dis
 class OpenBadges301DataModel(OpenBadgesDataModel):  # pylint: disable=abstract-method
     """
     Open Badges data model.
+
+    NOTE: this is an example of extending data model with future specs.
     """
 
     VERSION = "3.0.1"

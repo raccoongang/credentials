@@ -80,3 +80,12 @@ def is_valid_uuid(uuid_to_test, version=4):
         return True
     except (ValueError, TypeError):
         return False
+
+
+def capitalize_first(wording):
+    """
+    Unlike the standard string.capitalize() do not touches anything besides the initial character.
+    """
+    if not isinstance(wording, str):
+        return wording
+    return f"{wording[:1].upper()}{wording[1:]}"

@@ -5,16 +5,21 @@ import uuid
 from urllib.parse import urljoin
 
 from crum import get_current_request
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
 from credentials.apps.credentials.models import UserCredential
+from credentials.apps.verifiable_credentials.utils import capitalize_first
 
 from ..composition.utils import get_data_model, get_data_models
 from ..settings import vc_settings
 from ..storages.utils import get_storage
+
+
+User = get_user_model()
 
 
 def generate_data_model_choices():
@@ -94,15 +99,98 @@ class IssuanceLine(TimeStampedModel):
 
         return getattr(get_issuer(self.issuer_id), "issuer_name", None)
 
-    def credential_name(self):
+    @property
+    def credential_verbose_type(self):
         """
         Map internal credential types to verbose labels (source models do not provide those).
         """
-        credential_types = {
-            "programcertificate": _("Program Certificate"),
-            "coursecertificate": _("Course Certificate"),
+        contenttype_to_verbose_name = {
+            "programcertificate": _("program certificate"),
+            "coursecertificate": _("course certificate"),
         }
-        return credential_types.get(self.user_credential.credential_content_type.model)
+        return contenttype_to_verbose_name.get(self.credential_content_type)
+
+    @property
+    def credential_name(self):
+        """
+        Verifiable credentials `name` property resolution.
+        """
+        if credential_title := self.user_credential.credential.title:
+            return credential_title
+
+        contenttype_to_name = {
+            "programcertificate": _("program certificate for passing a program {program_title}").format(
+                program_title=getattr(self.program, "title", "")
+            ),
+            "coursecertificate": self.credential_verbose_type,
+        }
+        return capitalize_first(contenttype_to_name.get(self.credential_content_type))
+
+    @property
+    def credential_description(self):
+        """
+        Verifiable credential achievement description resolution.
+        """
+        effort_portion = (
+            _(", with total {hours_of_effort} Hours of effort required to complete it").format(
+                hours_of_effort=self.program.total_hours_of_effort
+            )
+            if self.program.total_hours_of_effort
+            else ""
+        )
+
+        program_certificate_description = _(
+            "{credential_type} is granted on program {program_title} completion offered by {organizations}, in collaboration with {platform_name}. The {program_title} program includes {course_count} course(s){effort_info}."  # pylint: disable=line-too-long
+        ).format(
+            credential_type=self.credential_verbose_type,
+            program_title=self.program.title,
+            organizations=", ".join(list(self.program.authoring_organizations.values_list("name", flat=True))),
+            platform_name=self.platform_name,
+            course_count=self.program.course_runs.count(),
+            effort_info=effort_portion,
+        )
+        type_to_description = {
+            "programcertificate": program_certificate_description,
+            "coursecertificate": "",
+        }
+        return capitalize_first(type_to_description.get(self.credential_content_type))
+
+    @property
+    def credential_narrative(self):
+        """
+        Verifiable credential achievement criteria narrative.
+        """
+        program_certificate_narrative = _(
+            "{recipient_fullname} successfully completed all courses and received passing grades for a Professional Certificate in {program_title} a program offered by {organizations}, in collaboration with {platform_name}."  # pylint: disable=line-too-long
+        ).format(
+            recipient_fullname=self.subject_fullname or _("recipient"),
+            program_title=self.program.title,
+            organizations=", ".join(list(self.program.authoring_organizations.values_list("name", flat=True))),
+            platform_name=self.platform_name,
+        )
+        type_to_narrative = {
+            "programcertificate": program_certificate_narrative,
+            "coursecertificate": "",
+        }
+        return capitalize_first(type_to_narrative.get(self.credential_content_type))
+
+    @property
+    def credential_content_type(self):
+        return self.user_credential.credential_content_type.model
+
+    @property
+    def program(self):
+        return getattr(self.user_credential.credential, "program", None)
+
+    @property
+    def platform_name(self):
+        if not (site_configuration := getattr(self.user_credential.credential.site, "siteconfiguration", "")):
+            return site_configuration
+        return site_configuration.platform_name
+
+    @property
+    def subject_fullname(self):
+        return User.objects.filter(username=self.user_credential.username).values_list("full_name", flat=True).first()
 
     def construct(self, context):
         serializer = self.data_model(self, context=context)
@@ -119,7 +207,11 @@ class IssuanceLine(TimeStampedModel):
 
         base_url = request.build_absolute_uri().split(request.path)[0]
         status_list_url = urljoin(
-            base_url, reverse("verifiable_credentials:api:v1:status-list-2021-v1", kwargs={"issuer_id": self.issuer_id})
+            base_url,
+            reverse(
+                "verifiable_credentials:api:v1:status-list-2021-v1",
+                kwargs={"issuer_id": self.issuer_id},
+            ),
         )
         if hash_str is None:
             return status_list_url

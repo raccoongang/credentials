@@ -46,6 +46,9 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
         """
         return [
             "https://www.w3.org/2018/credentials/v1",
+            # NOTE: this security context is here intentionally, otherwise wallet verification won't succeed.
+            # `DIDKIT` lib also adds it by itself, but not to the "correct/expected" place - into "proof" section.
+            "https://w3id.org/security/suites/ed25519-2020/v1",
         ]
 
     @classmethod
