@@ -30,22 +30,14 @@ class CredentialDataModel(serializers.Serializer):  # pylint: disable=abstract-m
         method_name="collect_context",
         help_text="https://www.w3.org/TR/vc-data-model/#contexts",
     )
-    type = serializers.SerializerMethodField(
-        help_text="https://www.w3.org/TR/vc-data-model/#types"
-    )
-    issuer = IssuerSchema(
-        source="*", help_text="https://www.w3.org/TR/vc-data-model/#issuer"
-    )
-    issued = serializers.DateTimeField(
-        source="modified", help_text="https://www.w3.org/2018/credentials/#issued"
-    )
+    type = serializers.SerializerMethodField(help_text="https://www.w3.org/TR/vc-data-model/#types")
+    issuer = IssuerSchema(source="*", help_text="https://www.w3.org/TR/vc-data-model/#issuer")
+    issued = serializers.DateTimeField(source="modified", help_text="https://www.w3.org/2018/credentials/#issued")
     issuanceDate = serializers.DateTimeField(
         source="modified",
         help_text="Deprecated (requred by the didkit for now) https://www.w3.org/2018/credentials/#issuanceDate",
     )
-    validFrom = serializers.DateTimeField(
-        source="modified", help_text="https://www.w3.org/2018/credentials/#validFrom"
-    )
+    validFrom = serializers.DateTimeField(source="modified", help_text="https://www.w3.org/2018/credentials/#validFrom")
     validUntil = serializers.DateTimeField(
         source="expiration_date",
         help_text="https://www.w3.org/2018/credentials/#validUntil",

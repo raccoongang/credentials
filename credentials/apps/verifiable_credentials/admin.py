@@ -16,10 +16,7 @@ class IssuersListFilter(admin.SimpleListFilter):
     parameter_name = "issuer_id"
 
     def lookups(self, request, model_admin):
-        return [
-            (issuer["issuer_id"], issuer["issuer_name"] or issuer["id"])
-            for issuer in get_issuers()
-        ]
+        return [(issuer["issuer_id"], issuer["issuer_name"] or issuer["id"]) for issuer in get_issuers()]
 
     def queryset(self, request, queryset):
         if not self.value():
@@ -74,9 +71,7 @@ class IssuanceConfigurationForm(forms.ModelForm):
 
         enabled_count = self.instance.__class__.objects.filter(enabled=True).count()
         if enabled_count < 2 and self.cleaned_data["enabled"] is False:
-            raise forms.ValidationError(
-                _("At least one Issuer must be always enabled!")
-            )
+            raise forms.ValidationError(_("At least one Issuer must be always enabled!"))
 
         return self.cleaned_data["enabled"]
 
