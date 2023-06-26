@@ -1,3 +1,6 @@
+"""
+Verifiable Credentials self-checks.
+"""
 from django.core.checks import Error, Tags, register
 
 from .settings import vc_settings

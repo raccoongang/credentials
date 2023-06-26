@@ -1,3 +1,6 @@
+"""
+Verifiable Credentials built-in storage backends.
+"""
 from enum import Enum
 
 from ..settings import vc_settings
@@ -31,7 +34,9 @@ class BaseStorage:
         return cls.PREFERRED_DATA_MODEL
 
     @classmethod
-    def get_deeplink_url(cls, issuance_line, **kwargs):  # pylint: disable=unused-argument
+    def get_deeplink_url(
+        cls, issuance_line, **kwargs
+    ):  # pylint: disable=unused-argument
         return cls.DEEP_LINK_URL
 
     @classmethod
