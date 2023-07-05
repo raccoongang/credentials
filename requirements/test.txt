@@ -142,9 +142,9 @@ django-ratelimit==3.0.1
     #   -r requirements/base.txt
 django-rest-swagger==2.2.0
     # via -r requirements/base.txt
-django-simple-history==3.0.0
+django-simple-history==3.1.1
     # via
-    #   -c requirements/common_constraints.txt
+    #   -c requirements/constraints.txt
     #   -r requirements/base.txt
 django-sortedm2m==3.1.1
     # via -r requirements/base.txt
@@ -211,11 +211,11 @@ edx-toggles==5.0.0
     # via
     #   -r requirements/base.txt
     #   edx-event-bus-kafka
-exceptiongroup==1.1.1
+exceptiongroup==1.1.2
     # via pytest
 factory-boy==3.2.1
     # via -r requirements/test.in
-faker==18.11.1
+faker==18.11.2
     # via factory-boy
 fastavro==1.7.4
     # via
@@ -276,7 +276,7 @@ mysqlclient==2.1.1
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.txt
-newrelic==8.8.0
+newrelic==8.8.1
     # via
     #   -r requirements/base.txt
     #   edx-django-utils
@@ -310,7 +310,7 @@ pbr==5.11.1
     # via
     #   -r requirements/base.txt
     #   stevedore
-pillow==9.5.0
+pillow==10.0.0
     # via -r requirements/base.txt
 platformdirs==3.8.0
     # via
@@ -501,7 +501,7 @@ tox==3.28.0
     #   -r requirements/test.in
 types-pyyaml==6.0.12.10
     # via responses
-typing-extensions==4.6.3
+typing-extensions==4.7.1
     # via
     #   -r requirements/base.txt
     #   asgiref

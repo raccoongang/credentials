@@ -101,7 +101,7 @@ distlib==0.3.6
     #   virtualenv
 distro==1.8.0
     # via docker-compose
-django==3.2.19
+django==3.2.20
     # via
     #   -c requirements/common_constraints.txt
     #   -c requirements/constraints.txt
@@ -158,9 +158,9 @@ django-ratelimit==3.0.1
     #   -r requirements/test.txt
 django-rest-swagger==2.2.0
     # via -r requirements/test.txt
-django-simple-history==3.0.0
+django-simple-history==3.1.1
     # via
-    #   -c requirements/common_constraints.txt
+    #   -c requirements/constraints.txt
     #   -r requirements/test.txt
 django-sortedm2m==3.1.1
     # via -r requirements/test.txt
@@ -236,13 +236,13 @@ edx-toggles==5.0.0
     # via
     #   -r requirements/test.txt
     #   edx-event-bus-kafka
-exceptiongroup==1.1.1
+exceptiongroup==1.1.2
     # via
     #   -r requirements/test.txt
     #   pytest
 factory-boy==3.2.1
     # via -r requirements/test.txt
-faker==18.11.1
+faker==18.11.2
     # via
     #   -r requirements/test.txt
     #   factory-boy
@@ -318,7 +318,7 @@ mysqlclient==2.1.1
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/test.txt
-newrelic==8.8.0
+newrelic==8.8.1
     # via
     #   -r requirements/test.txt
     #   edx-django-utils
@@ -357,7 +357,7 @@ pbr==5.11.1
     # via
     #   -r requirements/test.txt
     #   stevedore
-pillow==9.5.0
+pillow==10.0.0
     # via -r requirements/test.txt
 platformdirs==3.8.0
     # via
@@ -581,7 +581,7 @@ types-pyyaml==6.0.12.10
     # via
     #   -r requirements/test.txt
     #   responses
-typing-extensions==4.6.3
+typing-extensions==4.7.1
     # via
     #   -r requirements/test.txt
     #   asgiref
