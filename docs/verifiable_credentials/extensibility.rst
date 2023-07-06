@@ -20,8 +20,8 @@ Credentials data models
 
 There are 2 specifications included by default:
 
-- `Verifiable Credentials Data Model v1.1`_
-- `Open Badges Specification v3.0`_
+- `Verifiable Credentials Data Model v1.1`_ (see `VC1.1 model implementation`_)
+- `Open Badges Specification v3.0`_ (see `OB3.0 model implementation`_)
 
 Additional specifications may be implemented as separate `plugins`_.
 
@@ -56,3 +56,5 @@ Both `data models`_ and `storages`_ may be implemented as a Credentials IDA inst
 .. _Learner Credential Wallet: https://lcw.app
 .. _DRF: https://www.django-rest-framework.org/
 .. _Status List v2021: components.html#status-list-api
+.. _VC1.1 model implementation: https://github.com/openedx/credentials/tree/master/credentials/apps/verifiable_credentials/composition/verifiable_credentials.py
+.. _OB3.0 model implementation: https://github.com/openedx/credentials/tree/master/credentials/apps/verifiable_credentials/composition/open_badges.py
