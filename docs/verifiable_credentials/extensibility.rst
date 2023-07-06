@@ -8,7 +8,7 @@ Storage backend classes describe a destination for issued verifiable credentials
 
 - `Learner Credential Wallet`_ (mobile apps: Android, IOS)
 
-Additionally, you can try to install the `openedx-wallet`_ POC for investigation/onboarding purposes.
+Additionally, you can install the `openedx-wallet`_ POC for investigation/onboarding purposes.  This wallet is not recommended for production deployment.
 
 Data Models
 -----------
