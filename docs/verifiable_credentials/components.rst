@@ -114,33 +114,33 @@ Status List itself is a verifiable credential. But it serves a different purpose
     {
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
+        "https://w3id.org/security/suites/ed25519-2020/v1",
         "https://w3id.org/vc/status-list/2021/v1"
     ],
+    "id": "https://credentials.example.com/verifiable_credentials/api/v1/status-list/2021/v1/did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id/",
     "type": [
         "VerifiableCredential",
         "StatusList2021Credential"
     ],
     "credentialSubject": {
+        "id": "https://credentials.example.com/verifiable_credentials/api/v1/status-list/2021/v1/did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id/#list",
         "type": "StatusList2021",
-        "statusPurpose": "revocation",
-        "encodedList": "H4sIAAiZRmQC/+3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAODfAC7KO00QJwAA"
+        "encodedList": "H4sIAJzSq2QC/+3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAODfAC7KO00QJwAA",
+        "statusPurpose": "revocation"
     },
     "issuer": {
         "id": "did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id"
     },
-    "issuanceDate": "2023-04-24T14:58:16Z",
+    "issuanceDate": "2023-05-16T20:33:39Z",
     "proof": {
-        "@context": [
-            "https://w3id.org/security/suites/ed25519-2020/v1"
-        ],
         "type": "Ed25519Signature2020",
         "proofPurpose": "assertionMethod",
-        "proofValue": "zacJarQvmhhQ66t3EWcjawnR9k84sR8ToBs79ffgJyEiwaFdrcLUhE4ZCxWd7uRPEhz9BHtsbj2HCpwuktFYExL9",
+        "proofValue": "z2qgpEUHecAxtRNuRXqPavaLwq2cfTzLSykFa8FPEVxvuPxBkfHdqo17XTpA2q9wR7CYwBjsfDBXT2amXAZbRqdPz",
         "verificationMethod": "did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id#z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id",
-        "created": "2023-04-24T14:58:16.893Z"
+        "created": "2023-07-10T09:42:52.259Z"
     },
-    "validFrom": "2023-04-24T14:58:16Z",
-    "issued": "2023-04-24T14:58:16Z"
+    "issued": "2023-05-16T20:33:39Z",
+    "validFrom": "2023-05-16T20:33:39Z"
     }
 
 Status Entry example
