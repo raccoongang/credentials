@@ -2,8 +2,8 @@ Quick Start
 ===================================
 
 .. contents:: Steps
-  :local:
-  :class: no-bullets
+    :local:
+    :class: no-bullets
 
 This guide outlines initial preparations for the Verifiable Credentials feature.
 

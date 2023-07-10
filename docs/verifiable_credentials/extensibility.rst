@@ -8,7 +8,7 @@ Storage backend classes describe a destination for issued verifiable credentials
 
 - `Learner Credential Wallet`_ (mobile apps: Android, IOS)
 
-Additionally, you can try to install the `openedx-wallet`_ POC for investigation/onboarding purposes.
+Additionally, you can install the `openedx-wallet`_ POC for investigation/onboarding purposes.  This wallet is not recommended for production deployment.
 
 Data Models
 -----------
@@ -29,7 +29,8 @@ Credentials status information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. note::
-    Status information allows instant checks to figure out if the presented verifiable credential is still valid and actual.
+
+    Status information allows instant checks to figure out if the presented verifiable credential is still valid.  The credential issuer can invalidate a verifiable credential by updating its indexed record in the status list.
 
 `Status List v2021`_ is a special kind of verifiable credential. It serves as a mechanism of verification for issued verifiable credentials (meaning, it does not carry achievement information itself but it is a registry of statuses for all created achievement-related verifiable credentials).
 
