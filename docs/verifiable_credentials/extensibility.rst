@@ -4,11 +4,9 @@ Extensibility
 Storages
 --------
 
-Storage backend classes describe a destination for issued verifiable credentials. Basically, storages are wallets (mobile or web applications). By default, there is a single integration enabled:
+Storage backend classes describe a destination for issued verifiable credentials. Basically, storages are wallets (mobile or web applications).
 
-- `Learner Credential Wallet`_ (mobile apps: Android, IOS)
-
-Additionally, you can install the `openedx-wallet`_ POC for investigation/onboarding purposes.  This wallet is not recommended for production deployment.
+See available options on `Storages page`_.
 
 Data Models
 -----------
@@ -20,8 +18,8 @@ Credentials data models
 
 There are 2 specifications included by default:
 
-- `Open Badges Specification v3.0`_ (see `OB3.0 model implementation`_)
-- `Verifiable Credentials Data Model v1.1`_ (see `VC1.1 model implementation`_) - experimental
+- `Open Badges Specification v3.0`_ (see `OB3.0 model`_)
+- `Verifiable Credentials Data Model v1.1`_ (see `VC1.1 model`_) - experimental
 
 Additional specifications may be implemented as separate `plugins`_.
 
@@ -51,11 +49,11 @@ Both `data models`_ and `storages`_ may be implemented as a Credentials IDA inst
 .. _Verifiable Credential Status List v2021: https://w3c.github.io/vc-status-list-2021/
 .. _data models: extensibility.html#data-models
 .. _storages: extensibility.html#storages
+.. _storages page: storages.html
 .. _plugins: extensibility.html#plugins
-.. _openedx-wallet: https://github.com/raccoongang/openedx-wallet
 .. _Raccoon Gang : https://raccoongang.com
 .. _Learner Credential Wallet: https://lcw.app
 .. _DRF: https://www.django-rest-framework.org/
 .. _Status List v2021: components.html#status-list-api
-.. _VC1.1 model implementation: https://github.com/openedx/credentials/tree/master/credentials/apps/verifiable_credentials/composition/verifiable_credentials.py
-.. _OB3.0 model implementation: https://github.com/openedx/credentials/tree/master/credentials/apps/verifiable_credentials/composition/open_badges.py
+.. _VC1.1 model: https://github.com/openedx/credentials/tree/master/credentials/apps/verifiable_credentials/composition/verifiable_credentials.py
+.. _OB3.0 model: https://github.com/openedx/credentials/tree/master/credentials/apps/verifiable_credentials/composition/open_badges.py

@@ -1,7 +1,7 @@
 Storages
 ========
 
-Currently there is the only digital wallet is supported.
+Currently there is the only digital wallet is supported for production.
 
 Learner Credential Wallet
 -------------------------
@@ -142,8 +142,14 @@ This explains a generic usage flow for learners.
     ]
     }
 
+Other options
+-------------
+
+Additionally, you can install the `openedx-wallet`_ POC for investigation/onboarding purposes.  This wallet is not recommended for production deployment.
+
 .. _Official web-site: https://lcw.app/
 .. _Digital Credentials Consortium: https://digitalcredentials.mit.edu/
 .. _community issuer registry: https://github.com/digitalcredentials/community-registry
 .. _`Sandbox Registry`: https://github.com/digitalcredentials/sandbox-registry
 .. _`Verifiable Credentials tab`: components.html#learner-record-microfrontend
+.. _openedx-wallet: https://github.com/raccoongang/openedx-wallet
