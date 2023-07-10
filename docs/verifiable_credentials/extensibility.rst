@@ -20,8 +20,8 @@ Credentials data models
 
 There are 2 specifications included by default:
 
-- `Verifiable Credentials Data Model v1.1`_ (see `VC1.1 model implementation`_)
 - `Open Badges Specification v3.0`_ (see `OB3.0 model implementation`_)
+- `Verifiable Credentials Data Model v1.1`_ (see `VC1.1 model implementation`_) - experimental
 
 Additional specifications may be implemented as separate `plugins`_.
 

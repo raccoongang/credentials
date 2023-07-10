@@ -13,14 +13,15 @@ Please, see `Extensibility`_ section for the list of supported:
 ----
 
 .. toctree::
-   :maxdepth: 1
+    :maxdepth: 1
 
-   quickstart
-   usage
-   components
-   configuration
-   extensibility
-   tech_details
+    quickstart
+    usage
+    components
+    configuration
+    extensibility
+    storages
+    tech_details
 
 .. _Verifiable Credentials: https://en.wikipedia.org/wiki/Verifiable_credentials
 .. _Extensibility: extensibility.html

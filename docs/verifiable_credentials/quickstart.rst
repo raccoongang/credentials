@@ -68,12 +68,20 @@ Status List API endpoint is crucial for the feature. Once everything is configur
 .. code::
 
     # each Issuer maintains its own Status List:
-    https://credentials.example.com/verifiable_credentials/api/v1/status-list/2021/v1/<did>/
+    https://credentials.example.com/verifiable_credentials/api/v1/status-list/2021/v1/<issuer-did>/
 
 See `Status List API`_ for more details.
+
+4. Issuer registration (Learner Credential Wallet)
+--------------------------------------------------
+
+This step is specific for the Learner Credential Wallet storage.
+
+See Learner Credential Wallet `usage prerequisites`_.
 
 .. _issuer: https://www.w3.org/TR/vc-data-model-1.1/#dfn-issuers
 .. _configuration: configuration.html#configuration
 .. _management commands: configuration.html#management-commands
 .. _administration site: components.html#administration-site
 .. _status list API: components.html#status-list-api
+.. _usage prerequisites: storages.html#usage-prerequisites

@@ -6,6 +6,7 @@ The Verifiable Credentials feature includes the following parts:
 - **Verifiable Credentials application** (`credentials.apps.verifiable_credentials` within the Open edX Credentials IDA);
 - **Learner Record MFE** (`frontend-app-learner-record` micro-frontend);
 - third-party plugins (see `Extensibility`_)
+- digital wallets (see `Storages`_)
 
 Verifiable Credentials application
 ----------------------------------
@@ -170,3 +171,4 @@ Also see related `management command`_
 .. _Learner Credential Wallet: https://lcw.app/
 .. _Privacy Considerations: https://w3c.github.io/vc-status-list-2021/#privacy-considerations
 .. _management command: configuration.html#status-list-helper
+.. _storages: storages.html
