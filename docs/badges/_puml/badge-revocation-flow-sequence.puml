@@ -1,0 +1,63 @@
+@startuml name "Credly Badges revoke flow"
+
+!pragma teoz true
+autonumber
+
+title "Credly badges revoke effect (sequence diagram)"
+
+box "Open edX"
+    actor           "Open edX\n Learner" as learner
+    box "Platform IDA" #LightBlue
+        participant     "LMS" as lms
+    end box
+    participant     "EventBus" as ebus
+    box "Credentials IDA" #LightBlue
+        participant     "Badges app" as badges
+        participant     "Credly Badges app" as backend
+    end box
+end box
+box "External badging services"
+    box "Credly by Pearson" #LightSeaGreen
+        participant     "Credly" as credly
+    end box
+    participant     "Other" as other
+end box
+
+
+learner -> lms : Enters LMS course
+learner -> lms : Performs graded action\n (e.g. submits answer)
+
+lms -> ebus : Emits\n**COURSE_GRADE_NOW_FAILED**
+ebus <- badges : Receives\n**COURSE_GRADE_NOW_FAILED**
+
+rnote over badges,backend
+    **BadgeProcessor handles event**
+    - analyses Requirements
+    - updates Fulfillment(s)
+endrnote
+
+rnote over badges
+    **BadgeCollector handles event**
+    - analyses Fulfillment(s)
+    - revokes Badge(s)
+    - emits revocation event
+endrnote
+
+ebus <- badges : Emits\n**BADGE_REVOKED**
+lms -> ebus : Receives\n**BADGE_REVOKED**
+
+rnote over backend
+    **CredlyBadgeCollector**
+    handles event:
+    - analyses Fulfillment(s)
+    - revokes Badge(s)
+    - emits revocation event
+endrnote
+
+ebus <- backend : Emits\n**BADGE_REVOKED**
+lms -> ebus : Receives\n**BADGE_REVOKED**
+
+backend -> credly : Revokes issued user badge\n(API revocation request)
+backend -> learner : Optionally, notifies a Learner.
+
+@enduml

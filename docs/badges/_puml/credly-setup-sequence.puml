@@ -1,0 +1,78 @@
+@startuml name "Credly Badges setup"
+
+!pragma teoz true
+autonumber
+
+title "Credly badges intial configuration (sequence diagram)"
+
+box "Open edX"
+    actor           "Open edX\n Admin" as oex_admin
+    box "Platform IDA" #LightBlue
+        participant     "LMS" as lms
+    end box
+    participant     "EventBus" as ebus
+    box "Credentials IDA" #LightBlue
+        participant     "Badges app" as badges
+        participant     "Credly Badges app" as backend
+    end box
+end box
+box "External badging services"
+    box "Credly by Pearson" #LightSeaGreen
+        participant     "Credly" as credly
+        actor           "Credly\n Admin" as credly_admin
+    end box
+    participant     "Other" as other
+end box
+
+
+== Inital setup ==
+
+credly_admin -> credly : Configures API Client credentials\n for Open edX installation
+
+credly_admin -> credly : Creates Organization
+credly_admin -> credly : Creates a badge template "A"
+credly_admin -> credly : Creates a badge template "B"
+
+
+== Open edX Configuration ==
+
+oex_admin -> backend : Enters Credentials admin\n (Credly Badges app)
+oex_admin -> backend : Creates Organization configuration\n  (Credly client API connection)
+
+
+== Badge templates management ==
+
+oex_admin -> backend : Performs list action "Sync badge templates"
+backend -> credly : Requests available badge templates\n (Credly organization)
+backend <-- credly : Returns available (Org) badge templates
+
+rnote over badges,backend
+    - CredlyBadgeTemplate(A) is created
+    - CredlyBadgeTemplate(B) is created
+endrnote
+
+backend <-[#red]-> credly : Uses webhook to keep\n badge templates in sync?
+
+
+== Requirements setup ==
+
+oex_admin -> backend : Configures each template with forward and reverse effects.
+
+rnote over badges,backend
+    - Award effect Requirements are created
+    - Revoke effect Requirements are created
+endrnote
+
+hnote over badges,backend #LightGreen
+    At this moment all CredlyBadges
+    are configured to be given/revoked
+    for "specific course(s) completion".
+endhnote
+
+oex_admin -> backend : Activates configured badge templates
+
+rnote over badges,backend
+    BadgeProcessor starts taking
+    into account new requirements.
+endhnote
+@enduml
