@@ -451,7 +451,7 @@ openedx-atlas==0.5.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-openedx-events==9.2.0
+openedx-events @ git+https://github.com/raccoongang/openedx-events.git@aci.main
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
