@@ -1,7 +1,6 @@
 """
-Toggles for Badges app.
+Toggles for badges app.
 """
-
 
 from edx_toggles.toggles import SettingToggle
 
