@@ -1,0 +1,3 @@
+"""
+Toggles for badges app.
+"""

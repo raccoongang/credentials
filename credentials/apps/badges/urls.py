@@ -1,0 +1,4 @@
+"""
+URLs for badges.
+"""
+urlpatterns = []
