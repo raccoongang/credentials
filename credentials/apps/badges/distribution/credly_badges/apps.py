@@ -5,6 +5,7 @@ from credentials.apps.plugins.constants import (
     SettingsType,
     PROJECT_TYPE,
 )
+from .toggles import is_credly_badges_enabled, check_credly_badges_enabled
 
 
 class CredlyBadgesConfig(AppConfig):
@@ -26,4 +27,11 @@ class CredlyBadgesConfig(AppConfig):
                 SettingsType.TEST: {PluginSettings.RELATIVE_PATH: 'settings.test'},
             },
         }
-    }
+    } if is_credly_badges_enabled() else {}
+
+    @check_credly_badges_enabled
+    def ready(self):
+        """
+        Performs initial registrations for checks, signals, etc.
+        """
+        # TODO: from .checks import configuration_checks
