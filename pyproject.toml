@@ -11,3 +11,27 @@ lines_after_imports = 2
 combine_as_imports = true
 skip = ["migrations", "settings"]
 include_trailing_comma = true
+
+[project]
+# https://packaging.python.org/en/latest/specifications/declaring-project-metadata/
+name = "credentials"
+license = { file = "LICENSE" }
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Framework :: Django :: 3",
+]
+dynamic = ["version", "dependencies", "optional-dependencies"]
+
+[tool.setuptools]
+packages = ["credentials"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = "requirements/all.txt" }
+
+[project.entry-points."credentials.djangoapp"]
+badges = "credentials.apps.badges.apps:BadgesConfig"
