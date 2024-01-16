@@ -4,6 +4,8 @@
 #
 #    make upgrade
 #
+-e file:///edx/app/credentials/credentials/credentials/apps/badges/distribution/credly
+    # via -r requirements/base.txt
 asgiref==3.7.2
     # via
     #   -r requirements/base.txt
@@ -24,9 +26,9 @@ backports-zoneinfo==0.2.1
     #   django
 bleach==6.1.0
     # via -r requirements/base.txt
-boto3==1.34.11
+boto3==1.34.19
     # via django-ses
-botocore==1.34.11
+botocore==1.34.19
     # via
     #   boto3
     #   s3transfer
@@ -136,7 +138,7 @@ django-waffle==4.1.0
     #   edx-django-utils
     #   edx-drf-extensions
     #   edx-toggles
-django-webpack-loader==3.0.0
+django-webpack-loader==3.0.1
     # via -r requirements/base.txt
 djangorestframework==3.14.0
     # via
@@ -168,7 +170,7 @@ edx-django-utils==5.9.0
     #   edx-event-bus-kafka
     #   edx-rest-api-client
     #   edx-toggles
-edx-drf-extensions==9.0.1
+edx-drf-extensions==9.1.2
     # via -r requirements/base.txt
 edx-event-bus-kafka==5.5.0
     # via -r requirements/base.txt
@@ -188,7 +190,7 @@ edx-toggles==5.1.0
     # via
     #   -r requirements/base.txt
     #   edx-event-bus-kafka
-fastavro==1.9.2
+fastavro==1.9.3
     # via
     #   -r requirements/base.txt
     #   openedx-events
@@ -214,7 +216,7 @@ itypes==1.2.0
     # via
     #   -r requirements/base.txt
     #   coreapi
-jinja2==3.1.2
+jinja2==3.1.3
     # via
     #   -r requirements/base.txt
     #   code-annotations
@@ -223,11 +225,11 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-lxml==5.0.0
+lxml==5.1.0
     # via
     #   -r requirements/base.txt
     #   edx-i18n-tools
-markdown==3.5.1
+markdown==3.5.2
     # via -r requirements/base.txt
 markupsafe==2.1.3
     # via
@@ -239,7 +241,7 @@ monotonic==1.6
     #   segment-analytics-python
 mysqlclient==2.2.1
     # via -r requirements/base.txt
-newrelic==9.3.0
+newrelic==9.5.0
     # via
     #   -r requirements/base.txt
     #   -r requirements/production.in
@@ -319,7 +321,7 @@ python-dateutil==2.8.2
     #   botocore
     #   edx-ace
     #   segment-analytics-python
-python-memcached==1.61
+python-memcached==1.62
     # via -r requirements/base.txt
 python-slugify==8.0.1
     # via
