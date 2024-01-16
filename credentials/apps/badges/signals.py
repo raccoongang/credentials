@@ -1,0 +1,3 @@
+"""
+Badges signal handlers.
+"""
