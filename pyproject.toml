@@ -35,3 +35,4 @@ dependencies = { file = "requirements/all.txt" }
 
 [project.entry-points."credentials.djangoapp"]
 badges = "credentials.apps.badges.apps:BadgesConfig"
+credly_badges = "credentials.apps.badges.distribution.credly_badges.apps:CredlyBadgesConfig"
