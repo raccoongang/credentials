@@ -1,0 +1,3 @@
+"""
+Credly Badges admin configuration.
+"""
