@@ -12,5 +12,5 @@ class BadgesConfig(AppConfig):
         """
         Performs initial registrations for checks, signals, etc.
         """
-        from . import signals  # pylint: disable=unused-import,import-outside-toplevel
-        from . checks import badges_checks  # pylint: disable=unused-import,import-outside-toplevel
+        from . import handlers  # pylint: disable=unused-import,import-outside-toplevel
+        from .checks import badges_checks  # pylint: disable=unused-import,import-outside-toplevel
