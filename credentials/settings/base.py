@@ -584,6 +584,36 @@ EVENT_BUS_PRODUCER_CONFIG = {
             "enabled": False,
         },
     },
+    # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.badge.awarded.v1']
+    #    ['badges']['enabled']
+    # .. toggle_implementation: SettingToggle
+    # .. toggle_default: True
+    # .. toggle_description: Enables sending org.openedx.learning.badge.awarded.v1 events over the event bus.
+    # .. toggle_warning: The default may be changed in a later release.
+    # .. toggle_use_cases: opt_in
+    "org.openedx.learning.badge.awarded.v1": {
+        "badges": {"event_key_field": "badge.uuid", "enabled": True },
+    },
+    # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.badge.revoked.v1']
+    #    ['badges']['enabled']
+    # .. toggle_implementation: SettingToggle
+    # .. toggle_default: True
+    # .. toggle_description: Enables sending org.openedx.learning.badge.revoked.v1 events over the event bus.
+    # .. toggle_warning: The default may be changed in a later release.
+    # .. toggle_use_cases: opt_in
+    "org.openedx.learning.badge.revoked.v1": {
+        "badges": {"event_key_field": "badge.uuid", "enabled": True },
+    },
+}
+
+# Badges settings
+# .. setting_name: BADGES_CONFIG
+# .. setting_description: Dictionary with badges settings including enabled badge events, processors, collectors, etc.
+BADGES_CONFIG = {
+    "events": [
+        "org.openedx.learning.course.grade.passed.v1",
+        "org.openedx.learning.course.grade.failed.v1",
+    ],
 }
 
 # .. toggle_name: LOG_INCOMING_REQUESTS
