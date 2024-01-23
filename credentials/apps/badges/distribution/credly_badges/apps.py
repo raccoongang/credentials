@@ -5,18 +5,18 @@ from credentials.apps.plugins.constants import (
     SettingsType,
     PROJECT_TYPE,
 )
-from .toggles import is_badges_enabled, check_badges_enabled
+from .toggles import is_credly_badges_enabled, check_credly_badges_enabled
 
 
-class BadgesConfig(AppConfig):
-    name = "credentials.apps.badges"
-    verbose_name = "Badges"
+class CredlyBadgesConfig(AppConfig):
+    name = "credentials.apps.badges.distribution.credly_badges"
+    verbose_name = "Credly badges"
 
     plugin_app = {
         PluginURLs.CONFIG: {
             PROJECT_TYPE: {
-                PluginURLs.NAMESPACE: 'badges',
-                PluginURLs.REGEX: 'badges/',
+                PluginURLs.NAMESPACE: 'credly_badges',
+                PluginURLs.REGEX: 'credly-badges/',
                 PluginURLs.RELATIVE_PATH: 'urls',
             }
         },
@@ -27,9 +27,9 @@ class BadgesConfig(AppConfig):
                 SettingsType.TEST: {PluginSettings.RELATIVE_PATH: 'settings.test'},
             },
         }
-    } if is_badges_enabled() else {}
+    } if is_credly_badges_enabled() else {}
 
-    @check_badges_enabled
+    @check_credly_badges_enabled
     def ready(self):
         """
         Performs initial registrations for checks, signals, etc.
