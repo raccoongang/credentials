@@ -1,3 +1,0 @@
-"""
-Credly badges checks
-"""

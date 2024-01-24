@@ -1,15 +1,22 @@
-from django.apps import AppConfig
-from credentials.apps.plugins.constants import (
-    PluginURLs,
-    PluginSettings,
-    SettingsType,
-    PROJECT_TYPE,
-)
+from credentials.apps.badges.apps import BadgesAppConfig
+from credentials.apps.badges.toggles import is_badges_enabled
+from credentials.apps.plugins.constants import PROJECT_TYPE, PluginSettings, PluginURLs, SettingsType
 
 
-class CredlyBadgesConfig(AppConfig):
+class CredlyBadgesConfig(BadgesAppConfig):
+    """
+    Credly distribution backend.
+
+    This app is the Credential service plugin.
+    It is built on the top of the `credentials.apps.badges`.
+    It allows configuration and issuance specific to the Credly (by Pearson) badges from Open edX.
+
+    In addition in a context of Credly Organization:
+    - organization badge templates are used to setup Open edX badge templates;
+    - earned badges are distributed to the Credly service;
+    """
     name = "credly_badges"
-    verbose_name = "Credly Badges"
+    plugin_label = "Credly (by Pearson)"
 
     plugin_app = {
         PluginURLs.CONFIG: {
@@ -26,4 +33,12 @@ class CredlyBadgesConfig(AppConfig):
                 SettingsType.TEST: {PluginSettings.RELATIVE_PATH: 'settings.test'},
             },
         }
-    }
+    } if is_badges_enabled() else {} # TODO: improve this
+
+    def ready(self):
+        """
+        Activate installed badges plugins if they are enabled.
+
+        Performs initial registrations for checks, signals, etc.
+        """
+        super().ready()
