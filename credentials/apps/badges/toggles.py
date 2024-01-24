@@ -17,7 +17,7 @@ ENABLE_BADGES = SettingToggle('BADGES_ENABLED', default=False, module_name=__nam
 
 def is_badges_enabled():
     """
-    Checks if badges app enabled.
+    Check main feature flag.
     """
     return ENABLE_BADGES.is_enabled()
 

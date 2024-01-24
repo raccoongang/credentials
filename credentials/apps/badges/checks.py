@@ -1,5 +1,5 @@
 """
-Badges checks.
+Badges app self-checks.
 """
 from django.conf import settings
 from django.core.checks import Error, Tags, register

@@ -1,10 +1,10 @@
 import base64
 import logging
-from attrs import asdict
 from functools import lru_cache
 from urllib.parse import urljoin
 
 import requests
+from attrs import asdict
 from django.conf import settings
 from requests.packages.urllib3.exceptions import HTTPError
 
