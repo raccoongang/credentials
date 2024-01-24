@@ -1,37 +1,37 @@
 from django.apps import AppConfig
-from credentials.apps.plugins.constants import (
-    PluginURLs,
-    PluginSettings,
-    SettingsType,
-    PROJECT_TYPE,
-)
-from .toggles import is_badges_enabled, check_badges_enabled
+from django.conf import settings
+
+from credentials.apps.plugins.constants import PROJECT_TYPE, PluginSettings, PluginURLs, SettingsType
+
+from .toggles import check_badges_enabled, is_badges_enabled
 
 
-class BadgesConfig(AppConfig):
+class BadgesAppConfig(AppConfig):
+    """
+    Extended application config with additional Badges-specific logic.
+    """
+
+    @property
+    def verbose_name(self):
+        return f"Badges: {self.plugin_label}"
+
+
+class BadgesConfig(BadgesAppConfig):
+    """
+    Core badges application configuration.
+    """
+    default = True
     name = "credentials.apps.badges"
     verbose_name = "Badges"
-
-    plugin_app = {
-        PluginURLs.CONFIG: {
-            PROJECT_TYPE: {
-                PluginURLs.NAMESPACE: 'badges',
-                PluginURLs.REGEX: 'badges/',
-                PluginURLs.RELATIVE_PATH: 'urls',
-            }
-        },
-        PluginSettings.CONFIG: {
-            PROJECT_TYPE: {
-                SettingsType.BASE: {PluginSettings.RELATIVE_PATH: 'settings.base'},
-                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: 'settings.production'},
-                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: 'settings.test'},
-            },
-        }
-    } if is_badges_enabled() else {}
 
     @check_badges_enabled
     def ready(self):
         """
+        Activate installed badges plugins if they are enabled.
+
         Performs initial registrations for checks, signals, etc.
         """
-        # TODO: from .checks import configuration_checks
+        from .checks import badges_checks  # pylint: disable=unused-import,import-outside-toplevel
+        from .signals import handlers  # pylint: disable=unused-import,import-outside-toplevel
+
+        super().ready()

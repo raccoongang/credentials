@@ -610,6 +610,7 @@ EVENT_BUS_PRODUCER_CONFIG = {
 # .. setting_name: BADGES_CONFIG
 # .. setting_description: Dictionary with badges settings including enabled badge events, processors, collectors, etc.
 BADGES_CONFIG = {
+    # these events become available in rules setup:
     "events": [
         "org.openedx.learning.course.grade.passed.v1",
         "org.openedx.learning.course.grade.failed.v1",
