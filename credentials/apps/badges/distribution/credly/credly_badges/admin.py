@@ -6,9 +6,9 @@ from django.contrib import admin
 
 from credentials.apps.badges.toggles import is_badges_enabled
 
-from .models import CredlyOrganization, BadgeTemplate
-from .utils import sync_badge_templates_for_organization
 from .forms import CredlyOrganizationAdminForm
+from .models import BadgeTemplate, CredlyOrganization
+from .utils import sync_badge_templates_for_organization
 
 
 class CredlyOrganizationAdmin(admin.ModelAdmin):
