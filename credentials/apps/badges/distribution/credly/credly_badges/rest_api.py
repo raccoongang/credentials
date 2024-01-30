@@ -6,8 +6,7 @@ from urllib.parse import urljoin
 import requests
 from attrs import asdict
 from django.conf import settings
-from requests.packages.urllib3.exceptions import HTTPError
-
+from requests.exceptions import HTTPError
 from .exceptions import CredlyAPIError
 
 
@@ -21,6 +20,8 @@ class CredlyAPIClient:
     This class provides methods for performing various operations on the Credly API,
     such as fetching organization details, fetching badge templates, issuing badges,
     and revoking badges.
+
+    TODO: improve client to return data in a more usable format
     """
 
     def __init__(self, organization_id, api_key):

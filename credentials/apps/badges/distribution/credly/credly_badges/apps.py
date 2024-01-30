@@ -1,5 +1,5 @@
 from credentials.apps.badges.apps import BadgesAppConfig
-from credentials.apps.badges.toggles import is_badges_enabled
+from credentials.apps.badges.toggles import is_badges_enabled, check_badges_enabled
 from credentials.apps.plugins.constants import PROJECT_TYPE, PluginSettings, PluginURLs, SettingsType
 
 
@@ -35,10 +35,9 @@ class CredlyBadgesConfig(BadgesAppConfig):
         }
     } if is_badges_enabled() else {} # TODO: improve this
 
+    @ check_badges_enabled
     def ready(self):
         """
-        Activate installed badges plugins if they are enabled.
-
         Performs initial registrations for checks, signals, etc.
         """
         super().ready()
