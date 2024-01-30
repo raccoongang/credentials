@@ -1,5 +1,6 @@
-import attr
 from datetime import datetime
+
+import attr
 
 
 @attr.s(auto_attribs=True, frozen=True)
@@ -15,8 +16,16 @@ class IssueBadgeData:
         issued_at (datetime): Timestamp when the badge was issued.
     """
 
-    recipient_email: attr.ib(type=str)
-    issued_to_first_name: attr.ib(type=str)
-    issued_to_last_name: attr.ib(type=str)
-    badge_template_id: attr.ib(type=str)
-    issued_at: attr.ib(type=datetime)
+    recipient_email: str
+    issued_to_first_name: str
+    issued_to_last_name: str
+    badge_template_id: str
+    issued_at: datetime
+
+
+@attr.s(auto_attribs=True, frozen=True)
+class CredlyEventInfoData:
+    id: str
+    organization_id: str
+    event_type: str
+    occurred_at: datetime

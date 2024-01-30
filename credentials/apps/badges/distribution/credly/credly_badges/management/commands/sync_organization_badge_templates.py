@@ -1,7 +1,8 @@
 import logging
-from django.core.management.base import BaseCommand
-from credly_badges.utils import sync_badge_templates_for_organization
+
 from credly_badges.models import CredlyOrganization
+from credly_badges.utils import sync_badge_templates_for_organization
+from django.core.management.base import BaseCommand
 
 
 logger = logging.getLogger(__name__)

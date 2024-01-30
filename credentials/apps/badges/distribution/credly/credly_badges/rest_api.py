@@ -1,124 +1,48 @@
-import base64
 import logging
-from functools import lru_cache
-from urllib.parse import urljoin
 
-import requests
-from attrs import asdict
-from django.conf import settings
-from requests.exceptions import HTTPError
-from .exceptions import CredlyAPIError
+from django.shortcuts import get_object_or_404
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .api_client import CredlyAPIClient
+from .data import CredlyEventInfoData
+from .models import CredlyOrganization
+from .utils import (
+    handle_badge_template_changed_event,
+    handle_badge_template_created_event,
+    handle_badge_template_deleted_event,
+)
 
 
 logger = logging.getLogger(__name__)
 
 
-class CredlyAPIClient:
+class CredlyWebhook(APIView):
     """
-    A client for interacting with the Credly API.
+    Public API that handle Credly webhooks.
 
-    This class provides methods for performing various operations on the Credly API,
-    such as fetching organization details, fetching badge templates, issuing badges,
-    and revoking badges.
-
-    TODO: improve client to return data in a more usable format
+    Usage:
+        POST /edx_badges/api/credly/v1/webhook
     """
 
-    def __init__(self, organization_id, api_key):
-        """
-        Initializes a CredlyRestAPI object.
+    authentication_classes = []
+    permission_classes = []
 
-        Args:
-            organization_id (str): ID of the organization.
-            api_key (str): API key for authentication.
-        """
+    def post(self, request):
+        event_info_data = CredlyEventInfoData(**request.data)
+        organization = get_object_or_404(CredlyOrganization, uuid=event_info_data.organization_id)
+        credly_api_client = CredlyAPIClient(organization.uuid, organization.api_key)
 
-        self.organization_id = organization_id
-        self.api_key = api_key
-        self.base_api_url = urljoin(settings.CREDLY_API_BASE_URL, f"organizations/{self.organization_id}/")
+        event_info_response = credly_api_client.fetch_event_information(event_info_data.id)
 
-    def perform_request(self, method, url_suffix, data=None):
-        """
-        Perform an HTTP request to the specified URL suffix.
+        if event_info_data.event_type == "badge_template.created":
+            handle_badge_template_created_event(event_info_response)
+        elif event_info_data.event_type == "badge_template.changed":
+            handle_badge_template_changed_event(event_info_response)
+        elif event_info_data.event_type == "badge_template.deleted":
+            handle_badge_template_deleted_event(event_info_response)
+        else:
+            logger.error(f"Unknown event type: {event_info_data.event_type}")
 
-        Args:
-            method (str): HTTP method to use for the request.
-            url_suffix (str): URL suffix to append to the base Credly API URL.
-            data (dict, optional): Data to send with the request.
-
-        Returns:
-            dict: JSON response from the API.
-
-        Raises:
-            requests.HTTPError: If the API returns an error response.
-        """
-        url = urljoin(self.base_api_url, url_suffix)
-        response = requests.request(method.upper(), url, headers=self._get_headers(), data=data)
-        self._raise_for_error(response)
-        return response.json()
-
-    def fetch_organization(self):
-        """
-        Fetches the organization from the Credly API.
-        """
-        return self.perform_request("get", "")
-
-    def fetch_badge_templates(self):
-        """
-        Fetches the badge templates from the Credly API.
-        """
-        return self.perform_request("get", "badge_templates/")
-
-    def issue_badge(self, issue_badge_data):
-        """
-        Issues a badge using the Credly REST API.
-
-        Args:
-            issue_badge_data (IssueBadgeData): Data required to issue the badge.
-        """
-        return self.perform_request("post", "badges/", asdict(issue_badge_data))
-
-    def revoke_badge(self, badge_id):
-        """
-        Revoke a badge with the given badge ID.
-
-        Args:
-            badge_id (str): ID of the badge to revoke.
-        """
-        return self.perform_request("put", f"badges/{badge_id}/revoke/")
-
-    def _raise_for_error(self, response):
-        """
-        Raises a CredlyAPIError if the response status code indicates an error.
-
-        Args:
-            response (requests.Response): Response object from the Credly API request.
-
-        Raises:
-            CredlyAPIError: If the response status code indicates an error.
-        """
-        try:
-            response.raise_for_status()
-        except HTTPError:
-            logger.error(f"Error while processing credly api request: {response.status_code} - {response.text}")
-            raise CredlyAPIError
-
-    def _get_headers(self):
-        """
-        Returns the headers for making API requests to Credly.
-        """
-        return {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "Authorization": f"Basic {self._build_authorization_token()}",
-        }
-
-    @lru_cache
-    def _build_authorization_token(self):
-        """
-        Build the authorization token for the Credly API.
-
-        Returns:
-            str: Authorization token.
-        """
-        return base64.b64encode(self.api_key.encode("ascii")).decode("ascii")
+        return Response(status=status.HTTP_204_NO_CONTENT)

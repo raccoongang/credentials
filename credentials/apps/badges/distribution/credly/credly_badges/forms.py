@@ -5,9 +5,10 @@ Django forms for the credly badges
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .models import CredlyOrganization
-from .rest_api import CredlyAPIClient
+from .api_client import CredlyAPIClient
 from .exceptions import CredlyAPIError
+from .models import CredlyOrganization
+
 
 class CredlyOrganizationAdminForm(forms.ModelForm):
     class Meta:
