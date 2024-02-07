@@ -5,6 +5,7 @@ Credly Badges DB models.
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
+from credentials.apps.badges.models import BadgeTemplate
 
 
 class CredlyOrganization(TimeStampedModel):
@@ -26,30 +27,13 @@ class CredlyOrganization(TimeStampedModel):
         return cls.objects.values_list('uuid', flat=True)
 
 
-class BadgeTemplate(models.Model):
+class CredlyBadgeTemplate(BadgeTemplate):
     """
-    Badge template model.
+    Credly badge template model.
     """
-    STATE_CHOICES = (
-        ('active', _('Active')),
-        ('archived', _('Archived')),
-        ('draft', _('Draft')),
-        ('inactive', _('Inactive')),
-    )
 
-    uuid = models.UUIDField(unique=True, help_text=_('Unique badge template ID.'))
-    name = models.CharField(max_length=255, help_text=_('Badge template name.'))
     organization = models.ForeignKey(
         CredlyOrganization,
         on_delete=models.CASCADE,
-        help_text=_('Organization of the badge template.')
+        help_text=_('Organization of the credly badge template.')
     )
-    state = models.CharField(
-        max_length=255,
-        choices=STATE_CHOICES,
-        default='inactive',
-        help_text=_('State of the badge template.')
-    )
-
-    def __str__(self):
-        return self.name
