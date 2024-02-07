@@ -1,7 +1,8 @@
 from django.shortcuts import get_object_or_404
+from crum import get_current_request
 
 from .api_client import CredlyAPIClient
-from .models import BadgeTemplate, CredlyOrganization
+from .models import CredlyBadgeTemplate, CredlyOrganization
 
 
 def sync_badge_templates_for_organization(organization_id):
@@ -22,11 +23,14 @@ def sync_badge_templates_for_organization(organization_id):
     badge_templates_data = credly_api_client.fetch_badge_templates()
 
     for badge_template_data in badge_templates_data.get('data', []):
-        BadgeTemplate.objects.update_or_create(
+        CredlyBadgeTemplate.objects.update_or_create(
             uuid=badge_template_data.get('id'),
             defaults={
                 'name': badge_template_data.get('name'),
                 'organization': organization,
+                'status': badge_template_data.get('state'),
+                'site': get_current_request().site,
+                'type': 'credly',
             }
         )
 
@@ -40,11 +44,14 @@ def handle_badge_template_created_event(data):
 
     organization = get_object_or_404(CredlyOrganization, uuid=owner.get('id'))
 
-    BadgeTemplate.objects.update_or_create(
+    CredlyBadgeTemplate.objects.update_or_create(
         uuid=badge_template.get('id'),
         defaults={
             'name': badge_template.get('name'),
             'organization': organization,
+            'status': badge_template.get('state'),
+            'site': get_current_request().site,
+            'type': 'credly',
         }
     )
 
@@ -58,11 +65,14 @@ def handle_badge_template_changed_event(data):
 
     organization = get_object_or_404(CredlyOrganization, uuid=owner.get('id'))
 
-    BadgeTemplate.objects.update_or_create(
+    CredlyBadgeTemplate.objects.update_or_create(
         uuid=badge_template.get('id'),
         defaults={
             'name': badge_template.get('name'),
             'organization': organization,
+            'status': badge_template.get('state'),
+            'site': get_current_request().site,
+            'type': 'credly',
         }
     )
 
@@ -71,4 +81,7 @@ def handle_badge_template_deleted_event(data):
     """
     Deletes the badge template by provided uuid.
     """
-    BadgeTemplate.objects.filter(uuid=data.get('data', {}).get('badge_template', {}).get('id')).delete()
+    CredlyBadgeTemplate.objects.filter(
+        uuid=data.get('data', {}).get('badge_template', {}).get('id'),
+        site=get_current_request().site,
+    ).delete()
