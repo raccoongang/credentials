@@ -58,7 +58,7 @@ class CredlyAPIClient:
 
     def fetch_organization(self):
         """
-        Fetches the organization from the Credly API.
+        Fetches Credly Organization data.
         """
         return self.perform_request("get", "")
 
@@ -108,8 +108,8 @@ class CredlyAPIClient:
         try:
             response.raise_for_status()
         except HTTPError:
-            logger.error(f"Error while processing credly api request: {response.status_code} - {response.text}")
-            raise CredlyAPIError
+            logger.error(f"Error while processing Credly API request: {response.status_code} - {response.text}")
+            raise CredlyAPIError(response.text)
 
     def _get_headers(self):
         """

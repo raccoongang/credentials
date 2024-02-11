@@ -16,7 +16,5 @@ def process(sender, **kwargs):
 
 
 def collect(sender, **kwargs):
-    """
-
-    """
+    """ """
     pass
