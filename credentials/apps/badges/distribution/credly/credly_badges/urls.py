@@ -13,5 +13,5 @@ urlpatterns = []
 
 if is_badges_enabled():
     urlpatterns = [
-        path('api/webhook/', CredlyWebhook.as_view(), name='credly-webhook'),
+        path("api/webhook/", CredlyWebhook.as_view(), name="credly-webhook"),
     ]

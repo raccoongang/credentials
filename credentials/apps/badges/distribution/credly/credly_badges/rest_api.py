@@ -20,16 +20,34 @@ logger = logging.getLogger(__name__)
 
 class CredlyWebhook(APIView):
     """
-    Public API that handle Credly webhooks.
+    Public API (webhook endpoint) to handle incoming Credly updates.
 
     Usage:
-        POST /edx_badges/api/credly/v1/webhook
+        POST <credentials>/credly-badges/api/webhook/
     """
 
     authentication_classes = []
     permission_classes = []
 
     def post(self, request):
+        """
+        Handle incoming update events from the Credly service.
+
+        https://sandbox.credly.com/docs/webhooks#requirements
+
+        Handled events:
+            - badge_template.created
+            - badge_template.changed
+            - badge_template.deleted
+
+        - tries to recognize Credly Organization context;
+        - validates event type and its payload;
+        - performs corresponding item (badge template) updates;
+
+        Returned statuses:
+            - 204
+            - 404
+        """
         event_info_data = CredlyEventInfoData(**request.data)
         organization = get_object_or_404(CredlyOrganization, uuid=event_info_data.organization_id)
         credly_api_client = CredlyAPIClient(organization.uuid, organization.api_key)

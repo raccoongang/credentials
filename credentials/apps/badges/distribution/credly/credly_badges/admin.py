@@ -15,8 +15,13 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
     """
     Credly organization admin setup.
     """
+
     form = CredlyOrganizationAdminForm
-    list_display = ("name", "uuid", "api_key",)
+    list_display = (
+        "name",
+        "uuid",
+        "api_key",
+    )
     actions = ("sync_organization_badge_templates",)
 
     @admin.action(description="Sync organization badge templates")
@@ -32,12 +37,29 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
     """
     Badge template admin setup.
     """
-    list_display = ("name", "uuid", "status", "organization", "is_active",)
-    list_filter = ("status", "is_active", "organization")
-    search_fields = ("name", "uuid",)
+
+    list_display = (
+        "organization",
+        "state",
+        "name",
+        "uuid",
+        "is_active",
+    )
+    list_filter = (
+        "organization",
+        "is_active",
+        "state",
+    )
+    search_fields = (
+        "name",
+        "uuid",
+    )
+    readonly_fields = [
+        "organization",
+        "state",
+    ]
 
 
-# register admin configurations with respect to the feature flag
 if is_badges_enabled():
     admin.site.register(CredlyOrganization, CredlyOrganizationAdmin)
     admin.site.register(CredlyBadgeTemplate, CredlyBadgeTemplateAdmin)

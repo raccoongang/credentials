@@ -5,16 +5,20 @@ Credly Badges DB models.
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
+from model_utils import Choices
+from model_utils.fields import StatusField
+
 from credentials.apps.badges.models import BadgeTemplate
 
 
 class CredlyOrganization(TimeStampedModel):
     """
-    Credly organization configuration.
+    Credly Organization configuration.
     """
-    uuid = models.UUIDField(unique=True, help_text=_('Unique organization ID.'))
-    name = models.CharField(max_length=255, help_text=_('Organization display name.'))
-    api_key = models.CharField(max_length=255, help_text=_('Credly API shared secret for organization.'))
+
+    uuid = models.UUIDField(unique=True, help_text=_("Put your Credly Organization ID here."))
+    api_key = models.CharField(max_length=255, help_text=_("Credly API shared secret for Credly Organization."))
+    name = models.CharField(max_length=255, null=True, blank=True, help_text=_("Verbose name for Credly Organization."))
 
     def __str__(self):
         return self.name
@@ -24,16 +28,23 @@ class CredlyOrganization(TimeStampedModel):
         """
         Get all organization IDs.
         """
-        return cls.objects.values_list('uuid', flat=True)
+        return cls.objects.values_list("uuid", flat=True)
 
 
 class CredlyBadgeTemplate(BadgeTemplate):
     """
-    Credly badge template model.
+    Credly badge template.
     """
+
+    TYPE = "credly"
+    STATE = Choices("draft", "active", "archived")
 
     organization = models.ForeignKey(
         CredlyOrganization,
         on_delete=models.CASCADE,
-        help_text=_('Organization of the credly badge template.')
+        help_text=_("Credly Organization - template owner."),
+    )
+    state = StatusField(
+        choices_name="STATE",
+        help_text=_("Credly badge template state (auto-managed)."),
     )

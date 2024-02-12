@@ -12,7 +12,7 @@ asgiref==3.7.2
     #   -r requirements/production.txt
     #   django
     #   django-cors-headers
-astroid==3.0.2
+astroid==3.0.3
     # via
     #   -r requirements/dev.txt
     #   pylint
@@ -38,17 +38,17 @@ bcrypt==4.1.2
     # via
     #   -r requirements/dev.txt
     #   paramiko
-black==23.12.1
+black==24.1.1
     # via -r requirements/dev.txt
 bleach==6.1.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-boto3==1.34.19
+boto3==1.34.39
     # via
     #   -r requirements/production.txt
     #   django-ses
-botocore==1.34.19
+botocore==1.34.39
     # via
     #   -r requirements/production.txt
     #   boto3
@@ -57,7 +57,7 @@ cachetools==5.3.2
     # via
     #   -r requirements/dev.txt
     #   tox
-certifi==2023.11.17
+certifi==2024.2.2
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -90,7 +90,7 @@ click-log==0.4.0
     # via
     #   -r requirements/dev.txt
     #   edx-lint
-code-annotations==1.5.0
+code-annotations==1.6.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -111,9 +111,9 @@ coreschema==0.0.4
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   coreapi
-coverage==7.4.0
+coverage==7.4.1
     # via -r requirements/dev.txt
-cryptography==41.0.7
+cryptography==42.0.2
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -132,7 +132,7 @@ didkit==0.3.2
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-dill==0.3.7
+dill==0.3.8
     # via
     #   -r requirements/dev.txt
     #   pylint
@@ -144,7 +144,7 @@ distro==1.9.0
     # via
     #   -r requirements/dev.txt
     #   docker-compose
-django==4.2.9
+django==4.2.10
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -154,6 +154,7 @@ django==4.2.9
     #   django-debug-toolbar
     #   django-extensions
     #   django-filter
+    #   django-model-utils
     #   django-ses
     #   django-statici18n
     #   django-storages
@@ -189,13 +190,17 @@ django-crum==0.7.9
     #   -r requirements/production.txt
     #   edx-django-utils
     #   edx-toggles
-django-debug-toolbar==4.2.0
+django-debug-toolbar==4.3.0
     # via -r requirements/dev.txt
 django-extensions==3.2.3
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
 django-filter==23.5
+    # via
+    #   -r requirements/dev.txt
+    #   -r requirements/production.txt
+django-model-utils==4.3.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -288,7 +293,7 @@ edx-django-sites-extensions==4.0.2
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-edx-django-utils==5.9.0
+edx-django-utils==5.10.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -296,7 +301,7 @@ edx-django-utils==5.9.0
     #   edx-event-bus-kafka
     #   edx-rest-api-client
     #   edx-toggles
-edx-drf-extensions==9.1.2
+edx-drf-extensions==10.2.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -322,7 +327,7 @@ edx-rest-api-client==5.6.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-edx-toggles==5.1.0
+edx-toggles==5.1.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -333,7 +338,7 @@ exceptiongroup==1.2.0
     #   pytest
 factory-boy==3.3.0
     # via -r requirements/dev.txt
-faker==22.2.0
+faker==23.1.0
     # via
     #   -r requirements/dev.txt
     #   factory-boy
@@ -409,7 +414,7 @@ markdown==3.5.2
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-markupsafe==2.1.3
+markupsafe==2.1.5
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -418,20 +423,15 @@ mccabe==0.7.0
     # via
     #   -r requirements/dev.txt
     #   pylint
-monotonic==1.6
-    # via
-    #   -r requirements/dev.txt
-    #   -r requirements/production.txt
-    #   segment-analytics-python
 mypy-extensions==1.0.0
     # via
     #   -r requirements/dev.txt
     #   black
-mysqlclient==2.2.1
+mysqlclient==2.2.4
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-newrelic==9.5.0
+newrelic==9.6.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -449,7 +449,7 @@ openapi-codec==1.3.2
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   django-rest-swagger
-openedx-atlas==0.5.0
+openedx-atlas==0.6.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -473,7 +473,7 @@ paramiko==3.4.0
     # via
     #   -r requirements/dev.txt
     #   docker
-path==16.9.0
+path==16.10.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -491,14 +491,14 @@ pillow==10.2.0
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-platformdirs==4.1.0
+platformdirs==4.2.0
     # via
     #   -r requirements/dev.txt
     #   black
     #   pylint
     #   tox
     #   virtualenv
-pluggy==1.3.0
+pluggy==1.4.0
     # via
     #   -r requirements/dev.txt
     #   pytest
@@ -508,7 +508,7 @@ polib==1.2.0
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   edx-i18n-tools
-psutil==5.9.7
+psutil==5.9.8
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -531,6 +531,7 @@ pyjwt[crypto]==2.8.0
     #   edx-drf-extensions
     #   edx-rest-api-client
     #   pyjwt
+    #   segment-analytics-python
     #   social-auth-core
 pylint==3.0.3
     # via
@@ -580,11 +581,11 @@ pyrsistent==0.20.0
     # via
     #   -r requirements/dev.txt
     #   jsonschema
-pytest==7.4.4
+pytest==8.0.0
     # via
     #   -r requirements/dev.txt
     #   pytest-django
-pytest-django==4.7.0
+pytest-django==4.8.0
     # via -r requirements/dev.txt
 python-dateutil==2.8.2
     # via
@@ -602,7 +603,7 @@ python-memcached==1.62
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
-python-slugify==8.0.1
+python-slugify==8.0.4
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -612,7 +613,7 @@ python3-openid==3.2.0
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   social-auth-core
-pytz==2023.3.post1
+pytz==2024.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -667,7 +668,7 @@ sailthru-client==2.2.3
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   edx-ace
-segment-analytics-python==2.2.3
+segment-analytics-python==2.3.1
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -706,7 +707,7 @@ social-auth-app-django==5.2.0
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
     #   edx-auth-backends
-social-auth-core==4.5.1
+social-auth-core==4.5.2
     # via
     #   -r requirements/dev.txt
     #   -r requirements/production.txt
@@ -749,7 +750,7 @@ tomlkit==0.12.3
     # via
     #   -r requirements/dev.txt
     #   pylint
-tox==4.12.0
+tox==4.12.1
     # via -r requirements/dev.txt
 typing-extensions==4.9.0
     # via

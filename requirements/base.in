@@ -16,6 +16,7 @@ django
 django-cors-headers
 django-extensions
 django-filter
+django-model-utils
 django-ratelimit
 django-rest-swagger
 django-simple-history
