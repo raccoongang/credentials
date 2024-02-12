@@ -12,7 +12,7 @@ from edx_toggles.toggles import SettingToggle
 # .. toggle_permanent_justification: Badges are optional for usage.
 # .. toggle_creation_date: 2024-01-12
 # .. toggle_use_cases: open_edx
-ENABLE_BADGES = SettingToggle('BADGES_ENABLED', default=False, module_name=__name__)
+ENABLE_BADGES = SettingToggle("BADGES_ENABLED", default=False, module_name=__name__)
 
 
 def is_badges_enabled():
@@ -26,7 +26,9 @@ def check_badges_enabled(func):
     """
     Decorator for checking the applicability of a badges app.
     """
+
     def wrapper(*args, **kwargs):
         if is_badges_enabled():
             return func(*args, **kwargs)
+
     return wrapper

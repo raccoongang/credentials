@@ -1,9 +1,10 @@
 from django.apps import AppConfig
 from django.conf import settings
+from edx_django_utils.plugins import add_plugins, get_plugin_apps
 
-from credentials.apps.plugins.constants import PROJECT_TYPE, PluginSettings, PluginURLs, SettingsType
+from credentials.apps.plugins.constants import PluginSettings, PluginURLs
 
-from .toggles import check_badges_enabled, is_badges_enabled
+from .toggles import check_badges_enabled
 
 
 class BadgesAppConfig(AppConfig):
@@ -20,6 +21,7 @@ class BadgesConfig(BadgesAppConfig):
     """
     Core badges application configuration.
     """
+
     default = True
     name = "credentials.apps.badges"
     verbose_name = "Badges"
@@ -31,7 +33,7 @@ class BadgesConfig(BadgesAppConfig):
 
         Performs initial registrations for checks, signals, etc.
         """
+        from . import signals  # pylint: disable=unused-import,import-outside-toplevel
         from .checks import badges_checks  # pylint: disable=unused-import,import-outside-toplevel
-        from .signals import handlers  # pylint: disable=unused-import,import-outside-toplevel
 
         super().ready()
