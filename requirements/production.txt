@@ -4,8 +4,6 @@
 #
 #    make upgrade
 #
--e file:///edx/app/credentials/credentials/credentials/apps/badges/distribution/credly
-    # via -r requirements/base.txt
 asgiref==3.7.2
     # via
     #   -r requirements/base.txt
@@ -26,9 +24,9 @@ backports-zoneinfo==0.2.1
     #   django
 bleach==6.1.0
     # via -r requirements/base.txt
-boto3==1.34.39
+boto3==1.34.40
     # via django-ses
-botocore==1.34.39
+botocore==1.34.40
     # via
     #   boto3
     #   s3transfer
@@ -119,7 +117,7 @@ django-extensions==3.2.3
     # via -r requirements/base.txt
 django-filter==23.5
     # via -r requirements/base.txt
-django-model-utils==4.3.1
+django-model-utils==4.4.0
     # via -r requirements/base.txt
 django-ratelimit==4.1.0
     # via -r requirements/base.txt
@@ -257,6 +255,8 @@ openapi-codec==1.3.2
     #   -r requirements/base.txt
     #   django-rest-swagger
 openedx-atlas==0.6.0
+    # via -r requirements/base.txt
+openedx-badges-credly @ git+https://github.com/raccoongang/credentials.git@aci.main#subdirectory=credentials/apps/badges/distribution/credly
     # via -r requirements/base.txt
 openedx-events @ git+https://github.com/raccoongang/openedx-events.git@aci.main
     # via

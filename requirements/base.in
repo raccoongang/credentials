@@ -52,9 +52,11 @@ segment-analytics-python
 social-auth-app-django
 xss-utils
 
-# Badges baked-in backends:
--e credentials/apps/badges/distribution/credly
-
 # TODO Install in configuration
 git+https://github.com/openedx/credentials-themes.git@0.3.22#egg=edx_credentials_themes==0.3.22
+
+# Badges baked-in backends:
+openedx-badges-credly @ git+https://github.com/raccoongang/credentials.git@aci.main#subdirectory=credentials/apps/badges/distribution/credly
+
+# FIXME: switch this to upstream once approved/merged:
 git+https://github.com/raccoongang/openedx-events.git@aci.main#egg=openedx_events
