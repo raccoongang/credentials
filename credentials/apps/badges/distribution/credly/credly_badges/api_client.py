@@ -109,7 +109,7 @@ class CredlyAPIClient:
             response.raise_for_status()
         except HTTPError:
             logger.error(f"Error while processing Credly API request: {response.status_code} - {response.text}")
-            raise CredlyAPIError(response.text)
+            raise CredlyAPIError(f"Credly API:{response.text}({response.status_code})")
 
     def _get_headers(self):
         """

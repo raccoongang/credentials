@@ -15,6 +15,8 @@ class CredlyOrganizationAdminForm(forms.ModelForm):
     Additional actions for Credly Organization items.
     """
 
+    api_data = {}
+
     class Meta:
         model = CredlyOrganization
         fields = "__all__"
@@ -36,11 +38,23 @@ class CredlyOrganizationAdminForm(forms.ModelForm):
 
         return cleaned_data
 
+    def save(self, commit=True):
+        """
+        Auto-fill addition properties.
+        """
+        instance = super().save(commit=False)
+        instance.name = self.api_data.get("name")
+        instance.save()
+
+        return instance
+
     def _ensure_organization_exists(self, api_client):
         """
         Try to fetch organization data by the configured Credly Organization ID.
         """
         try:
-            return api_client.fetch_organization()
-        except CredlyAPIError as exc:
-            raise forms.ValidationError(exc)
+            response_json = api_client.fetch_organization()
+            if org_data := response_json.get("data"):
+                self.api_data = org_data
+        except CredlyAPIError as err:
+            raise forms.ValidationError(message=str(err))

@@ -21,7 +21,7 @@ class CredlyOrganization(TimeStampedModel):
     name = models.CharField(max_length=255, null=True, blank=True, help_text=_("Verbose name for Credly Organization."))
 
     def __str__(self):
-        return self.name
+        return f"{self.name or self.uuid}"
 
     @classmethod
     def get_all_organization_ids(cls):
