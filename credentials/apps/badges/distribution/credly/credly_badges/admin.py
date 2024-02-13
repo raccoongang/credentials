@@ -22,6 +22,9 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
         "uuid",
         "api_key",
     )
+    readonly_fields = [
+        "name",
+    ]
     actions = ("sync_organization_badge_templates",)
 
     @admin.action(description="Sync organization badge templates")
