@@ -612,7 +612,7 @@ EVENT_BUS_PRODUCER_CONFIG = {
 BADGES_CONFIG = {
     # these events become available in rules setup:
     "events": [
-        "org.openedx.learning.course.grade.passed.v1",
-        "org.openedx.learning.course.grade.failed.v1",
+        "org.openedx.learning.course.grade.now.passed.v1",
+        "org.openedx.learning.course.grade.now.failed.v1",
     ],
 }

@@ -35,5 +35,8 @@ class BadgesConfig(BadgesAppConfig):
         """
         from . import signals  # pylint: disable=unused-import,import-outside-toplevel
         from .checks import badges_checks  # pylint: disable=unused-import,import-outside-toplevel
+        from .utils import connect_generic_signal_to_events
+
+        connect_generic_signal_to_events()
 
         super().ready()
