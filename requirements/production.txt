@@ -24,9 +24,9 @@ backports-zoneinfo==0.2.1
     #   django
 bleach==6.1.0
     # via -r requirements/base.txt
-boto3==1.34.45
+boto3==1.34.48
     # via django-ses
-botocore==1.34.45
+botocore==1.34.48
     # via
     #   boto3
     #   s3transfer
@@ -61,7 +61,7 @@ coreschema==0.0.4
     # via
     #   -r requirements/base.txt
     #   coreapi
-cryptography==42.0.3
+cryptography==42.0.4
     # via
     #   -r requirements/base.txt
     #   pyjwt
@@ -81,6 +81,7 @@ django==4.2.10
     #   django-crum
     #   django-extensions
     #   django-filter
+    #   django-model-utils
     #   django-ses
     #   django-statici18n
     #   django-storages
@@ -115,6 +116,8 @@ django-crum==0.7.9
 django-extensions==3.2.3
     # via -r requirements/base.txt
 django-filter==23.5
+    # via -r requirements/base.txt
+django-model-utils==4.4.0
     # via -r requirements/base.txt
 django-ratelimit==4.1.0
     # via -r requirements/base.txt
@@ -235,7 +238,7 @@ markupsafe==2.1.5
     #   jinja2
 mysqlclient==2.2.4
     # via -r requirements/base.txt
-newrelic==9.6.0
+newrelic==9.7.0
     # via
     #   -r requirements/base.txt
     #   -r requirements/production.in
@@ -252,6 +255,8 @@ openapi-codec==1.3.2
     #   -r requirements/base.txt
     #   django-rest-swagger
 openedx-atlas==0.6.0
+    # via -r requirements/base.txt
+openedx-badges-credly @ git+https://github.com/raccoongang/credentials.git@aci.main#subdirectory=credentials/apps/badges/distribution/credly
     # via -r requirements/base.txt
 openedx-events==9.5.2
     # via
@@ -399,7 +404,7 @@ sqlparse==0.4.4
     # via
     #   -r requirements/base.txt
     #   django
-stevedore==5.1.0
+stevedore==5.2.0
     # via
     #   -r requirements/base.txt
     #   code-annotations
