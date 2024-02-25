@@ -37,7 +37,7 @@ class CredlyBadgeTemplate(BadgeTemplate):
     """
 
     TYPE = "credly"
-    STATE = Choices("draft", "active", "archived")
+    STATES = Choices("draft", "active", "archived")
 
     organization = models.ForeignKey(
         CredlyOrganization,
@@ -45,6 +45,6 @@ class CredlyBadgeTemplate(BadgeTemplate):
         help_text=_("Credly Organization - template owner."),
     )
     state = StatusField(
-        choices_name="STATE",
+        choices_name="STATES",
         help_text=_("Credly badge template state (auto-managed)."),
     )
