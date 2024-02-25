@@ -71,3 +71,27 @@ class BadgeRequirement(models.Model):
 
     def __str__(self):
         return f"BadgeRequirement:{self.id}:{self.template.uuid}"
+
+
+class DataRule(models.Model):
+    """
+    Specifies expected data attribute value for event payload.
+    """
+
+    requirement = models.ForeignKey(
+        BadgeRequirement,
+        on_delete=models.CASCADE,
+        help_text=_("Parent requirement for this data rule."),
+    )
+    path = models.CharField(
+        max_length=255,
+        help_text=_(
+            'Public signal\'s data payload nested property path, e.g: "user.pii.username".'
+        ),
+    )
+    value = models.CharField(
+        max_length=255,
+        help_text=_(
+            'Expected value for the nested property, e.g: "cucumber1997".'
+        ),
+    )

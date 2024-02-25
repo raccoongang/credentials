@@ -4,8 +4,8 @@ Admin section configuration.
 
 from django.contrib import admin
 
+from .models import BadgeRequirement, BadgeTemplate, DataRule
 from .toggles import is_badges_enabled
-from .models import BadgeRequirement, BadgeTemplate
 
 
 class BadgeRequirementInline(admin.TabularInline):
@@ -14,10 +14,19 @@ class BadgeRequirementInline(admin.TabularInline):
     extra = 0
 
 
+class DataRuleInline(admin.TabularInline):
+    model = DataRule
+    extra = 0
+
+
 class BadgeRequirementAdmin(admin.ModelAdmin):
     """
     Badge template requirement admin setup.
     """
+
+    inlines = [
+        DataRuleInline,
+    ]
 
     list_display = [
         "id",
@@ -37,6 +46,10 @@ class BadgeTemplateAdmin(admin.ModelAdmin):
     Badge template admin setup.
     """
 
+    inlines = [
+        BadgeRequirementInline,
+    ]
+
     list_display = (
         "name",
         "uuid",
@@ -53,9 +66,6 @@ class BadgeTemplateAdmin(admin.ModelAdmin):
     )
     readonly_fields = [
         "origin",
-    ]
-    inlines = [
-        BadgeRequirementInline,
     ]
 
 
