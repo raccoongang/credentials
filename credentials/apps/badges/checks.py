@@ -2,8 +2,9 @@
 Badges app self-checks.
 """
 
-from django.conf import settings
 from django.core.checks import Error, Tags, register
+
+from .utils import get_badging_event_types
 
 
 @register(Tags.compatibility)
@@ -19,7 +20,7 @@ def badges_checks(*args, **kwargs):
     """
     errors = []
 
-    if not settings.BADGES_CONFIG.get("events"):
+    if not get_badging_event_types():
         errors.append(
             Error(
                 "BADGES_CONFIG['events'] must include at least one event.",

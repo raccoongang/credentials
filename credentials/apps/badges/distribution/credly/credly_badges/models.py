@@ -4,6 +4,7 @@ Credly Badges DB models.
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from credentials.apps.credentials.models import UserCredential
 from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
@@ -48,3 +49,10 @@ class CredlyBadgeTemplate(BadgeTemplate):
         choices_name="STATES",
         help_text=_("Credly badge template state (auto-managed)."),
     )
+
+
+class CredlyBadge(UserCredential):
+    """
+    Earned Credly badge template for user.
+    """
+    # TODO: check if we can fetch pii for username from LMS for badge issuing?
