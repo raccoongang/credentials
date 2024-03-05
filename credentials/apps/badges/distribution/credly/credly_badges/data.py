@@ -21,11 +21,3 @@ class IssueBadgeData:
     issued_to_last_name: str
     badge_template_id: str
     issued_at: datetime
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class CredlyEventInfoData:
-    id: str
-    organization_id: str
-    event_type: str
-    occurred_at: datetime
