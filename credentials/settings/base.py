@@ -585,24 +585,24 @@ EVENT_BUS_PRODUCER_CONFIG = {
         },
     },
     # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.badge.awarded.v1']
-    #    ['badges']['enabled']
+    #    ['learning-badge-lifecycle']['enabled']
     # .. toggle_implementation: SettingToggle
     # .. toggle_default: True
     # .. toggle_description: Enables sending org.openedx.learning.badge.awarded.v1 events over the event bus.
     # .. toggle_warning: The default may be changed in a later release.
     # .. toggle_use_cases: opt_in
     "org.openedx.learning.badge.awarded.v1": {
-        "badges": {"event_key_field": "badge.uuid", "enabled": True},
+        "learning-badge-lifecycle": {"event_key_field": "badge.uuid", "enabled": True},
     },
     # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.badge.revoked.v1']
-    #    ['badges']['enabled']
+    #    ['learning-badge-lifecycle']['enabled']
     # .. toggle_implementation: SettingToggle
     # .. toggle_default: True
     # .. toggle_description: Enables sending org.openedx.learning.badge.revoked.v1 events over the event bus.
     # .. toggle_warning: The default may be changed in a later release.
     # .. toggle_use_cases: opt_in
     "org.openedx.learning.badge.revoked.v1": {
-        "badges": {"event_key_field": "badge.uuid", "enabled": True},
+        "learning-badge-lifecycle": {"event_key_field": "badge.uuid", "enabled": True},
     },
 }
 
