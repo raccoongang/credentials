@@ -552,36 +552,6 @@ EVENT_BUS_TOPIC_PREFIX = "dev"
 # .. setting_default: all events disabled
 # .. setting_description: Dictionary of event_types mapped to dictionaries of topic to topic-related configuration.
 EVENT_BUS_PRODUCER_CONFIG = {
-    # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.program.certificate.awarded.v1']
-    #    ['learning-program-certificate-lifecycle']['enabled']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Enables sending PROGRAM_CERTIFICATE_AWARDED events over the event bus.
-    # .. toggle_warning: The default may be changed in a later release.
-    # .. toggle_use_cases: opt_in
-    # .. toggle_creation_date: 2023-10-13
-    # .. toggle_tickets: https://github.com/openedx/credentials/issues/2241
-    "org.openedx.learning.program.certificate.awarded.v1": {
-        "learning-program-certificate-lifecycle": {
-            "event_key_field": "program_certificate.program.uuid",
-            "enabled": False,
-        },
-    },
-    # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.program.certificate.revoked.v1']
-    #    ['learning-program-certificate-lifecycle']['enabled']
-    # .. toggle_implementation: SettingToggle
-    # .. toggle_default: False
-    # .. toggle_description: Enables sending PROGRAM_CERTIFICATE_REVOKED events over the event bus.
-    # .. toggle_warning: The default may be changed in a later release.
-    # .. toggle_use_cases: opt_in
-    # .. toggle_creation_date: 2023-10-13
-    # .. toggle_tickets: https://github.com/openedx/credentials/issues/2241
-    "org.openedx.learning.program.certificate.revoked.v1": {
-        "learning-program-certificate-lifecycle": {
-            "event_key_field": "program_certificate.program.uuid",
-            "enabled": False,
-        },
-    },
     # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.badge.awarded.v1']
     #    ['learning-badge-lifecycle']['enabled']
     # .. toggle_implementation: SettingToggle
@@ -619,6 +589,7 @@ LEARNER_RECORD_MFE_RECORDS_PAGE_URL = ""
 # Plugin Django Apps
 INSTALLED_APPS.extend(get_plugin_apps(PROJECT_TYPE))
 add_plugins(__name__, PROJECT_TYPE, SettingsType.BASE)
+
 # Badges settings
 # .. setting_name: BADGES_CONFIG
 # .. setting_description: Dictionary with badges settings including enabled badge events, processors, collectors, etc.
