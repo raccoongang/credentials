@@ -17,6 +17,7 @@ django-cors-headers
 django-hijack
 django-extensions
 django-filter
+django-model-utils
 django-ratelimit
 django-rest-swagger
 django-simple-history
@@ -47,6 +48,8 @@ requests
 social-auth-app-django
 xss-utils
 
+# Badges baked-in backends:
+openedx-badges-credly @ git+https://github.com/raccoongang/credentials.git@aci.main#subdirectory=credentials/apps/badges/distribution/credly
 
 # TODO Install in configuration
 git+https://github.com/openedx/credentials-themes.git@0.1.121#egg=edx_credentials_themes==0.1.121
