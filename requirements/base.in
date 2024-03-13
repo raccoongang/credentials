@@ -50,3 +50,7 @@ xss-utils
 
 # TODO Install in configuration
 git+https://github.com/openedx/credentials-themes.git@0.1.121#egg=edx_credentials_themes==0.1.121
+git+https://github.com/openedx/event-bus-redis.git@v0.4.0
+
+# TODO: switch to upstream once PR is merged: https://github.com/openedx/openedx-events/pull/303
+git+https://github.com/raccoongang/openedx-events.git@aci.main

@@ -63,6 +63,7 @@ THIRD_PARTY_APPS = [
     "drf_yasg",
     "hijack",
     "xss_utils",
+    "openedx_events",
 ]
 
 PROJECT_APPS = [
@@ -541,8 +542,49 @@ LOGO_WHITE_URL_SVG = "https://edx-cdn.org/v3/default/logo-white.svg"
 FAVICON_URL = "https://edx-cdn.org/v3/default/favicon.ico"
 LOGO_POWERED_BY_OPEN_EDX_URL = "https://edx-cdn.org/v3/prod/open-edx-tag.svg"
 
-# .. toggle_name: USE_LEARNER_RECORD_MFE
-# .. toggle_implementation: DjangoSetting
+# Event Bus Settings
+EVENT_BUS_PRODUCER = "edx_event_bus_redis.create_producer"
+EVENT_BUS_CONSUMER = "edx_event_bus_redis.RedisEventConsumer"
+EVENT_BUS_REDIS_CONNECTION_URL = "redis://:password@edx.devstack.redis:6379/"
+EVENT_BUS_TOPIC_PREFIX = "dev"
+# .. setting_name: EVENT_BUS_PRODUCER_CONFIG
+# .. setting_default: all events disabled
+# .. setting_description: Dictionary of event_types mapped to dictionaries of topic to topic-related configuration.
+EVENT_BUS_PRODUCER_CONFIG = {
+    # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.program.certificate.awarded.v1']
+    #    ['learning-program-certificate-lifecycle']['enabled']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables sending PROGRAM_CERTIFICATE_AWARDED events over the event bus.
+    # .. toggle_warning: The default may be changed in a later release.
+    # .. toggle_use_cases: opt_in
+    # .. toggle_creation_date: 2023-10-13
+    # .. toggle_tickets: https://github.com/openedx/credentials/issues/2241
+    "org.openedx.learning.program.certificate.awarded.v1": {
+        "learning-program-certificate-lifecycle": {
+            "event_key_field": "program_certificate.program.uuid",
+            "enabled": False,
+        },
+    },
+    # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.program.certificate.revoked.v1']
+    #    ['learning-program-certificate-lifecycle']['enabled']
+    # .. toggle_implementation: SettingToggle
+    # .. toggle_default: False
+    # .. toggle_description: Enables sending PROGRAM_CERTIFICATE_REVOKED events over the event bus.
+    # .. toggle_warning: The default may be changed in a later release.
+    # .. toggle_use_cases: opt_in
+    # .. toggle_creation_date: 2023-10-13
+    # .. toggle_tickets: https://github.com/openedx/credentials/issues/2241
+    "org.openedx.learning.program.certificate.revoked.v1": {
+        "learning-program-certificate-lifecycle": {
+            "event_key_field": "program_certificate.program.uuid",
+            "enabled": False,
+        },
+    },
+}
+
+# .. toggle_name: LOG_INCOMING_REQUESTS
+# .. toggle_implementation: WaffleSwitch
 # .. toggle_default: False
 # .. toggle_description: Determines if the Credentials IDA should redirect to the Learner Record MFE when navigating
 #   between the program detail page and program list pages.
