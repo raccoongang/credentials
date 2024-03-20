@@ -13,4 +13,3 @@ from django.dispatch import Signal
 #         'badge_template_id',  # Integer ID of finished badge template
 #     ]
 BADGE_PROGRESS_COMPLETE = Signal()
-
