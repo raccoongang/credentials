@@ -33,7 +33,7 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
         Sync badge templates for selected organizations.
         """
         for organization in queryset:
-            sync_badge_templates_for_organization(organization.uuid)
+            sync_badge_templates_for_organization(organization.uuid, request.site)
 
 
 class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
