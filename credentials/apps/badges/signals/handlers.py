@@ -46,7 +46,7 @@ def event_handler(sender, signal, **kwargs):
 @receiver(BADGE_PROGRESS_INCOMPLETE)
 def listen_for_incompleted_badge(sender, username, badge_template_id, **kwargs):  # pylint: disable=unused-argument
     badge_template = get_badge_template_by_id(badge_template_id)
-    user = get_user_by_username(username)
+    user = ... # find way to retriebe user info from lms
 
     if badge_template is None:
         return
