@@ -7,6 +7,7 @@ import logging
 
 from django.dispatch import receiver
 
+from openedx_events.learning.data import BadgeData, BadgeTemplateData
 from openedx_events.learning.signals import BADGE_REVOKED
 from openedx_events.tooling import OpenEdxPublicSignal, load_all_signals
 
@@ -46,4 +47,16 @@ def listen_for_incompleted_badge(sender, username, badge_template_id, **kwargs):
     badge_template = get_badge_template_by_id(badge_template_id)
     ...
 
-    BADGE_REVOKED.send_event(badge=badge_template)
+    # `uuid` and `user` empty until user retrieving from LMS is implemented
+    badge_data = BadgeData(
+        uuid=...,
+        user=...,
+        template=BadgeTemplateData(
+            uuid=str(badge_template.uuid),
+            type=badge_template.origin,
+            name=badge_template.name,
+            description=badge_template.description,
+            image_url=badge_template.icon.url,
+        ),
+    )
+    BADGE_REVOKED.send_event(badge=badge_data)
