@@ -49,7 +49,7 @@ def listen_for_incompleted_badge(sender, username, badge_template_id, **kwargs):
     badge_template = get_badge_template_by_id(badge_template_id)
     user = get_user_by_username(username)
 
-    badge = revoke_badge() # plug until function is implemented
+    badge = revoke_badge() # function needs to be implemente
 
     badge_data = BadgeData(
         uuid=badge.uuid,
