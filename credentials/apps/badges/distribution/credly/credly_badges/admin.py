@@ -68,16 +68,15 @@ class CredlyBadgeAdmin(admin.ModelAdmin):
     Credly badge admin setup.
     """
     list_display = (
-        "recipient_email",
+        "username",
         "issuing_state",
         "uuid",
-        "issued_at",
     )
     list_filter = (
         "issuing_state",
     )
     search_fields = (
-        "recipient_email",
+        "username",
         "uuid",
     )
     readonly_fields = (
