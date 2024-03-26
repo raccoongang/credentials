@@ -11,6 +11,8 @@ from openedx_events.learning.data import BadgeData, BadgeTemplateData
 from openedx_events.learning.signals import BADGE_AWARDED
 from openedx_events.tooling import OpenEdxPublicSignal, load_all_signals
 
+from apps.core.api import get_user_by_username
+
 from .signals import BADGE_PROGRESS_COMPLETE
 from ..services.badge_templates import get_badge_template_by_id
 from ..utils import get_badging_event_types
@@ -45,12 +47,13 @@ def event_handler(sender, signal, **kwargs):
 @receiver(BADGE_PROGRESS_COMPLETE)
 def listen_for_completed_badge(sender, username, badge_template_id, **kwargs):  # pylint: disable=unused-argument
     badge_template = get_badge_template_by_id(badge_template_id)
-    ...
+    user = get_user_by_username(username)
+    badge = award_badge() # function needs to be implemented
 
-    # `uuid` and `user` empty until user retrieving from LMS is implemented
+    
     badge_data = BadgeData(
-        uuid=...,
-        user=...,
+        uuid=badge.uuid,
+        user=user,
         template=BadgeTemplateData(
             uuid=str(badge_template.uuid),
             type=badge_template.origin,
@@ -59,4 +62,4 @@ def listen_for_completed_badge(sender, username, badge_template_id, **kwargs):  
             image_url=badge_template.icon.url,
         ),
     )
-    BADGE_AWARDED.send_event(badge=badge_template)
+    BADGE_AWARDED.send_event(badge=badge_data)
