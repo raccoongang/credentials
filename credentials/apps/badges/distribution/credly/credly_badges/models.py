@@ -55,7 +55,6 @@ class CredlyBadge(UserCredential):
     """
     Earned Credly badge template for user.
     """
-    # TODO: check if we can fetch pii for username from LMS for badge issuing?
 
     ISSUING_STATES = Choices("created", "no_response", "error", "pending", "accepted", "rejected", "revoked")
 
@@ -64,9 +63,3 @@ class CredlyBadge(UserCredential):
         help_text=_("Credly badge issuing state"),
         default=ISSUING_STATES.created,
     )
-    recipient_email = models.EmailField()
-    issued_to_first_name = models.CharField(max_length=30)
-    issued_to_last_name = models.CharField(max_length=150)
-    issued_at = models.DateTimeField(auto_now_add=True)
-
-    badge_template_id = models.PositiveIntegerField()
