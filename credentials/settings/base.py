@@ -598,5 +598,7 @@ BADGES_CONFIG = {
     "events": [
         "org.openedx.learning.course.grade.now.passed.v1",
         "org.openedx.learning.course.grade.now.failed.v1",
+        "org.openedx.learning.ccx.course.grade.now.passed.v1",
+        "org.openedx.learning.ccx.course.grade.now.failed.v1",
     ],
 }
