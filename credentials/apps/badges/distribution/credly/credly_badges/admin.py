@@ -69,18 +69,18 @@ class CredlyBadgeAdmin(admin.ModelAdmin):
     """
     list_display = (
         "username",
-        "issuing_state",
+        "state",
         "uuid",
     )
     list_filter = (
-        "issuing_state",
+        "state",
     )
     search_fields = (
         "username",
         "uuid",
     )
     readonly_fields = (
-        "issuing_state",
+        "state",
         "uuid",
     )
 

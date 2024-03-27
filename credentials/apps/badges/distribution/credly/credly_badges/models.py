@@ -56,10 +56,10 @@ class CredlyBadge(UserCredential):
     Earned Credly badge template for user.
     """
 
-    ISSUING_STATES = Choices("created", "no_response", "error", "pending", "accepted", "rejected", "revoked")
+    STATES = Choices("created", "no_response", "error", "pending", "accepted", "rejected", "revoked")
 
-    issuing_state = StatusField(
-        choices_name="ISSUING_STATES",
+    state = StatusField(
+        choices_name="STATES",
         help_text=_("Credly badge issuing state"),
-        default=ISSUING_STATES.created,
+        default=STATES.created,
     )
