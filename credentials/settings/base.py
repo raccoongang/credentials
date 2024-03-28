@@ -596,9 +596,7 @@ add_plugins(__name__, PROJECT_TYPE, SettingsType.BASE)
 BADGES_CONFIG = {
     # these events become available in rules setup:
     "events": [
-        "org.openedx.learning.course.grade.now.passed.v1",
-        "org.openedx.learning.course.grade.now.failed.v1",
-        "org.openedx.learning.ccx.course.grade.now.passed.v1",
-        "org.openedx.learning.ccx.course.grade.now.failed.v1",
+        "org.openedx.learning.course.passing.status.v1",
+        "org.openedx.learning.ccx.course.passing.status.v1",
     ],
 }
