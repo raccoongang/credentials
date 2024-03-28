@@ -9,5 +9,6 @@ define internal signals:
 
 from django.dispatch import Signal
 
+
 BADGE_PROGRESS_COMPLETE = Signal()
 BADGE_PROGRESS_INCOMPLETE = Signal()
