@@ -7,4 +7,7 @@ define internal signals:
 - BADGE_REQUIREMENTS_NOT_COMPLETE - a reason for earned badge revocation;
 """
 
+from django.dispatch import Signal
+
+BADGE_PROGRESS_COMPLETE = Signal()
 BADGE_PROGRESS_INCOMPLETE = Signal()

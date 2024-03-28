@@ -11,6 +11,8 @@ from .models import BadgeTemplate
 def process(signal, sender, **kwargs):
     """
     Processes incoming public signal consumed from event bus and re-emitted within the service.
+
+    This handler is connected to all public signals that are listed in BADGES_CONFIG setting.
     """
 
     # find all REQUIREMENTs for the signal;
@@ -34,7 +36,7 @@ def process(signal, sender, **kwargs):
         user=kwargs.get("user_course_data").user,
         template=BadgeTemplateData(
             uuid=str(badge_template.uuid),
-            type=badge_template.origin,
+            origin=badge_template.origin,
             name=badge_template.name,
             description=badge_template.description,
             image_url=badge_template.icon.url,
