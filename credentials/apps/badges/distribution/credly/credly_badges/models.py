@@ -55,4 +55,11 @@ class CredlyBadge(UserCredential):
     """
     Earned Credly badge template for user.
     """
-    # TODO: check if we can fetch pii for username from LMS for badge issuing?
+
+    STATES = Choices("created", "no_response", "error", "pending", "accepted", "rejected", "revoked")
+
+    state = StatusField(
+        choices_name="STATES",
+        help_text=_("Credly badge issuing state"),
+        default=STATES.created,
+    )
