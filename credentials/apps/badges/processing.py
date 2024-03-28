@@ -5,6 +5,8 @@ Badge templates progress evaluation.
 from openedx_events.learning.data import BadgeData, BadgeTemplateData
 from openedx_events.learning.signals import BADGE_AWARDED, BADGE_REVOKED
 
+from credentials.apps.core.api import get_or_create_user_from_event_data
+
 from .models import BadgeTemplate
 
 
@@ -47,7 +49,10 @@ def process(signal, sender, **kwargs):
         BADGE_AWARDED.send_event(badge=badge_data)
     elif sender == "org.openedx.learning.course.grade.now.failed.v1":
         BADGE_REVOKED.send_event(badge=badge_data)
-
+    
+    # Registering credentials User
+    if sender == "org.openedx.learning.student.registration.completed.v1":
+        get_or_create_user_from_event_data(kwargs.get("user"))
 
 def collect(sender, **kwargs):
     """ """
