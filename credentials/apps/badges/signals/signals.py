@@ -1,3 +1,5 @@
+from django.dispatch import Signal
+
 """
 define internal signals:
 - BADGE_REQUIREMENT_FULFILLED - a single specific requirement has finished;
@@ -7,9 +9,6 @@ define internal signals:
 
 from django.dispatch import Signal
 
-# Signal that indicates that user handn't finished all badge template requirements.
-# providing_args=[
-#         'username',  # String usernam of User
-#         'badge_template_id',  # Integer ID of finished badge template
-#     ]
+
+BADGE_PROGRESS_COMPLETE = Signal()
 BADGE_PROGRESS_INCOMPLETE = Signal()

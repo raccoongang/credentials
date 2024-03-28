@@ -8,13 +8,14 @@ import logging
 from django.dispatch import receiver
 
 from openedx_events.learning.data import BadgeData, BadgeTemplateData
-from openedx_events.learning.signals import BADGE_REVOKED
+from openedx_events.learning.signals import BADGE_AWARDED, BADGE_REVOKED
 from openedx_events.tooling import OpenEdxPublicSignal, load_all_signals
 
 from apps.core.api import get_user_by_username
 
-from .signals import BADGE_PROGRESS_INCOMPLETE
+from .signals import BADGE_PROGRESS_COMPLETE, BADGE_PROGRESS_INCOMPLETE
 from ..services.badge_templates import get_badge_template_by_id
+from ..services.user_credentials import create_user_credential
 from ..utils import get_badging_event_types
 from ..processing import process
 
@@ -44,13 +45,20 @@ def event_handler(sender, signal, **kwargs):
     process(signal, sender=sender, **kwargs)
 
 
-@receiver(BADGE_PROGRESS_INCOMPLETE)
-def listen_for_incompleted_badge(sender, username, badge_template_id, **kwargs):  # pylint: disable=unused-argument
+@receiver(BADGE_PROGRESS_COMPLETE)
+def listen_for_completed_badge(sender, username, badge_template_id, **kwargs):  # pylint: disable=unused-argument
     badge_template = get_badge_template_by_id(badge_template_id)
     user = get_user_by_username(username)
+    
+    if badge_template is None:
+        return
 
-    badge = revoke_badge() # function needs to be implemented
-
+    if badge_template.origin == 'openedx':
+        create_user_credential(username, badge_template)
+        
+    badge = award_badge() # function needs to be implemented
+    
+    # UserCredential.as_badge_data():
     badge_data = BadgeData(
         uuid=badge.uuid,
         user=user,
@@ -62,4 +70,34 @@ def listen_for_incompleted_badge(sender, username, badge_template_id, **kwargs):
             image_url=badge_template.icon.url,
         ),
     )
+
+    BADGE_AWARDED.send_event(badge=badge_data)
+ 
+
+@receiver(BADGE_PROGRESS_INCOMPLETE)
+def listen_for_incompleted_badge(sender, username, badge_template_id, **kwargs):  # pylint: disable=unused-argument
+    badge_template = get_badge_template_by_id(badge_template_id)
+    user = get_user_by_username(username)
+    
+    if badge_template is None:
+        return
+    
+    if user is None:
+        return
+
+    badge = revoke_badge() # function needs to be implemented
+    
+    # UserCredential.as_badge_data():
+    badge_data = BadgeData(
+        uuid=badge.uuid,
+        user=user,
+        template=BadgeTemplateData(
+            uuid=str(badge_template.uuid),
+            type=badge_template.origin,
+            name=badge_template.name,
+            description=badge_template.description,
+            image_url=badge_template.icon.url,
+        ),
+    )
+  
     BADGE_REVOKED.send_event(badge=badge_data)

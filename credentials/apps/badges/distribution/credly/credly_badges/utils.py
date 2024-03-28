@@ -5,7 +5,7 @@ from .api_client import CredlyAPIClient
 from .models import CredlyBadgeTemplate, CredlyOrganization
 
 
-def sync_badge_templates_for_organization(organization_id):
+def sync_badge_templates_for_organization(organization_id, site):
     """
     Pull active badge templates for a given Credly Organization.
 
@@ -27,7 +27,7 @@ def sync_badge_templates_for_organization(organization_id):
         CredlyBadgeTemplate.objects.update_or_create(
             uuid=badge_template_data.get("id"),
             defaults={
-                "site": get_current_request().site,
+                "site": site,
                 "organization": organization,
                 "name": badge_template_data.get("name"),
                 "state": badge_template_data.get("state"),
