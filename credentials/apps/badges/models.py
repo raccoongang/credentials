@@ -16,7 +16,7 @@ class BadgeTemplate(AbstractCredential):
     Describes badge credential type.
     """
 
-    TYPE = "openedx"
+    ORIGIN = "openedx"
 
     uuid = models.UUIDField(
         unique=True, default=uuid.uuid4, help_text=_("Unique badge template ID.")
@@ -37,7 +37,7 @@ class BadgeTemplate(AbstractCredential):
         super().save()
         # auto-evaluate type:
         if not self.origin:
-            self.origin = self.TYPE
+            self.origin = self.ORIGIN
             self.save(*args, **kwargs)
 
 

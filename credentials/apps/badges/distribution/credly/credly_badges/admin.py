@@ -7,7 +7,7 @@ from django.contrib import admin
 from credentials.apps.badges.toggles import is_badges_enabled
 
 from .forms import CredlyOrganizationAdminForm
-from .models import CredlyBadgeTemplate, CredlyOrganization
+from .models import CredlyBadge, CredlyBadgeTemplate, CredlyOrganization
 from .utils import sync_badge_templates_for_organization
 
 
@@ -33,7 +33,7 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
         Sync badge templates for selected organizations.
         """
         for organization in queryset:
-            sync_badge_templates_for_organization(organization.uuid)
+            sync_badge_templates_for_organization(organization.uuid, request.site)
 
 
 class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
@@ -63,6 +63,29 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
     ]
 
 
+class CredlyBadgeAdmin(admin.ModelAdmin):
+    """
+    Credly badge admin setup.
+    """
+    list_display = (
+        "username",
+        "state",
+        "uuid",
+    )
+    list_filter = (
+        "state",
+    )
+    search_fields = (
+        "username",
+        "uuid",
+    )
+    readonly_fields = (
+        "state",
+        "uuid",
+    )
+
+
 if is_badges_enabled():
     admin.site.register(CredlyOrganization, CredlyOrganizationAdmin)
     admin.site.register(CredlyBadgeTemplate, CredlyBadgeTemplateAdmin)
+    admin.site.register(CredlyBadge, CredlyBadgeAdmin)
