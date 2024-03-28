@@ -9,8 +9,9 @@ from django.dispatch import receiver
 
 from openedx_events.tooling import OpenEdxPublicSignal, load_all_signals
 
-from .signals import BADGE_PROGRESS_COMPLETE
+from apps.core.api import get_user_by_username
 
+from .signals import BADGE_PROGRESS_COMPLETE, BADGE_PROGRESS_INCOMPLETE
 from ..services.badge_templates import get_badge_template_by_id
 from ..services.user_credentials import create_user_credential
 from ..utils import get_badging_event_types
@@ -51,6 +52,15 @@ def listen_for_completed_badge(sender, username, badge_template_id, **kwargs):  
 
     if badge_template.origin == 'openedx':
         create_user_credential(username, badge_template)
-        return
+    
 
-    # TODO: add processing for 'credly' origin
+@receiver(BADGE_PROGRESS_INCOMPLETE)
+def listen_for_incompleted_badge(sender, username, badge_template_id, **kwargs):  # pylint: disable=unused-argument
+    badge_template = get_badge_template_by_id(badge_template_id)
+    user = get_user_by_username()
+
+    if badge_template is None:
+        return
+    
+    if user is None:
+        return
