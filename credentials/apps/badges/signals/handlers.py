@@ -73,10 +73,10 @@ def processor(sender, signal, **kwargs):
     course_passing_status = kwargs.get("course_passing_status", None)
 
     if course_passing_status.status == CoursePassingStatusData.PASSING:
-        BADGE_PROGRESS_COMPLETE.send(sender=sender, username=kwargs.get("user_course_data").user.username, badge_template_id=1)  # temporarily faked badge_template_id
+        BADGE_PROGRESS_COMPLETE.send(sender=sender, username=kwargs.get("course_passing_status").user.pii.username, badge_template_id=1)  # temporarily faked badge_template_id
 
     if course_passing_status.status == CoursePassingStatusData.FAILING:
-        BADGE_PROGRESS_INCOMPLETE.send(sender=sender, username=kwargs.get("user_course_data").user.username, badge_template_id=1)  # temporarily faked badge_template_id
+        BADGE_PROGRESS_INCOMPLETE.send(sender=sender, username=kwargs.get("course_passing_status").user.pii.username, badge_template_id=1)  # temporarily faked badge_template_id
 
 
 @receiver(BADGE_PROGRESS_COMPLETE)
