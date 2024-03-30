@@ -6,9 +6,40 @@ import uuid
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
+from model_utils.fields import StatusField
 
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
+
+
+class CredlyOrganization(TimeStampedModel):
+    """
+    Credly Organization configuration.
+    """
+
+    uuid = models.UUIDField(
+        unique=True, help_text=_("Put your Credly Organization ID here.")
+    )
+    api_key = models.CharField(
+        max_length=255, help_text=_("Credly API shared secret for Credly Organization.")
+    )
+    name = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_("Verbose name for Credly Organization."),
+    )
+
+    def __str__(self):
+        return f"{self.name or self.uuid}"
+
+    @classmethod
+    def get_all_organization_ids(cls):
+        """
+        Get all organization IDs.
+        """
+        return list(cls.objects.values_list("uuid", flat=True))
 
 
 class BadgeTemplate(AbstractCredential):
@@ -17,6 +48,8 @@ class BadgeTemplate(AbstractCredential):
     """
 
     ORIGIN = "openedx"
+
+    STATES = Choices("draft", "active", "archived")
 
     uuid = models.UUIDField(
         unique=True, default=uuid.uuid4, help_text=_("Unique badge template ID.")
@@ -29,6 +62,10 @@ class BadgeTemplate(AbstractCredential):
     origin = models.CharField(
         max_length=128, null=True, blank=True, help_text=_("Badge template type.")
     )
+    state = StatusField(
+        choices_name="STATES",
+        help_text=_("Credly badge template state (auto-managed)."),
+    )
 
     def __str__(self):
         return self.name
@@ -40,12 +77,39 @@ class BadgeTemplate(AbstractCredential):
             self.origin = self.ORIGIN
             self.save(*args, **kwargs)
 
+    @classmethod
+    def by_uuid(cls, template_uuid):
+        return cls.objects.filter(uuid=template_uuid, origin=cls.ORIGIN).first()
+
+
+class CredlyBadgeTemplate(BadgeTemplate):
+    """
+    Credly badge template.
+    """
+
+    ORIGIN = "credly"
+
+    organization = models.ForeignKey(
+        CredlyOrganization,
+        on_delete=models.CASCADE,
+        help_text=_("Credly Organization - template owner."),
+    )
+
+    @property
+    def management_url(self):
+        """
+        Build external Credly dashboard URL.
+        """
+        credly_host_base_url = "https://sandbox.credly.com"
+        return f"{credly_host_base_url}/mgmt/organizations/{self.organization.uuid}/badges/templates/{self.uuid}/details"
+
 
 class BadgeRequirement(models.Model):
     """
-    Describes what must happen and its effect for badge template.
+    Describes what must happen and how such event will affect badge progress.
 
-    NOTE: all requirement for a single badge template follow "AND" processing logic by default.
+    NOTE:   Badge template's requirements implement "AND" processing logic (e.g. all requirements must be fulfilled).
+            To achieve "OR" processing logic for 2 requirement one must group them (put identical group ID).
     """
 
     EFFECTS = Choices("award", "revoke")
@@ -84,6 +148,7 @@ class DataRule(models.Model):
 
     OPERATORS = Choices(
         ("eq", "="),
+        # ("ne", "!="),
         # ('lt', '<'),
         # ('gt', '>'),
     )
@@ -93,7 +158,7 @@ class DataRule(models.Model):
         on_delete=models.CASCADE,
         help_text=_("Parent requirement for this data rule."),
     )
-    path = models.CharField(
+    data_path = models.CharField(
         max_length=255,
         help_text=_(
             'Public signal\'s data payload nested property path, e.g: "user.pii.username".'
@@ -107,7 +172,6 @@ class DataRule(models.Model):
         help_text=_(
             "Expected value comparison operator. https://docs.python.org/3/library/operator.html"
         ),
-        verbose_name=_("action"),
     )
     value = models.CharField(
         max_length=255,
@@ -115,10 +179,15 @@ class DataRule(models.Model):
         verbose_name=_("expected value"),
     )
 
+    def __str__(self):
+        return f"{self.requirement.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
+
 
 class BadgeProgress(models.Model):
     """
     Tracks a single badge template progress for user.
+
+    - allows multiple requirements status tracking;
     """
 
     credential = models.OneToOneField(
@@ -144,7 +213,7 @@ class BadgeProgress(models.Model):
 
 class Fulfillment(models.Model):
     """
-    Completed badge template requirement for user.
+    Tracks completed badge template requirement for user.
     """
 
     progress = models.ForeignKey(BadgeProgress, on_delete=models.CASCADE)
@@ -153,4 +222,22 @@ class Fulfillment(models.Model):
         models.SET_NULL,
         blank=True,
         null=True,
+    )
+
+
+class CredlyBadge(UserCredential):
+    """
+    Earned Credly badge (Badge template credential) for user.
+
+    - tracks distributed (external Credly service) state for Credly badge.
+    """
+
+    STATES = Choices(
+        "created", "no_response", "error", "pending", "accepted", "rejected", "revoked"
+    )
+
+    state = StatusField(
+        choices_name="STATES",
+        help_text=_("Credly badge issuing state"),
+        default=STATES.created,
     )

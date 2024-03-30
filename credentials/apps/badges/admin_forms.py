@@ -1,12 +1,12 @@
 """
-Credly Badges admin forms.
+Badges admin forms.
 """
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .api_client import CredlyAPIClient
-from .exceptions import CredlyAPIError
+from .credly.api_client import CredlyAPIClient
+from .credly.exceptions import CredlyAPIError
 from .models import CredlyOrganization
 
 

@@ -1,9 +1,14 @@
+# FIXME: this moves to badges.issuers
 from django.contrib.contenttypes.models import ContentType
 
 from ..models import BadgeTemplate, UserCredential
 
 
 def create_user_credential(username, badge_template):
+    """
+    TODO: backport Issuers
+    https://github.com/raccoongang/credentials/blob/208a3637cdaabd4777fa5ac91bff49a42972034a/credentials/apps/credentials/issuers.py
+    """
     if not isinstance(username, str):
         raise ValueError("`username` must be a string")
 

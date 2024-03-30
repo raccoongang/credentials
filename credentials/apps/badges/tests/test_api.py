@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
 
 from ..models import BadgeTemplate, UserCredential
-from ..services.badge_templates import get_badge_template_by_id
+from ..api import get_badge_template_by_id
 from ..services.user_credentials import create_user_credential
 
 

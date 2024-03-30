@@ -1,0 +1,116 @@
+import logging
+
+from crum import get_current_request
+from django.shortcuts import get_object_or_404
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .api_client import CredlyAPIClient
+from ..models import CredlyBadgeTemplate, CredlyOrganization
+
+
+logger = logging.getLogger(__name__)
+
+
+class CredlyWebhook(APIView):
+    """
+    Public API (webhook endpoint) to handle incoming Credly updates.
+
+    Usage:
+        POST <credentials>/credly-badges/api/webhook/
+    """
+
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request):
+        """
+        Handle incoming update events from the Credly service.
+
+        https://sandbox.credly.com/docs/webhooks#requirements
+
+        Handled events:
+            - badge_template.created
+            - badge_template.changed
+            - badge_template.deleted
+
+        - tries to recognize Credly Organization context;
+        - validates event type and its payload;
+        - performs corresponding item (badge template) updates;
+
+        Returned statuses:
+            - 204
+            - 404
+        """
+        credly_api_client = CredlyAPIClient(request.data.get("organization_id"))
+
+        event_info_response = credly_api_client.fetch_event_information(request.data.get("id"))
+        event_type = request.data.get("event_type")
+
+        if event_type == "badge_template.created":
+            self.handle_badge_template_created_event(event_info_response)
+        elif event_type == "badge_template.changed":
+            self.handle_badge_template_changed_event(event_info_response)
+        elif event_type == "badge_template.deleted":
+            self.handle_badge_template_deleted_event(event_info_response)
+        else:
+            logger.error(f"Unknown event type: {event_type}")
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @staticmethod
+    def handle_badge_template_created_event(data):
+        """
+        Create a new badge template.
+        """
+        # TODO: dry it
+        badge_template = data.get("data", {}).get("badge_template", {})
+        owner = data.get("data", {}).get("badge_template", {}).get("owner", {})
+
+        organization = get_object_or_404(CredlyOrganization, uuid=owner.get("id"))
+
+        CredlyBadgeTemplate.objects.update_or_create(
+            uuid=badge_template.get("id"),
+            defaults={
+                "site": get_current_request().site,
+                "organization": organization,
+                "name": badge_template.get("name"),
+                "state": badge_template.get("state"),
+                "description": badge_template.get("description"),
+                "icon": badge_template.get("image_url"),
+            },
+        )
+
+    @staticmethod
+    def handle_badge_template_changed_event(data):
+        """
+        Change the badge template.
+        """
+        # TODO: dry it
+        badge_template = data.get("data", {}).get("badge_template", {})
+        owner = data.get("data", {}).get("badge_template", {}).get("owner", {})
+
+        organization = get_object_or_404(CredlyOrganization, uuid=owner.get("id"))
+
+        CredlyBadgeTemplate.objects.update_or_create(
+            uuid=badge_template.get("id"),
+            defaults={
+                "site": get_current_request().site,
+                "organization": organization,
+                "name": badge_template.get("name"),
+                "state": badge_template.get("state"),
+                "description": badge_template.get("description"),
+                "icon": badge_template.get("image_url"),
+            },
+        )
+
+    @staticmethod
+    def handle_badge_template_deleted_event(data):
+        """
+        Deletes the badge template by provided uuid.
+        """
+        CredlyBadgeTemplate.objects.filter(
+            uuid=data.get("data", {}).get("badge_template", {}).get("id"),
+            site=get_current_request().site,
+        ).delete()

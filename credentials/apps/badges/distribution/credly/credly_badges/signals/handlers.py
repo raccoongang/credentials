@@ -1,3 +1,0 @@
-"""
-Credly Badges signal handlers.
-"""

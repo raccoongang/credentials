@@ -14,6 +14,8 @@ class IssueBadgeData:
         issued_to_last_name (str): Last name of the badge recipient.
         badge_template_id (str): ID of the badge template.
         issued_at (datetime): Timestamp when the badge was issued.
+
+    Reference: https://credly.com/docs/issued_badges
     """
 
     recipient_email: str
