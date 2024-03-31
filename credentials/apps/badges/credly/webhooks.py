@@ -1,10 +1,10 @@
 import logging
 
-from crum import get_current_request
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.sites.shortcuts import get_current_site
 
 from .api_client import CredlyAPIClient
 from ..models import CredlyBadgeTemplate, CredlyOrganization
@@ -45,22 +45,24 @@ class CredlyWebhook(APIView):
         """
         credly_api_client = CredlyAPIClient(request.data.get("organization_id"))
 
-        event_info_response = credly_api_client.fetch_event_information(request.data.get("id"))
+        event_info_response = credly_api_client.fetch_event_information(
+            request.data.get("id")
+        )
         event_type = request.data.get("event_type")
 
         if event_type == "badge_template.created":
-            self.handle_badge_template_created_event(event_info_response)
+            self.handle_badge_template_created_event(request, event_info_response)
         elif event_type == "badge_template.changed":
-            self.handle_badge_template_changed_event(event_info_response)
+            self.handle_badge_template_changed_event(request, event_info_response)
         elif event_type == "badge_template.deleted":
-            self.handle_badge_template_deleted_event(event_info_response)
+            self.handle_badge_template_deleted_event(request, event_info_response)
         else:
             logger.error(f"Unknown event type: {event_type}")
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @staticmethod
-    def handle_badge_template_created_event(data):
+    def handle_badge_template_created_event(request, data):
         """
         Create a new badge template.
         """
@@ -74,7 +76,7 @@ class CredlyWebhook(APIView):
             uuid=badge_template.get("id"),
             organization=organization,
             defaults={
-                "site": get_current_request().site,
+                "site": get_current_site(request),
                 "name": badge_template.get("name"),
                 "state": badge_template.get("state"),
                 "description": badge_template.get("description"),
@@ -83,7 +85,7 @@ class CredlyWebhook(APIView):
         )
 
     @staticmethod
-    def handle_badge_template_changed_event(data):
+    def handle_badge_template_changed_event(request, data):
         """
         Change the badge template.
         """
@@ -95,9 +97,9 @@ class CredlyWebhook(APIView):
 
         CredlyBadgeTemplate.objects.update_or_create(
             uuid=badge_template.get("id"),
+            organization=organization,
             defaults={
-                "site": get_current_request().site,
-                "organization": organization,
+                "site": get_current_site(request),
                 "name": badge_template.get("name"),
                 "state": badge_template.get("state"),
                 "description": badge_template.get("description"),
@@ -106,11 +108,11 @@ class CredlyWebhook(APIView):
         )
 
     @staticmethod
-    def handle_badge_template_deleted_event(data):
+    def handle_badge_template_deleted_event(request, data):
         """
         Deletes the badge template by provided uuid.
         """
         CredlyBadgeTemplate.objects.filter(
             uuid=data.get("data", {}).get("badge_template", {}).get("id"),
-            site=get_current_request().site,
+            site=get_current_site(request),
         ).delete()
