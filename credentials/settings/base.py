@@ -596,7 +596,12 @@ add_plugins(__name__, PROJECT_TYPE, SettingsType.BASE)
 BADGES_CONFIG = {
     # these events become available in rules setup:
     "events": [
-        "org.openedx.learning.course.passing.status.v1",
-        "org.openedx.learning.ccx.course.passing.status.v1",
+        "org.openedx.learning.course.passing.status.updated.v1",
+        "org.openedx.learning.ccx.course.passing.status.updated.v1",
     ],
+    "credly": {
+        "CREDLY_API_BASE_URL": "https://sandbox-api.credly.com/v1/",
+        "CREDLY_SANDBOX_API_BASE_URL": "https://api.credly.com/v1/",
+        "USE_SANDBOX": False,
+    },
 }
