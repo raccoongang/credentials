@@ -47,21 +47,26 @@ class CredlyAPIClient:
     and revoking badges.
     """
 
-    def __init__(self, organization_id):
+    def __init__(self, organization_id, api_key=None):
         """
         Initializes a CredlyRestAPI object.
 
         Args:
-            organization_id (str): ID of the organization.
+            organization_id (str, uuid): ID of the organization.
+            api_key (str): optional ID of the organization.
         """
-        self.organization = self._validate_organization(organization_id)
+        if api_key is None:
+            self.organization = self._get_organization(organization_id)
+            api_key = self.organization.api_key
+
+        self.api_key = api_key
         self.organization_id = organization_id
-        self.api_key = self.organization.api_key
+
         self.base_api_url = urljoin(
             get_credly_api_base_url(settings), f"organizations/{self.organization_id}/"
         )
 
-    def _validate_organization(self, organization_id):
+    def _get_organization(self, organization_id):
         """
         Check if Credly Organization with provided ID exists.
         """
@@ -87,6 +92,7 @@ class CredlyAPIClient:
             requests.HTTPError: If the API returns an error response.
         """
         url = urljoin(self.base_api_url, url_suffix)
+        logger.debug(f"Credly API: {method.upper()} {url}")
         response = requests.request(
             method.upper(), url, headers=self._get_headers(), data=data
         )
