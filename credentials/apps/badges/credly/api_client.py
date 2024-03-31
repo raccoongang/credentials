@@ -199,9 +199,9 @@ class CredlyAPIClient:
         for raw_badge_template in raw_badge_templates:
             CredlyBadgeTemplate.objects.update_or_create(
                 uuid=raw_badge_template.get("id"),
+                organization=self.organization,
                 defaults={
                     "site": site,
-                    "organization": self.organization,
                     "name": raw_badge_template.get("name"),
                     "state": raw_badge_template.get("state"),
                     "description": raw_badge_template.get("description"),
