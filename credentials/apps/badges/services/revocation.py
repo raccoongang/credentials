@@ -21,14 +21,14 @@ def notify_badge_revoked(username, badge_template_uuid):  # pylint: disable=unus
 
     # UserCredential.as_badge_data():
     badge_data = BadgeData(
-        uuid=uuid.uuid4(),
+        uuid=str(uuid.uuid4()),
         user=UserData(
             pii=UserPersonalData(
                 username='event_user-username',
                 email='event_user-email',
                 name='event_user-name',
             ),
-            id='event_user-id',
+            id=1,
             is_active=True,
         ),
         template=BadgeTemplateData(
@@ -36,7 +36,7 @@ def notify_badge_revoked(username, badge_template_uuid):  # pylint: disable=unus
             origin=badge_template.origin,
             name=badge_template.name,
             description=badge_template.description,
-            image_url=badge_template.icon,
+            image_url=str(badge_template.icon),
         ),
     )
 
