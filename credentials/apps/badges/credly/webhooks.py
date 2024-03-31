@@ -72,9 +72,9 @@ class CredlyWebhook(APIView):
 
         CredlyBadgeTemplate.objects.update_or_create(
             uuid=badge_template.get("id"),
+            organization=organization,
             defaults={
                 "site": get_current_request().site,
-                "organization": organization,
                 "name": badge_template.get("name"),
                 "state": badge_template.get("state"),
                 "description": badge_template.get("description"),
