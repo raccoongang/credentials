@@ -1,8 +1,10 @@
 import attr
+import inspect
+
 from attrs import asdict
 from django.conf import settings
 
-from openedx_events.learning.data import UserData, UserPersonalData
+from openedx_events.learning.data import UserData
 
 
 def get_badging_event_types():
@@ -51,14 +53,26 @@ def keypath(payload, keys_path):
     return traverse(current, keys)
 
 
-def get_user_data(payload: dict) -> UserData:
-    for value in payload.values():
-        if not isinstance(value, dict):
-            continue
-
-        if 'pii' in value.keys():
-            pii = UserPersonalData(**value['pii'])
-            user_data = UserData(id=value['id'], is_active=value['is_active'], pii=pii)
-            return user_data
-        else:
-            get_user_data(value)
+def get_user_data(data) -> UserData:
+    """
+    Extracts UserData object from any dataclass that contains UserData as a field.
+    Arguments:
+        data: Input dataclass object that contains UserData.
+    Returns:
+        UserData: UserData object contained within the input dataclass.
+    """
+    # Check if the data is an instance of UserData directly
+    if isinstance(data, UserData):
+        return data
+    # Inspect attributes of the dataclass
+    for attr_name, attr_value in inspect.getmembers(data):
+        # Check if the attribute is an instance of UserData
+        if isinstance(attr_value, UserData):
+            return attr_value
+        # If the attribute is an instance of another dataclass, recursively search for UserData
+        elif attr_value is not None and attr_name != "pii" and hasattr(attr_value, "__attrs_attrs__"):
+            user_data = get_user_data(attr_value)
+            if user_data:
+                return user_data
+    # UserData not found in the dataclass or its attributes
+    return None

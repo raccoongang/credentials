@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime
 from attr import asdict
 
-from openedx_events.learning.data import CourseEnrollmentData, ProgramCertificateData, UserData, UserPersonalData, CourseData, ProgramData
+from openedx_events.learning.data import UserData, UserPersonalData, CourseData, CoursePassingStatusData
 
 from ..utils import keypath, get_user_data
 
@@ -44,70 +44,34 @@ class TestKeypath(unittest.TestCase):
 class TestGetUserData(unittest.TestCase):
     def setUp(self):
         # Set up some sample data
-        self.user_personal_data_1 = UserPersonalData(
-            username="john_doe",
-            email="john@example.com",
-            name="John Doe"
-        )
+        # Assuming you have instantiated CourseData and UserData objects appropriately
+        self.course_data_1 = CourseData(course_key="CS101", display_name="Introduction to Computer Science", start=datetime(2024, 4, 1), end=datetime(2024, 6, 1))
+        self.user_data_1 = UserData(id=1, is_active=True, pii=UserPersonalData(username="user1", email="user1@example.com", name="John Doe"))
 
-        self.user_data_1 = UserData(
-            id=123,
-            is_active=True,
-            pii=self.user_personal_data_1
-        )
+        self.course_data_2 = CourseData(course_key="PHY101", display_name="Introduction to Physics", start=datetime(2024, 4, 15), end=datetime(2024, 7, 15))
+        self.user_data_2 = UserData(id=2, is_active=False, pii=UserPersonalData(username="user2", email="user2@example.com", name="Jane Doe"))
 
-        self.user_data_2 = UserData(
-            id=456,
-            is_active=False,
-            pii=self.user_personal_data_1
-        )
+        # Generating CoursePassingStatusData instances
+        self.passing_status_1 = CoursePassingStatusData(status=CoursePassingStatusData.PASSING, course=self.course_data_1, user=self.user_data_1)
+        self.failing_status_1 = CoursePassingStatusData(status=CoursePassingStatusData.FAILING, course=self.course_data_2, user=self.user_data_2)
 
-        self.course_data_1 = CourseData(
-            course_key="course-v1:edX+DemoX+Demo_Course",
-            display_name="Demo Course",
-            start=datetime(2024, 1, 1),
-            end=datetime(2024, 12, 31)
-        )
-
-        self.course_enrollment_1 = CourseEnrollmentData(
-            user=self.user_data_1,
-            course=self.course_data_1,
-            mode="audit",
-            is_active=True,
-            creation_date=datetime.now(),
-            created_by=self.user_data_1
-        )
-
-        self.program_data_1 = ProgramData(
-            uuid="12345",
-            title="MicroMasters in Data Science",
-            program_type="microbachelors"
-        )
-
-        self.program_certificate_1 = ProgramCertificateData(
-            user=self.user_data_2,
-            program=self.program_data_1,
-            uuid="abcdef123456",
-            status="awarded",
-            url="https://example.com/certificate"
-        )
 
     def test_get_user_data_from_course_enrollment(self):
         # Test extracting UserData from CourseEnrollmentData
-        result_1 = get_user_data(asdict(self.course_enrollment_1))
+        result_1 = get_user_data(self.passing_status_1)
         self.assertIsNotNone(result_1)
-        self.assertEqual(result_1.id, 123)
+        self.assertEqual(result_1.id, 1)
         self.assertTrue(result_1.is_active)
-        self.assertEqual(result_1.pii.username, "john_doe")
-        self.assertEqual(result_1.pii.email, "john@example.com")
+        self.assertEqual(result_1.pii.username, "user1")
+        self.assertEqual(result_1.pii.email, "user1@example.com")
         self.assertEqual(result_1.pii.name, "John Doe")
 
     def test_get_user_data_from_program_certificate(self):
         # Test extracting UserData from ProgramCertificateData
-        result_2 = get_user_data(asdict(self.program_certificate_1))
+        result_2 = get_user_data(self.failing_status_1)
         self.assertIsNotNone(result_2)
-        self.assertEqual(result_2.id, 456)
+        self.assertEqual(result_2.id, 2)
         self.assertFalse(result_2.is_active)
-        self.assertEqual(result_2.pii.username, "john_doe")
-        self.assertEqual(result_2.pii.email, "john@example.com")
-        self.assertEqual(result_2.pii.name, "John Doe")
+        self.assertEqual(result_2.pii.username, "user2")
+        self.assertEqual(result_2.pii.email, "user2@example.com")
+        self.assertEqual(result_2.pii.name, "Jane Doe")
