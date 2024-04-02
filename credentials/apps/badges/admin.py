@@ -45,6 +45,7 @@ class FulfillmentInline(admin.TabularInline):
 class DataRuleInline(admin.TabularInline):
     model = DataRule
     extra = 0
+    readonly_fields = ("operator",)
     fields = [
         "data_path",
         "operator",

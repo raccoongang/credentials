@@ -145,7 +145,7 @@ class BadgeRequirement(models.Model):
         if not self.template.is_active:
             super().save(*args, **kwargs)
         else:
-            raise ValidationError("Cannot update BadgeRequirement for inactive BadgeTemplate")
+            raise ValidationError("Cannot update BadgeRequirement for active BadgeTemplate")
 
 
 class DataRule(models.Model):
@@ -190,6 +190,13 @@ class DataRule(models.Model):
 
     def __str__(self):
         return f"{self.requirement.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
+    
+    def save(self, *args, **kwargs):
+        # Check if the related BadgeTemplate is active
+        if not self.requirement.template.is_active:
+            super().save(*args, **kwargs)
+        else:
+            raise ValidationError("Cannot update DataRule for active BadgeTemplate")
 
 
 class BadgeProgress(models.Model):
