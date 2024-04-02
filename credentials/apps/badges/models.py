@@ -5,10 +5,12 @@ Badges DB models.
 import uuid
 
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
+
 
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
 
@@ -137,6 +139,13 @@ class BadgeRequirement(models.Model):
 
     def __str__(self):
         return f"BadgeRequirement:{self.id}:{self.template.uuid}"
+    
+    def save(self, *args, **kwargs):
+        # Check if the related BadgeTemplate is active
+        if not self.template.is_active:
+            super().save(*args, **kwargs)
+        else:
+            raise ValidationError("Cannot update BadgeRequirement for inactive BadgeTemplate")
 
 
 class DataRule(models.Model):
@@ -148,7 +157,7 @@ class DataRule(models.Model):
 
     OPERATORS = Choices(
         ("eq", "="),
-        # ("ne", "!="),
+        ("ne", "!="),
         # ('lt', '<'),
         # ('gt', '>'),
     )
