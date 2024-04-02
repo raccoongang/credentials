@@ -2,6 +2,8 @@ import attr
 from attrs import asdict
 from django.conf import settings
 
+from openedx_events.learning.data import UserData, UserPersonalData
+
 
 def get_badging_event_types():
     """
@@ -47,3 +49,16 @@ def keypath(payload, keys_path):
             return None
 
     return traverse(current, keys)
+
+
+def get_user_data(payload: dict) -> UserData:
+    for value in payload.values():
+        if not isinstance(value, dict):
+            continue
+
+        if 'pii' in value.keys():
+            pii = UserPersonalData(**value['pii'])
+            user_data = UserData(id=value['id'], is_active=value['is_active'], pii=pii)
+            return user_data
+        else:
+            get_user_data(value)
