@@ -111,6 +111,9 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         BadgeRequirementInline,
     ]
 
+    def has_add_permission(self, request):
+        return False
+
     def dashboard_link(self, obj):
         url = obj.management_url
         return format_html("<a href='{url}'>{url}</a>", url=url)
