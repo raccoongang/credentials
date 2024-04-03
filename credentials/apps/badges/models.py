@@ -4,6 +4,7 @@ Badges DB models.
 
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -115,6 +116,7 @@ class BadgeRequirement(models.Model):
     """
 
     EFFECTS = Choices("award", "revoke")
+    EVENT_TYPES = Choices(*settings.BADGES_CONFIG['events'])
 
     template = models.ForeignKey(
         BadgeTemplate,
@@ -123,6 +125,7 @@ class BadgeRequirement(models.Model):
     )
     event_type = models.CharField(
         max_length=255,
+        choices=EVENT_TYPES,
         help_text=_(
             'Public signal type. Use namespaced types, e.g: "org.openedx.learning.student.registration.completed.v1"'
         ),
