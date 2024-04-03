@@ -1,6 +1,10 @@
 import attr
+import inspect
+
 from attrs import asdict
 from django.conf import settings
+
+from openedx_events.learning.data import UserData
 
 
 def get_badging_event_types():
@@ -47,3 +51,26 @@ def keypath(payload, keys_path):
             return None
 
     return traverse(current, keys)
+
+
+def get_user_data(data) -> UserData:
+    """
+    Extracts UserData object from any dataclass that contains UserData as a field.
+
+    Parameters:
+        - data: Input dataclass object that contains UserData.
+
+    Returns:
+        UserData: UserData object contained within the input dataclass.
+    """
+    if isinstance(data, UserData):
+        return data
+    
+    for _, attr_value in inspect.getmembers(data):
+        if isinstance(attr_value, UserData):
+            return attr_value
+        elif attr.has(attr_value):
+            user_data = get_user_data(attr_value)
+            if user_data:
+                return user_data
+    return None
