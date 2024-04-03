@@ -4,11 +4,14 @@ Badges DB models.
 
 import uuid
 
+from django.conf import settings
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
+
 
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
 
@@ -113,6 +116,7 @@ class BadgeRequirement(models.Model):
     """
 
     EFFECTS = Choices("award", "revoke")
+    EVENT_TYPES = Choices(*settings.BADGES_CONFIG['events'])
 
     template = models.ForeignKey(
         BadgeTemplate,
@@ -121,6 +125,7 @@ class BadgeRequirement(models.Model):
     )
     event_type = models.CharField(
         max_length=255,
+        choices=EVENT_TYPES,
         help_text=_(
             'Public signal type. Use namespaced types, e.g: "org.openedx.learning.student.registration.completed.v1"'
         ),
@@ -137,6 +142,13 @@ class BadgeRequirement(models.Model):
 
     def __str__(self):
         return f"BadgeRequirement:{self.id}:{self.template.uuid}"
+    
+    def save(self, *args, **kwargs):
+        # Check if the related BadgeTemplate is active
+        if not self.template.is_active:
+            super().save(*args, **kwargs)
+        else:
+            raise ValidationError("Cannot update BadgeRequirement for active BadgeTemplate")
 
 
 class DataRule(models.Model):
@@ -148,7 +160,7 @@ class DataRule(models.Model):
 
     OPERATORS = Choices(
         ("eq", "="),
-        # ("ne", "!="),
+        ("ne", "!="),
         # ('lt', '<'),
         # ('gt', '>'),
     )
@@ -179,8 +191,18 @@ class DataRule(models.Model):
         verbose_name=_("expected value"),
     )
 
+    class Meta:
+        unique_together = ("requirement", "data_path", "operator", "value")
+
     def __str__(self):
         return f"{self.requirement.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
+    
+    def save(self, *args, **kwargs):
+        # Check if the related BadgeTemplate is active
+        if not self.requirement.template.is_active:
+            super().save(*args, **kwargs)
+        else:
+            raise ValidationError("Cannot update DataRule for active BadgeTemplate")
 
 
 class BadgeProgress(models.Model):

@@ -26,6 +26,16 @@ class BadgeRequirementInline(admin.TabularInline):
     show_change_link = True
     extra = 0
 
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj and obj.is_active:
+            readonly_fields.extend([
+                "template",
+                "event_type",
+                "effect",
+                "description",
+            ])
+        return readonly_fields
 
 class FulfillmentInline(admin.TabularInline):
     model = Fulfillment
@@ -35,12 +45,21 @@ class FulfillmentInline(admin.TabularInline):
 class DataRuleInline(admin.TabularInline):
     model = DataRule
     extra = 0
-    readonly_fields = ("operator",)
     fields = [
         "data_path",
         "operator",
         "value",
     ]
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj and obj.template.is_active:
+            readonly_fields.extend([
+                "data_path",
+                "operator",
+                "value",
+            ])
+        return readonly_fields
 
 
 class CredlyOrganizationAdmin(admin.ModelAdmin):
@@ -111,6 +130,9 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         BadgeRequirementInline,
     ]
 
+    def has_add_permission(self, request):
+        return False
+
     def dashboard_link(self, obj):
         url = obj.management_url
         return format_html("<a href='{url}'>{url}</a>", url=url)
@@ -147,6 +169,18 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         "event_type",
         "effect",
     ]
+
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj and obj.template.is_active:
+            readonly_fields.extend([
+                "template",
+                "event_type",
+                "effect",
+                "description",
+            ])
+        return readonly_fields
 
 
 class BadgeProgressAdmin(admin.ModelAdmin):
