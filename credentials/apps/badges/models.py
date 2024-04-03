@@ -157,7 +157,7 @@ class DataRule(models.Model):
 
     OPERATORS = Choices(
         ("eq", "="),
-        # ("ne", "!="),
+        ("ne", "!="),
         # ('lt', '<'),
         # ('gt', '>'),
     )
