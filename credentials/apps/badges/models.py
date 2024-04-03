@@ -188,6 +188,9 @@ class DataRule(models.Model):
         verbose_name=_("expected value"),
     )
 
+    class Meta:
+        unique_together = ("requirement", "data_path", "operator", "value")
+
     def __str__(self):
         return f"{self.requirement.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
     
