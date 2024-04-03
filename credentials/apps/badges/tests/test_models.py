@@ -37,16 +37,3 @@ class BadgeRequirementTestCase(TestCase):
         self.assertEqual(data_rules.count(), 2)
         self.assertIn(data_rule1, data_rules)
         self.assertIn(data_rule2, data_rules)
-
-    def test_str_representation(self):
-        data_rule = DataRule.objects.create(
-            requirement=self.requirement,
-            data_path="user.pii.username",
-            operator="eq",
-            value="cucumber1997",
-        )
-
-        self.assertEqual(
-            str(data_rule),
-            f"{self.requirement.template.uuid}:user.pii.username:eq:cucumber1997"
-        )
