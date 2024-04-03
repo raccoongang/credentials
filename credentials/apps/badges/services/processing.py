@@ -5,8 +5,9 @@ Main processing logic.
 from openedx_events.learning.data import CoursePassingStatusData
 
 from ..models import CredlyBadgeTemplate
-from ..utils import keypath, get_user_data
 from ..signals import BADGE_PROGRESS_COMPLETE, BADGE_PROGRESS_INCOMPLETE
+from ..services.requirements import discover_requirements
+from ..utils import keypath, get_user_data
 
 
 def process_event(sender, **kwargs):
@@ -48,9 +49,11 @@ def process_event(sender, **kwargs):
     #   - BADGE_PROGRESS_INCOMPLETE emitted >> handle_badge_regression (possibly, we need a flag here)
 
     user_data = get_user_data(kwargs)
+    requirements = discover_requirements(sender)
 
     # faked: related to the BadgeRequirement template (in real processing):
     badge_template_uuid = CredlyBadgeTemplate.objects.first().uuid
+
 
     if (
         keypath(kwargs, "course_passing_status.status")
