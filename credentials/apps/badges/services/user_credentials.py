@@ -1,5 +1,9 @@
 # FIXME: this moves to badges.issuers
+from typing import Union
+
 from django.contrib.contenttypes.models import ContentType
+
+from openedx_events.learning.data import UserData
 
 from ..models import BadgeTemplate, UserCredential
 
@@ -20,3 +24,10 @@ def create_user_credential(username, badge_template):
         credential_id=badge_template.id,
         username=username,
     )
+
+
+def identify_event_user(user: UserData) -> Union[str, None]:
+    try:
+        return UserCredential.objects.get(username=user.pii.username).username
+    except UserCredential.DoesNotExist:
+        return None
