@@ -3,7 +3,7 @@ import uuid
 from django.contrib.sites.models import Site
 from django.test import TestCase
 
-from ..models import BadgeRequirement, BadgeTemplate, CredlyBadgeTemplate, CredlyOrganization, DataRule
+from ..models import BadgeProgress, BadgeRequirement, BadgeTemplate, CredlyBadgeTemplate, CredlyOrganization, DataRule, Fulfillment
 
 
 class DataRulesTestCase(TestCase):
@@ -99,3 +99,27 @@ class BadgeRequirementTestCase(TestCase):
         self.assertIn(self.requirement1, requirements)
         self.assertIn(self.requirement2, requirements)
         self.assertIn(self.requirement3, requirements)
+
+
+class RequirementFulfillmentTestCase(TestCase):
+    def setUp(self):
+        self.site = Site.objects.create(domain="test_domain", name="test_name")
+        self.badge_template1 = BadgeTemplate.objects.create(uuid=uuid.uuid4(), name="test_template1", state="draft", site=self.site)
+        self.badge_template2 = BadgeTemplate.objects.create(uuid=uuid.uuid4(), name="test_template2", state="draft", site=self.site)
+        self.badge_progress = BadgeProgress.objects.create(template=self.badge_template1, username='test1')
+        self.badge_requirement = BadgeRequirement.objects.create(template=self.badge_template1, event_type="org.openedx.learning.course.passing.status.updated.v1")
+    
+    def test_fulfillment_create_success(self):
+        fulfillment = self.badge_requirement.fulfill('test1')
+        self.assertIsNotNone(fulfillment)
+        self.assertIsInstance(fulfillment, Fulfillment)
+    
+    def test_fulfillment_wrong_username(self):
+        fulfillment = self.badge_requirement.fulfill('abc')
+        self.assertIsNone(fulfillment)
+    
+    def test_fulfillment_wrong_template(self):
+        self.badge_requirement.template = self.badge_template2
+        self.badge_requirement.save()
+        fulfillment = self.badge_requirement.fulfill('abc')
+        self.assertIsNone(fulfillment)
