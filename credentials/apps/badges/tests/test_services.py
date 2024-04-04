@@ -3,17 +3,21 @@ import uuid
 from django.contrib.sites.models import Site
 from django.test import TestCase
 
-from ..models import BadgeRequirement, BadgeTemplate, CredlyBadgeTemplate, CredlyOrganization
+from ..models import BadgeRequirement, BadgeTemplate, CredlyOrganization
+from ..services.requirements import discover_requirements
+
 
 class BadgeRequirementDiscoveryTestCase(TestCase):
     def setUp(self):
-        self.organization = CredlyOrganization.objects.create(uuid=uuid.uuid4(), api_key="test-api-key", name="test_organization")
+        self.organization = CredlyOrganization.objects.create(
+            uuid=uuid.uuid4(), api_key="test-api-key", name="test_organization")
         self.site = Site.objects.create(domain="test_domain", name="test_name")
-        self.badge_template = BadgeTemplate.objects.create(uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site)
+        self.badge_template = BadgeTemplate.objects.create(
+            uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site)
 
         self.COURSE_PASSING_EVENT = "org.openedx.learning.course.passing.status.updated.v1"
         self.CCX_COURSE_PASSING_EVENT = "org.openedx.learning.ccx.course.passing.status.updated.v1"
-    
+
     def test_discovery_eventtype_related_requirements(self):
         self.requirements = []
 
@@ -36,12 +40,19 @@ class BadgeRequirementDiscoveryTestCase(TestCase):
             description="Test ccx course passing revoke description",
         ))
 
-        course_passing_requirements = BadgeRequirement.objects.filter(event_type=self.COURSE_PASSING_EVENT)
-        ccx_course_passing_requirements = BadgeRequirement.objects.filter(event_type=self.CCX_COURSE_PASSING_EVENT)
+        course_passing_requirements = discover_requirements(
+            event_type=self.COURSE_PASSING_EVENT)
+        ccx_course_passing_requirements = discover_requirements(
+            event_type=self.CCX_COURSE_PASSING_EVENT)
 
         self.assertEqual(course_passing_requirements.count(), 1)
         self.assertEqual(ccx_course_passing_requirements.count(), 2)
 
-        self.assertEqual(course_passing_requirements[0].description, "Test course passing award description")
-        self.assertEqual(ccx_course_passing_requirements[0].description, "Test ccx course passing award description")
-        self.assertEqual(ccx_course_passing_requirements[1].description, "Test ccx course passing revoke description")
+        self.assertEqual(
+            course_passing_requirements[0].description, "Test course passing award description")
+        self.assertEqual(
+            ccx_course_passing_requirements[0].description, "Test ccx course passing award description")
+        self.assertEqual(
+            ccx_course_passing_requirements[1].description, "Test ccx course passing revoke description")
+
+
