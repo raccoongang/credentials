@@ -24,10 +24,3 @@ def create_user_credential(username, badge_template):
         credential_id=badge_template.id,
         username=username,
     )
-
-
-def identify_event_user(user: UserData) -> Union[str, None]:
-    try:
-        return UserCredential.objects.get(username=user.pii.username).username
-    except UserCredential.DoesNotExist:
-        return None
