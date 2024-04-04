@@ -149,6 +149,9 @@ class BadgeRequirement(models.Model):
             super().save(*args, **kwargs)
         else:
             raise ValidationError("Cannot update BadgeRequirement for active BadgeTemplate")
+    
+    def is_fullfiled(self, username: str) -> bool:
+        return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
 
 
 class DataRule(models.Model):
