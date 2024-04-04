@@ -1,9 +1,5 @@
 # FIXME: this moves to badges.issuers
-from typing import Union
-
 from django.contrib.contenttypes.models import ContentType
-
-from openedx_events.learning.data import UserData
 
 from ..models import BadgeTemplate, UserCredential
 
