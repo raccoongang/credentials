@@ -83,6 +83,29 @@ class BadgeTemplate(AbstractCredential):
     @classmethod
     def by_uuid(cls, template_uuid):
         return cls.objects.filter(uuid=template_uuid, origin=cls.ORIGIN).first()
+    
+    def user_progress(username: str) -> float:
+        """
+        Calculate user progress for badge template.
+        """
+        requirements_count = BadgeRequirement.filter(template=self).count()
+        fulfilled_requirements_count = Fulfillment.filter(progress__username=username, requirement__template=self).count()
+        return fulfilled_requirements_count / requirements_count
+    
+    def user_completion(username: str) -> bool:
+        """
+        Check if user completed badge template.
+        """
+        return self.user_progress(username) == 1.0
+    
+    @property
+    def ratio(self) -> float:
+        """
+        Calculate badge template progress ratio.
+        """
+        requirements_count = BadgeRequirement.filter(template=self).count()
+        fulfilled_requirements_count = Fulfillment.filter(requirement__template=self).count()
+        return fulfilled_requirements_count / requirements_count
 
 
 class CredlyBadgeTemplate(BadgeTemplate):
