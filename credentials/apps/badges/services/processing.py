@@ -55,7 +55,7 @@ def process_event(sender, **kwargs):
     requirements = discover_requirements(sender)
 
     # faked: related to the BadgeRequirement template (in real processing):
-    badge_template_uuid = CredlyBadgeTemplate.objects.first().uuid
+    badge_template_id = CredlyBadgeTemplate.objects.first().id
 
 
     if (
@@ -65,7 +65,7 @@ def process_event(sender, **kwargs):
         BADGE_PROGRESS_COMPLETE.send(
             sender=sender,
             username=keypath(kwargs, "course_passing_status.user.pii.username"),
-            badge_template_uuid=badge_template_uuid,
+            badge_template_id=badge_template_id,
         )
 
     if (
@@ -75,5 +75,5 @@ def process_event(sender, **kwargs):
         BADGE_PROGRESS_INCOMPLETE.send(
             sender=sender,
             username=keypath(kwargs, "course_passing_status.user.pii.username"),
-            badge_template_uuid=badge_template_uuid,
+            badge_template_id=badge_template_id,
         )
