@@ -115,7 +115,7 @@ class BadgeRequirement(models.Model):
             To achieve "OR" processing logic for 2 requirement one must group them (put identical group ID).
     """
 
-    EFFECTS = Choices("award", "revoke")
+    EFFECTS = Choices("award")
     EVENT_TYPES = Choices(*settings.BADGES_CONFIG['events'])
 
     template = models.ForeignKey(
@@ -135,6 +135,7 @@ class BadgeRequirement(models.Model):
         choices=EFFECTS,
         default=EFFECTS.award,
         help_text=_("Defines how this requirement contributes to badge earning."),
+        editable=False,
     )
     description = models.TextField(
         null=True, blank=True, help_text=_("Provide more details if needed.")
@@ -203,6 +204,82 @@ class DataRule(models.Model):
             super().save(*args, **kwargs)
         else:
             raise ValidationError("Cannot update DataRule for active BadgeTemplate")
+
+
+class BadgePenalty(models.Model):
+    """
+    Describes badge regression rules for particular BadgeRequirement.
+    """
+
+    class Meta:
+        verbose_name_plural = "Badge penalties"
+
+    EFFECTS = Choices("revoke")
+    
+    requirement = models.ForeignKey(
+        BadgeRequirement,
+        on_delete=models.CASCADE,
+        help_text=_("Badge requirement for which this penalty is defined."),
+    )
+    effect = models.CharField(
+        max_length=32,
+        choices=EFFECTS,
+        default=EFFECTS.revoke,
+        help_text=_("Defines how this penalty contributes to badge regression."),
+        editable=False,
+    )
+    description = models.TextField(
+        null=True, blank=True, help_text=_("Provide more details if needed.")
+    )
+
+    def __str__(self):
+        return f"BadgePenalty:{self.id}:{self.requirement.template.uuid}"
+
+
+class PenaltyDataRule(models.Model):
+    """
+    Specifies expected data attribute value for penalty rule.
+    """
+
+    OPERATORS = Choices(
+        ("eq", "="),
+        ("ne", "!="),
+        # ('lt', '<'),
+        # ('gt', '>'),
+    )
+
+    penalty = models.ForeignKey(
+        BadgePenalty,
+        on_delete=models.CASCADE,
+        help_text=_("Parent penalty for this data rule."),
+    )
+    data_path = models.CharField(
+        max_length=255,
+        help_text=_(
+            'Public signal\'s data payload nested property path, e.g: "user.pii.username".'
+        ),
+        verbose_name=_("key path"),
+    )
+    operator = models.CharField(
+        max_length=32,
+        choices=OPERATORS,
+        default=OPERATORS.eq,
+        help_text=_(
+            "Expected value comparison operator. https://docs.python.org/3/library/operator.html"
+        ),
+    )
+    value = models.CharField(
+        max_length=255,
+        help_text=_('Expected value for the nested property, e.g: "cucumber1997".'),
+        verbose_name=_("expected value"),
+    )
+
+    class Meta:
+        unique_together = ("penalty", "data_path", "operator", "value")
+
+    def __str__(self):
+        return f"{self.penalty.requirement.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
+
 
 
 class BadgeProgress(models.Model):

@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .admin_forms import CredlyOrganizationAdminForm
 from .models import (
+    BadgePenalty,
     BadgeProgress,
     BadgeRequirement,
     CredlyBadge,
@@ -17,6 +18,7 @@ from .models import (
     CredlyOrganization,
     DataRule,
     Fulfillment,
+    PenaltyDataRule,
 )
 from .toggles import is_badges_enabled
 
@@ -145,6 +147,75 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
     image.short_description = _("icon")
 
 
+class DataRulePenaltyInline(admin.TabularInline):
+    model = PenaltyDataRule
+    extra = 0
+    fields = [
+        "data_path",
+        "operator",
+        "value",
+    ]
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj and obj.requirement.template.is_active:
+            readonly_fields.extend([
+                "data_path",
+                "operator",
+                "value",
+            ])
+        return readonly_fields
+
+
+class BadgePenaltyAdmin(admin.ModelAdmin):
+    """
+    Badge requirement penalty setup admin.
+    """
+    inlines = [
+        DataRulePenaltyInline,
+    ]
+
+    list_display = [
+        "id",
+        "requirement",
+    ]
+    list_display_links = (
+        "id",
+        "requirement",
+    )
+    list_filter = [
+        "requirement",
+        "description",
+    ]
+
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj and obj.requirement.template.is_active:
+            readonly_fields.extend([
+                "requirement",
+            ])
+        return readonly_fields
+
+
+class BadgePenaltyInline(admin.TabularInline):
+    model = BadgePenalty
+    extra = 0
+    fields = [
+        "effect",
+        "description",
+    ]
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj and obj.template.is_active:
+            readonly_fields.extend([
+                "effect",
+                "description",
+            ])
+        return readonly_fields
+
+
 class BadgeRequirementAdmin(admin.ModelAdmin):
     """
     Badge template requirement admin setup.
@@ -152,13 +223,13 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
 
     inlines = [
         DataRuleInline,
+        BadgePenaltyInline,
     ]
 
     list_display = [
         "id",
         "template",
         "event_type",
-        "effect",
     ]
     list_display_links = (
         "id",
@@ -167,7 +238,6 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
     list_filter = [
         "template",
         "event_type",
-        "effect",
     ]
 
 
@@ -237,4 +307,5 @@ if is_badges_enabled():
     admin.site.register(CredlyBadgeTemplate, CredlyBadgeTemplateAdmin)
     admin.site.register(CredlyBadge, CredlyBadgeAdmin)
     admin.site.register(BadgeRequirement, BadgeRequirementAdmin)
+    admin.site.register(BadgePenalty, BadgePenaltyAdmin)
     admin.site.register(BadgeProgress, BadgeProgressAdmin)
