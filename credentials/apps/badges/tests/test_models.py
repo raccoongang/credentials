@@ -113,13 +113,3 @@ class RequirementFulfillmentTestCase(TestCase):
         fulfillment = self.badge_requirement.fulfill('test1')
         self.assertIsNotNone(fulfillment)
         self.assertIsInstance(fulfillment, Fulfillment)
-    
-    def test_fulfillment_wrong_username(self):
-        fulfillment = self.badge_requirement.fulfill('abc')
-        self.assertIsNone(fulfillment)
-    
-    def test_fulfillment_wrong_template(self):
-        self.badge_requirement.template = self.badge_template2
-        self.badge_requirement.save()
-        fulfillment = self.badge_requirement.fulfill('abc')
-        self.assertIsNone(fulfillment)

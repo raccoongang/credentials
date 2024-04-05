@@ -151,10 +151,7 @@ class BadgeRequirement(models.Model):
             raise ValidationError("Cannot update BadgeRequirement for active BadgeTemplate")
 
     def fulfill(self, username: str):
-        try:
-            progress = BadgeProgress.objects.get(template=self.template, username=username)
-        except BadgeProgress.DoesNotExist:
-            return None
+        progress, _ = BadgeProgress.objects.get_or_create(template=self.template, username=username)
         return Fulfillment.objects.create(progress=progress, requirement=self)
 
 class DataRule(models.Model):
