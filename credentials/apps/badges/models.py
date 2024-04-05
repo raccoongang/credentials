@@ -115,7 +115,7 @@ class BadgeRequirement(models.Model):
             To achieve "OR" processing logic for 2 requirement one must group them (put identical group ID).
     """
 
-    EFFECTS = Choices("award", "revoke")
+    EFFECT = "award"
     EVENT_TYPES = Choices(*settings.BADGES_CONFIG['events'])
 
     template = models.ForeignKey(
@@ -129,12 +129,6 @@ class BadgeRequirement(models.Model):
         help_text=_(
             'Public signal type. Use namespaced types, e.g: "org.openedx.learning.student.registration.completed.v1"'
         ),
-    )
-    effect = models.CharField(
-        max_length=32,
-        choices=EFFECTS,
-        default=EFFECTS.award,
-        help_text=_("Defines how this requirement contributes to badge earning."),
     )
     description = models.TextField(
         null=True, blank=True, help_text=_("Provide more details if needed.")

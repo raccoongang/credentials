@@ -32,7 +32,6 @@ class BadgeRequirementInline(admin.TabularInline):
             readonly_fields.extend([
                 "template",
                 "event_type",
-                "effect",
                 "description",
             ])
         return readonly_fields
@@ -158,7 +157,6 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         "id",
         "template",
         "event_type",
-        "effect",
     ]
     list_display_links = (
         "id",
@@ -167,7 +165,6 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
     list_filter = [
         "template",
         "event_type",
-        "effect",
     ]
 
 
@@ -177,7 +174,6 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
             readonly_fields.extend([
                 "template",
                 "event_type",
-                "effect",
                 "description",
             ])
         return readonly_fields

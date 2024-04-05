@@ -14,7 +14,6 @@ class DataRulesTestCase(TestCase):
         self.requirement = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
-            effect="award",
             description="Test description",
         )
 
@@ -50,19 +49,16 @@ class BadgeRequirementTestCase(TestCase):
         self.requirement1 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
-            effect="award",
             description="Test description",
         )
         self.requirement2 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
-            effect="revoke",
             description="Test description",
         )
         self.requirement3 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.ccx.course.passing.status.updated.v1",
-            effect="award",
             description="Test description",
         )
 
@@ -77,19 +73,16 @@ class BadgeRequirementTestCase(TestCase):
         self.requirement1 = BadgeRequirement.objects.create(
             template=self.credlybadge_template,
             event_type="org.openedx.learning.ccx.course.passing.status.updated.v1",
-            effect="award",
             description="Test description",
         )
         self.requirement2 = BadgeRequirement.objects.create(
             template=self.credlybadge_template,
             event_type="org.openedx.learning.ccx.course.passing.status.updated.v1",
-            effect="revoke",
             description="Test description",
         )
         self.requirement3 = BadgeRequirement.objects.create(
             template=self.credlybadge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
-            effect="award",
             description="Test description",
         )
 
