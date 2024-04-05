@@ -115,7 +115,6 @@ class BadgeRequirement(models.Model):
             To achieve "OR" processing logic for 2 requirement one must group them (put identical group ID).
     """
 
-    EFFECT = "award"
     EVENT_TYPES = Choices(*settings.BADGES_CONFIG['events'])
 
     template = models.ForeignKey(
