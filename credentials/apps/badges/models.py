@@ -151,10 +151,8 @@ class BadgeRequirement(models.Model):
             raise ValidationError("Cannot update BadgeRequirement for active BadgeTemplate")
     
     def reset(self, username: str):
-        try:
-            Fulfillment.objects.get(progress__username=username, progress__template=self.template).delete()
-        except Fulfillment.DoesNotExist:
-            return
+        Fulfillment.objects.filter(requirement=self, progress__username=username, progress__template=self.template).delete()
+
 
 
 class DataRule(models.Model):
@@ -237,6 +235,10 @@ class BadgeProgress(models.Model):
 
     def __str__(self):
         return f"BadgeProgress:{self.username}"
+    
+    @staticmethod
+    def reset(username: str):
+        Fulfillment.objects.filter(progress__username=username).delete()
 
 
 class Fulfillment(models.Model):
