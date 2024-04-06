@@ -21,13 +21,12 @@ class BadgeRequirementDiscoveryTestCase(TestCase):
         self.requirements = []
         self.requirements.append(
             BadgeRequirement.objects.create(template=self.badge_template, event_type=self.COURSE_PASSING_EVENT,
-                                            effect="award", description="Test course passing award description"))
+                                            description="Test course passing award description"))
         self.requirements.append(
             BadgeRequirement.objects.create(template=self.badge_template, event_type=self.CCX_COURSE_PASSING_EVENT,
-                                            effect="award", description="Test ccx course passing award description"))
+                                            description="Test ccx course passing award description"))
         self.requirements.append(
             BadgeRequirement.objects.create(template=self.badge_template, event_type=self.CCX_COURSE_PASSING_EVENT,
-                                            effect="revoke",
                                             description="Test ccx course passing revoke description"))
         course_passing_requirements = discover_requirements(event_type=self.COURSE_PASSING_EVENT)
         ccx_course_passing_requirements = discover_requirements(event_type=self.CCX_COURSE_PASSING_EVENT)
