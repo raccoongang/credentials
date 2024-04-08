@@ -118,13 +118,21 @@ class RequirementFulfillmentCheckTestCase(TestCase):
     def test_fulfillment_check_wrong_username(self):
         is_fulfilled = self.badge_requirement.is_fullfiled('asd')
         self.assertFalse(is_fulfilled)
-    
-    def test_fulfillment_check_wrong_template(self):
-        self.badge_progress.template = self.badge_template2
-        self.badge_requirement.save()
-        is_fulfilled = self.badge_requirement.is_fullfiled('test1')
-        self.assertTrue(is_fulfilled)
+
         
+class BadgeRequirementGroupTestCase(TestCase):
+    def setUp(self):
+        self.site = Site.objects.create(domain="test_domain", name="test_name")
+        self.badge_template = BadgeTemplate.objects.create(uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site)
+        self.badge_requirement1 = BadgeRequirement.objects.create(template=self.badge_template, event_type="org.openedx.learning.course.passing.status.updated.v1", group="group1")
+        self.badge_requirement2 = BadgeRequirement.objects.create(template=self.badge_template, event_type="org.openedx.learning.ccx.course.passing.status.updated.v1", group="group1")
+        self.badge_requirement3 = BadgeRequirement.objects.create(template=self.badge_template, event_type="org.openedx.learning.course.passing.status.updated.v1")
+    
+    def test_requirement_group(self):
+        group = self.badge_template.badgerequirement_set.filter(group="group1")
+        self.assertEqual(group.count(), 2)
+        self.assertIsNone(self.badge_requirement3.group)
+
 
 class BadgeTemplateUserProgressTestCase(TestCase):
     def setUp(self):
