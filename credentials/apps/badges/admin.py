@@ -8,7 +8,7 @@ from django.core.management import call_command
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .admin_forms import BadgePenaltyForm, CredlyOrganizationAdminForm
+from .admin_forms import BadgePenaltyForm, CredlyOrganizationAdminForm, PenaltyDataRuleForm
 from .models import (
     BadgePenalty,
     BadgeProgress,
@@ -138,21 +138,7 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
 class DataRulePenaltyInline(admin.TabularInline):
     model = PenaltyDataRule
     extra = 0
-    fields = [
-        "data_path",
-        "operator",
-        "value",
-    ]
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = list(super().get_readonly_fields(request, obj))
-        if obj and obj.template.is_active:
-            readonly_fields.extend([
-                "data_path",
-                "operator",
-                "value",
-            ])
-        return readonly_fields
+    form = PenaltyDataRuleForm
 
 
 class BadgeRequirementAdmin(admin.ModelAdmin):
@@ -205,15 +191,6 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
         "requirements",
     )
     form = BadgePenaltyForm
-
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = list(super().get_readonly_fields(request, obj))
-        if obj and obj.template.is_active:
-            readonly_fields.extend([
-                "requirements",
-            ])
-        return readonly_fields
 
 
 class BadgeProgressAdmin(admin.ModelAdmin):

@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .credly.api_client import CredlyAPIClient
 from .credly.exceptions import CredlyAPIError
-from .models import BadgePenalty, CredlyOrganization
+from .models import BadgePenalty, CredlyOrganization, PenaltyDataRule
 
 
 class CredlyOrganizationAdminForm(forms.ModelForm):
@@ -72,3 +72,15 @@ class BadgePenaltyForm(forms.ModelForm):
                 if field_name in ("template", "requirements", "description"):
                     self.fields[field_name].disabled = True
 
+
+class PenaltyDataRuleForm(forms.ModelForm):
+    class Meta:
+        model = PenaltyDataRule
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and hasattr(self.instance, 'penalty') and self.instance.penalty.template.is_active:
+            for field_name in self.fields:
+                if field_name in ("data_path", "operator", "value"):
+                    self.fields[field_name].disabled = True

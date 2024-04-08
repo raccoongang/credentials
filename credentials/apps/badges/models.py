@@ -154,7 +154,6 @@ class BadgeRequirement(models.Model):
             To achieve "OR" processing logic for 2 requirement one must group them (put identical group ID).
     """
 
-    EFFECT = "award"
     EVENT_TYPES = Choices(*settings.BADGES_CONFIG['events'])
 
     template = models.ForeignKey(
@@ -247,13 +246,13 @@ class PenaltyDataRule(AbstractDataRule):
     
     def save(self, *args, **kwargs):
         # Check if the related BadgeTemplate is active
-        if not self.penalty.requirement.template.is_active:
+        if not self.penalty.template.is_active:
             super().save(*args, **kwargs)
         else:
             raise ValidationError("Cannot update PenaltyDataRule for active BadgeTemplate")
 
     def __str__(self):
-        return f"{self.penalty.requirement.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
+        return f"{self.penalty.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
 
     class Meta:
         unique_together = ("penalty", "data_path", "operator", "value")
