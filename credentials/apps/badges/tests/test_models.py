@@ -20,13 +20,13 @@ class DataRulesTestCase(TestCase):
     def test_multiple_data_rules_for_requirement(self):
         data_rule1 = DataRule.objects.create(
             requirement=self.requirement,
-            data_path="user.pii.username",
+            data_path="course_passing_status.user.pii.username",
             operator="eq",
             value="cucumber1997",
         )
         data_rule2 = DataRule.objects.create(
             requirement=self.requirement,
-            data_path="user.pii.email",
+            data_path="course_passing_status.user.pii.email",
             operator="eq",
             value="test@example.com",
         )
@@ -116,3 +116,17 @@ class RequirementFulfillmentCheckTestCase(TestCase):
         self.badge_requirement.save()
         is_fulfilled = self.badge_requirement.is_fullfiled('test1')
         self.assertTrue(is_fulfilled)
+
+
+class BadgeRequirementGroupTestCase(TestCase):
+    def setUp(self):
+        self.site = Site.objects.create(domain="test_domain", name="test_name")
+        self.badge_template = BadgeTemplate.objects.create(uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site)
+        self.badge_requirement1 = BadgeRequirement.objects.create(template=self.badge_template, event_type="org.openedx.learning.course.passing.status.updated.v1", group="group1")
+        self.badge_requirement2 = BadgeRequirement.objects.create(template=self.badge_template, event_type="org.openedx.learning.ccx.course.passing.status.updated.v1", group="group1")
+        self.badge_requirement3 = BadgeRequirement.objects.create(template=self.badge_template, event_type="org.openedx.learning.course.passing.status.updated.v1")
+    
+    def test_requirement_group(self):
+        group = self.badge_template.badgerequirement_set.filter(group="group1")
+        self.assertEqual(group.count(), 2)
+        self.assertIsNone(self.badge_requirement3.group)

@@ -133,6 +133,13 @@ class BadgeRequirement(models.Model):
         null=True, blank=True, help_text=_("Provide more details if needed.")
     )
 
+    group = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_("Group ID for requirements grouping."),
+    )
+
     def __str__(self):
         return f"BadgeRequirement:{self.id}:{self.template.uuid}"
     
