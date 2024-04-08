@@ -146,6 +146,9 @@ class BadgeRequirement(models.Model):
     def is_fullfiled(self, username: str) -> bool:
         return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
 
+    def fulfill(self, username: str):
+        progress, _ = BadgeProgress.objects.get_or_create(template=self.template, username=username)
+        return Fulfillment.objects.create(progress=progress, requirement=self)
 
 class DataRule(models.Model):
     """

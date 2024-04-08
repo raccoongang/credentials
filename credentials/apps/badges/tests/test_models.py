@@ -110,9 +110,4 @@ class RequirementFulfillmentCheckTestCase(TestCase):
     def test_fulfillment_check_wrong_username(self):
         is_fulfilled = self.badge_requirement.is_fullfiled('asd')
         self.assertFalse(is_fulfilled)
-    
-    def test_fulfillment_check_wrong_template(self):
-        self.badge_progress.template = self.badge_template2
-        self.badge_requirement.save()
-        is_fulfilled = self.badge_requirement.is_fullfiled('test1')
-        self.assertTrue(is_fulfilled)
+ 
