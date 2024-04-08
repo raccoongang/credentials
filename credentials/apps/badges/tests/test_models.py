@@ -22,7 +22,6 @@ class DataRulesTestCase(TestCase):
         self.requirement = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
-            effect="award",
             description="Test description",
         )
 
@@ -58,19 +57,16 @@ class BadgeRequirementTestCase(TestCase):
         self.requirement1 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
-            effect="award",
             description="Test description",
         )
         self.requirement2 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
-            effect="revoke",
             description="Test description",
         )
         self.requirement3 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.ccx.course.passing.status.updated.v1",
-            effect="award",
             description="Test description",
         )
 
@@ -85,19 +81,16 @@ class BadgeRequirementTestCase(TestCase):
         self.requirement1 = BadgeRequirement.objects.create(
             template=self.credlybadge_template,
             event_type="org.openedx.learning.ccx.course.passing.status.updated.v1",
-            effect="award",
             description="Test description",
         )
         self.requirement2 = BadgeRequirement.objects.create(
             template=self.credlybadge_template,
             event_type="org.openedx.learning.ccx.course.passing.status.updated.v1",
-            effect="revoke",
             description="Test description",
         )
         self.requirement3 = BadgeRequirement.objects.create(
             template=self.credlybadge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
-            effect="award",
             description="Test description",
         )
 
@@ -107,6 +100,31 @@ class BadgeRequirementTestCase(TestCase):
         self.assertIn(self.requirement1, requirements)
         self.assertIn(self.requirement2, requirements)
         self.assertIn(self.requirement3, requirements)
+
+        
+class RequirementFulfillmentCheckTestCase(TestCase):
+    def setUp(self):
+        self.site = Site.objects.create(domain="test_domain", name="test_name")
+        self.badge_template1 = BadgeTemplate.objects.create(uuid=uuid.uuid4(), name="test_template1", state="draft", site=self.site)
+        self.badge_template2 = BadgeTemplate.objects.create(uuid=uuid.uuid4(), name="test_template2", state="draft", site=self.site)
+        self.badge_progress = BadgeProgress.objects.create(template=self.badge_template1, username='test1')
+        self.badge_requirement = BadgeRequirement.objects.create(template=self.badge_template1, event_type="org.openedx.learning.course.passing.status.updated.v1")
+        self.fulfillment = Fulfillment.objects.create(progress=self.badge_progress, requirement=self.badge_requirement)
+    
+    def test_fulfillment_check_success(self):
+        is_fulfilled = self.badge_requirement.is_fullfiled('test1')
+        self.assertTrue(is_fulfilled)
+    
+    def test_fulfillment_check_wrong_username(self):
+        is_fulfilled = self.badge_requirement.is_fullfiled('asd')
+        self.assertFalse(is_fulfilled)
+    
+    def test_fulfillment_check_wrong_template(self):
+        self.badge_progress.template = self.badge_template2
+        self.badge_requirement.save()
+        is_fulfilled = self.badge_requirement.is_fullfiled('test1')
+        self.assertTrue(is_fulfilled)
+        
 
 class BadgeTemplateUserProgressTestCase(TestCase):
     def setUp(self):
@@ -196,4 +214,3 @@ class BadgeTemplateRatioTestCase(TestCase):
         BadgeRequirement.objects.filter(template=self.badge_template).delete()
         with self.assertRaises(ValueError):
             self.badge_template.ratio
-        

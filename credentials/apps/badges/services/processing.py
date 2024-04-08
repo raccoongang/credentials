@@ -4,6 +4,8 @@ Main processing logic.
 
 from openedx_events.learning.data import CoursePassingStatusData
 
+from credentials.apps.core.api import get_or_create_user_from_event_data
+
 from ..models import CredlyBadgeTemplate
 from ..signals import BADGE_PROGRESS_COMPLETE, BADGE_PROGRESS_INCOMPLETE
 from ..services.requirements import discover_requirements
@@ -49,10 +51,11 @@ def process_event(sender, **kwargs):
     #   - BADGE_PROGRESS_INCOMPLETE emitted >> handle_badge_regression (possibly, we need a flag here)
 
     user_data = get_user_data(kwargs)
+    username = get_or_create_user_from_event_data(user_data)[0].username
     requirements = discover_requirements(sender)
 
     # faked: related to the BadgeRequirement template (in real processing):
-    badge_template_uuid = CredlyBadgeTemplate.objects.first().uuid
+    badge_template_id = CredlyBadgeTemplate.objects.first().id
 
 
     if (
@@ -62,7 +65,7 @@ def process_event(sender, **kwargs):
         BADGE_PROGRESS_COMPLETE.send(
             sender=sender,
             username=keypath(kwargs, "course_passing_status.user.pii.username"),
-            badge_template_uuid=badge_template_uuid,
+            badge_template_id=badge_template_id,
         )
 
     if (
@@ -72,5 +75,5 @@ def process_event(sender, **kwargs):
         BADGE_PROGRESS_INCOMPLETE.send(
             sender=sender,
             username=keypath(kwargs, "course_passing_status.user.pii.username"),
-            badge_template_uuid=badge_template_uuid,
+            badge_template_id=badge_template_id,
         )
