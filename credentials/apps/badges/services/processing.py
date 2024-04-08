@@ -8,7 +8,8 @@ from credentials.apps.core.api import get_or_create_user_from_event_data
 
 from ..models import CredlyBadgeTemplate
 from ..signals import BADGE_PROGRESS_COMPLETE, BADGE_PROGRESS_INCOMPLETE
-from ..services.requirements import discover_requirements
+from ..services.awarding import discover_requirements
+from ..services.revocation import discover_penalties
 from ..utils import keypath, get_user_data
 
 
@@ -53,6 +54,7 @@ def process_event(sender, **kwargs):
     user_data = get_user_data(kwargs)
     username = get_or_create_user_from_event_data(user_data)[0].username
     requirements = discover_requirements(sender)
+    penalties = discover_penalties(sender)
 
     # faked: related to the BadgeRequirement template (in real processing):
     badge_template_id = CredlyBadgeTemplate.objects.first().id
