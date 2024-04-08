@@ -12,7 +12,6 @@ from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
 
-
 from credentials.apps.badges.utils import is_datapath_valid
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
 
