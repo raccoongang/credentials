@@ -45,6 +45,45 @@ class CredlyOrganization(TimeStampedModel):
         return list(cls.objects.values_list("uuid", flat=True))
 
 
+class AbstractDataRule(models.Model):
+    """
+    Abstract DataRule configuration model.
+
+    .. no_req_or_pen: This model has no requirement or penalty.
+    """
+
+    OPERATORS = Choices(
+        ("eq", "="),
+        ("ne", "!="),
+        # ('lt', '<'),
+        # ('gt', '>'),
+    )
+
+    data_path = models.CharField(
+        max_length=255,
+        help_text=_(
+            'Public signal\'s data payload nested property path, e.g: "user.pii.username".'
+        ),
+        verbose_name=_("key path"),
+    )
+    operator = models.CharField(
+        max_length=32,
+        choices=OPERATORS,
+        default=OPERATORS.eq,
+        help_text=_(
+            "Expected value comparison operator. https://docs.python.org/3/library/operator.html"
+        ),
+    )
+    value = models.CharField(
+        max_length=255,
+        help_text=_('Expected value for the nested property, e.g: "cucumber1997".'),
+        verbose_name=_("expected value"),
+    )
+
+    class Meta:
+        abstract = True
+
+
 class BadgeTemplate(AbstractCredential):
     """
     Describes badge credential type.
@@ -175,44 +214,15 @@ class BadgeRequirement(models.Model):
         progress, _ = BadgeProgress.objects.get_or_create(template=self.template, username=username)
         return Fulfillment.objects.create(progress=progress, requirement=self)
 
-class DataRule(models.Model):
+class DataRule(AbstractDataRule):
     """
     Specifies expected data attribute value for event payload.
-
     NOTE: all data rules for a single requirement follow "AND" processing logic.
     """
-
-    OPERATORS = Choices(
-        ("eq", "="),
-        ("ne", "!="),
-        # ('lt', '<'),
-        # ('gt', '>'),
-    )
-
     requirement = models.ForeignKey(
         BadgeRequirement,
         on_delete=models.CASCADE,
         help_text=_("Parent requirement for this data rule."),
-    )
-    data_path = models.CharField(
-        max_length=255,
-        help_text=_(
-            'Public signal\'s data payload nested property path, e.g: "user.pii.username".'
-        ),
-        verbose_name=_("key path"),
-    )
-    operator = models.CharField(
-        max_length=32,
-        choices=OPERATORS,
-        default=OPERATORS.eq,
-        help_text=_(
-            "Expected value comparison operator. https://docs.python.org/3/library/operator.html"
-        ),
-    )
-    value = models.CharField(
-        max_length=255,
-        help_text=_('Expected value for the nested property, e.g: "cucumber1997".'),
-        verbose_name=_("expected value"),
     )
 
     class Meta:
@@ -230,6 +240,56 @@ class DataRule(models.Model):
             super().save(*args, **kwargs)
         else:
             raise ValidationError("Cannot update DataRule for active BadgeTemplate")
+
+
+class BadgePenalty(models.Model):
+    """
+    Describes badge regression rules for particular BadgeRequirement.
+    """
+    
+    template = models.ForeignKey(
+        BadgeTemplate,
+        on_delete=models.CASCADE,
+        help_text=_("Badge template this penalty serves for."),
+    )
+    requirements = models.ManyToManyField(
+        BadgeRequirement,
+        help_text=_("Badge requirements for which this penalty is defined."),
+    )
+    description = models.TextField(
+        null=True, blank=True, help_text=_("Provide more details if needed.")
+    )
+
+    def __str__(self):
+        return f"BadgePenalty:{self.id}:{self.template.uuid}"
+
+    class Meta:
+        verbose_name_plural = "Badge penalties"
+
+
+class PenaltyDataRule(AbstractDataRule):
+    """
+    Specifies expected data attribute value for penalty rule.
+    NOTE: all data rules for a single penalty follow "AND" processing logic.
+    """
+    penalty = models.ForeignKey(
+        BadgePenalty,
+        on_delete=models.CASCADE,
+        help_text=_("Parent penalty for this data rule."),
+    )
+    
+    def save(self, *args, **kwargs):
+        # Check if the related BadgeTemplate is active
+        if not self.penalty.template.is_active:
+            super().save(*args, **kwargs)
+        else:
+            raise ValidationError("Cannot update PenaltyDataRule for active BadgeTemplate")
+
+    def __str__(self):
+        return f"{self.penalty.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
+
+    class Meta:
+        unique_together = ("penalty", "data_path", "operator", "value")
 
 
 class BadgeProgress(models.Model):
