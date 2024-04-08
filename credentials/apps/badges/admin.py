@@ -107,6 +107,9 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         BadgeRequirementInline,
     ]
 
+    def has_add_permission(self, request):
+        return False
+
     def dashboard_link(self, obj):
         url = obj.management_url
         return format_html("<a href='{url}'>{url}</a>", url=url)
@@ -132,7 +135,6 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         "id",
         "template",
         "event_type",
-        "effect",
     ]
     list_display_links = (
         "id",
@@ -141,9 +143,19 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
     list_filter = [
         "template",
         "event_type",
-        "effect",
     ]
     form = BadgeRequirementForm
+
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj and obj.template.is_active:
+            readonly_fields.extend([
+                "template",
+                "event_type",
+                "description",
+            ])
+        return readonly_fields
 
 
 class BadgeProgressAdmin(admin.ModelAdmin):

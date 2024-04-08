@@ -4,6 +4,7 @@ Badges DB models.
 
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -12,6 +13,7 @@ from model_utils import Choices
 from model_utils.fields import StatusField
 
 
+from credentials.apps.badges.utils import is_datapath_valid
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
 
 
@@ -114,7 +116,7 @@ class BadgeRequirement(models.Model):
             To achieve "OR" processing logic for 2 requirement one must group them (put identical group ID).
     """
 
-    EFFECTS = Choices("award", "revoke")
+    EVENT_TYPES = Choices(*settings.BADGES_CONFIG['events'])
 
     template = models.ForeignKey(
         BadgeTemplate,
@@ -123,15 +125,10 @@ class BadgeRequirement(models.Model):
     )
     event_type = models.CharField(
         max_length=255,
+        choices=EVENT_TYPES,
         help_text=_(
             'Public signal type. Use namespaced types, e.g: "org.openedx.learning.student.registration.completed.v1"'
         ),
-    )
-    effect = models.CharField(
-        max_length=32,
-        choices=EFFECTS,
-        default=EFFECTS.award,
-        help_text=_("Defines how this requirement contributes to badge earning."),
     )
     description = models.TextField(
         null=True, blank=True, help_text=_("Provide more details if needed.")
@@ -139,6 +136,16 @@ class BadgeRequirement(models.Model):
 
     def __str__(self):
         return f"BadgeRequirement:{self.id}:{self.template.uuid}"
+    
+    def save(self, *args, **kwargs):
+        # Check if the related BadgeTemplate is active
+        if not self.template.is_active:
+            super().save(*args, **kwargs)
+        else:
+            raise ValidationError("Cannot update BadgeRequirement for active BadgeTemplate")
+    
+    def is_fullfiled(self, username: str) -> bool:
+        return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
 
 
 class DataRule(models.Model):
@@ -150,7 +157,7 @@ class DataRule(models.Model):
 
     OPERATORS = Choices(
         ("eq", "="),
-        # ("ne", "!="),
+        ("ne", "!="),
         # ('lt', '<'),
         # ('gt', '>'),
     )
@@ -181,8 +188,21 @@ class DataRule(models.Model):
         verbose_name=_("expected value"),
     )
 
+    class Meta:
+        unique_together = ("requirement", "data_path", "operator", "value")
+
     def __str__(self):
         return f"{self.requirement.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
+    
+    def save(self, *args, **kwargs):
+        if not is_datapath_valid(self.data_path, self.requirement.event_type):
+            raise ValidationError("Invalid data path for event type")
+
+        # Check if the related BadgeTemplate is active
+        if not self.requirement.template.is_active:
+            super().save(*args, **kwargs)
+        else:
+            raise ValidationError("Cannot update DataRule for active BadgeTemplate")
 
 
 class BadgeProgress(models.Model):
