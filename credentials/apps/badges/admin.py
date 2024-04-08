@@ -8,7 +8,7 @@ from django.core.management import call_command
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .admin_forms import CredlyOrganizationAdminForm
+from .admin_forms import BadgePenaltyForm, CredlyOrganizationAdminForm
 from .models import (
     BadgePenalty,
     BadgeProgress,
@@ -28,16 +28,13 @@ class BadgeRequirementInline(admin.TabularInline):
     show_change_link = True
     extra = 0
 
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = list(super().get_readonly_fields(request, obj))
-        if obj and obj.is_active:
-            readonly_fields.extend([
-                "template",
-                "event_type",
-                "effect",
-                "description",
-            ])
-        return readonly_fields
+
+class BadgePenaltyInline(admin.TabularInline):
+    model = BadgePenalty
+    show_change_link = True
+    extra = 0
+    form = BadgePenaltyForm
+
 
 class FulfillmentInline(admin.TabularInline):
     model = Fulfillment
@@ -52,16 +49,6 @@ class DataRuleInline(admin.TabularInline):
         "operator",
         "value",
     ]
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = list(super().get_readonly_fields(request, obj))
-        if obj and obj.template.is_active:
-            readonly_fields.extend([
-                "data_path",
-                "operator",
-                "value",
-            ])
-        return readonly_fields
 
 
 class CredlyOrganizationAdmin(admin.ModelAdmin):
@@ -130,6 +117,7 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
     ]
     inlines = [
         BadgeRequirementInline,
+        BadgePenaltyInline,
     ]
 
     def has_add_permission(self, request):
@@ -158,13 +146,37 @@ class DataRulePenaltyInline(admin.TabularInline):
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = list(super().get_readonly_fields(request, obj))
-        if obj and obj.requirement.template.is_active:
+        if obj and obj.template.is_active:
             readonly_fields.extend([
                 "data_path",
                 "operator",
                 "value",
             ])
         return readonly_fields
+
+
+class BadgeRequirementAdmin(admin.ModelAdmin):
+    """
+    Badge template requirement admin setup.
+    """
+
+    inlines = [
+        DataRuleInline,
+    ]
+
+    list_display = [
+        "id",
+        "template",
+        "event_type",
+    ]
+    list_display_links = (
+        "id",
+        "template",
+    )
+    list_filter = [
+        "template",
+        "event_type",
+    ]
 
 
 class BadgePenaltyAdmin(admin.ModelAdmin):
@@ -177,59 +189,7 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
 
     list_display = [
         "id",
-        "requirement",
-    ]
-    list_display_links = (
-        "id",
-        "requirement",
-    )
-    list_filter = [
-        "requirement",
-        "description",
-    ]
-
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = list(super().get_readonly_fields(request, obj))
-        if obj and obj.requirement.template.is_active:
-            readonly_fields.extend([
-                "requirement",
-            ])
-        return readonly_fields
-
-
-class BadgePenaltyInline(admin.TabularInline):
-    model = BadgePenalty
-    extra = 0
-    fields = [
-        "effect",
-        "description",
-    ]
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = list(super().get_readonly_fields(request, obj))
-        if obj and obj.template.is_active:
-            readonly_fields.extend([
-                "effect",
-                "description",
-            ])
-        return readonly_fields
-
-
-class BadgeRequirementAdmin(admin.ModelAdmin):
-    """
-    Badge template requirement admin setup.
-    """
-
-    inlines = [
-        DataRuleInline,
-        BadgePenaltyInline,
-    ]
-
-    list_display = [
-        "id",
         "template",
-        "event_type",
     ]
     list_display_links = (
         "id",
@@ -237,18 +197,21 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
     )
     list_filter = [
         "template",
-        "event_type",
+        "requirements",
     ]
+    fields = (
+        "template",
+        "description",
+        "requirements",
+    )
+    form = BadgePenaltyForm
 
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = list(super().get_readonly_fields(request, obj))
         if obj and obj.template.is_active:
             readonly_fields.extend([
-                "template",
-                "event_type",
-                "effect",
-                "description",
+                "requirements",
             ])
         return readonly_fields
 
