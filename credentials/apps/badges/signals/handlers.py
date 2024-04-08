@@ -9,9 +9,8 @@ import logging
 from django.dispatch import receiver
 from openedx_events.tooling import OpenEdxPublicSignal, load_all_signals
 
-from ..services.awarding import notify_badge_awarded
 from ..services.processing import process_event
-from ..services.revocation import notify_badge_revoked
+from ..services.issuers import CredlyBadgeTemplateIssuer
 from ..utils import get_badging_event_types
 from .signals import BADGE_PROGRESS_COMPLETE, BADGE_PROGRESS_INCOMPLETE
 
@@ -43,7 +42,7 @@ def handle_badging_event(sender, signal, **kwargs):
 
 
 @receiver(BADGE_PROGRESS_COMPLETE)
-def handle_badge_completion(sender, username, badge_template_uuid, **kwargs):  # pylint: disable=unused-argument
+def handle_badge_completion(sender, username, badge_template_id, **kwargs):  # pylint: disable=unused-argument
     """
     On user's Badge completion.
 
@@ -51,13 +50,14 @@ def handle_badge_completion(sender, username, badge_template_uuid, **kwargs):  #
     - badge template ID
     """
 
-    # TODO: issue UserCredential
-    # TODO: ussue Credly badge
-    notify_badge_awarded(username, badge_template_uuid)
+    CredlyBadgeTemplateIssuer().award(
+        badge_template_id,
+        username
+    )
 
 
 @receiver(BADGE_PROGRESS_INCOMPLETE)
-def handle_badge_regression(sender, username, badge_template_uuid, **kwargs):  # pylint: disable=unused-argument
+def handle_badge_regression(sender, username, badge_template_id, **kwargs):  # pylint: disable=unused-argument
     """
     On user's Badge regression (incompletion).
 
@@ -65,6 +65,7 @@ def handle_badge_regression(sender, username, badge_template_uuid, **kwargs):  #
     - badge template ID
     """
 
-    # TODO: change UserCredential's status to revoked
-    # TODO: revoke Credly badge
-    notify_badge_revoked(username, badge_template_uuid)
+    CredlyBadgeTemplateIssuer().revoke(
+        badge_template_id,
+        username,
+    )

@@ -12,7 +12,7 @@ from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
 
-
+from credentials.apps.badges.utils import is_datapath_valid
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
 
 
@@ -181,6 +181,9 @@ class BadgeRequirement(models.Model):
             super().save(*args, **kwargs)
         else:
             raise ValidationError("Cannot update BadgeRequirement for active BadgeTemplate")
+    
+    def is_fullfiled(self, username: str) -> bool:
+        return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
 
 
 class DataRule(AbstractDataRule):
@@ -201,6 +204,9 @@ class DataRule(AbstractDataRule):
         return f"{self.requirement.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
     
     def save(self, *args, **kwargs):
+        if not is_datapath_valid(self.data_path, self.requirement.event_type):
+            raise ValidationError("Invalid data path for event type")
+
         # Check if the related BadgeTemplate is active
         if not self.requirement.template.is_active:
             super().save(*args, **kwargs)

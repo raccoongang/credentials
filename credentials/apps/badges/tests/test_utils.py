@@ -4,7 +4,7 @@ from attr import asdict
 
 from openedx_events.learning.data import UserData, UserPersonalData, CourseData, CoursePassingStatusData
 
-from ..utils import keypath, get_user_data
+from ..utils import keypath, get_user_data, is_datapath_valid
 
 
 class TestKeypath(unittest.TestCase):
@@ -39,6 +39,19 @@ class TestKeypath(unittest.TestCase):
         }
         result = keypath(payload, "course.id")
         self.assertIsNone(result)
+
+
+class TestKeypathCheck(unittest.TestCase):
+    def setUp(self):
+        self.event_type = "org.openedx.learning.course.passing.status.updated.v1"
+
+    def test_datapath_valid_success(self):
+        is_valid = is_datapath_valid("course_passing_status.user.pii.username", self.event_type)
+        self.assertTrue(is_valid)
+    
+    def test_datapath_valid_failure(self):
+        is_valid = is_datapath_valid("course_passing_status.user.username", self.event_type)
+        self.assertFalse(is_valid)
 
 
 class TestGetUserData(unittest.TestCase):

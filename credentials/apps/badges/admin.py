@@ -35,7 +35,7 @@ class BadgePenaltyInline(admin.TabularInline):
     extra = 0
     form = BadgePenaltyForm
 
-
+    
 class FulfillmentInline(admin.TabularInline):
     model = Fulfillment
     extra = 0
@@ -185,11 +185,6 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
         "template",
         "requirements",
     ]
-    fields = (
-        "template",
-        "description",
-        "requirements",
-    )
     form = BadgePenaltyForm
 
 
