@@ -28,13 +28,13 @@ class DataRulesTestCase(TestCase):
     def test_multiple_data_rules_for_requirement(self):
         data_rule1 = DataRule.objects.create(
             requirement=self.requirement,
-            data_path="user.pii.username",
+            data_path="course_passing_status.user.pii.username",
             operator="eq",
             value="cucumber1997",
         )
         data_rule2 = DataRule.objects.create(
             requirement=self.requirement,
-            data_path="user.pii.email",
+            data_path="course_passing_status.user.pii.email",
             operator="eq",
             value="test@example.com",
         )
@@ -199,18 +199,19 @@ class BadgeTemplateRatioTestCase(TestCase):
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
         )
+        self.progress = BadgeProgress.objects.create(username="test_user", template=self.badge_template)
+
+    def test_ratio_no_fulfillments(self):
+        self.assertEqual(self.progress.ratio, 0.0)
 
     def test_ratio_success(self):
         Fulfillment.objects.create(
-            progress=BadgeProgress.objects.create(username="test_user", template=self.badge_template),
+            progress=self.progress,
             requirement=self.requirement1,
         )
-        self.assertEqual(self.badge_template.ratio, 1.0)
-    
-    def test_ratio_no_fulfillments(self):
-        self.assertEqual(self.badge_template.ratio, 0.0)
+        self.assertEqual(self.progress.ratio, 1.0)
 
     def test_ratio_no_requirements(self):
         BadgeRequirement.objects.filter(template=self.badge_template).delete()
         with self.assertRaises(ValueError):
-            self.badge_template.ratio
+            self.progress.ratio

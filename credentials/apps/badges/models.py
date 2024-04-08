@@ -100,18 +100,6 @@ class BadgeTemplate(AbstractCredential):
         Check if user completed badge template.
         """
         return self.user_progress(username) == 1.0
-    
-    @property
-    def ratio(self) -> float:
-        """
-        Calculate badge template progress ratio.
-        """
-        requirements_count = BadgeRequirement.objects.filter(template=self).count()
-        if requirements_count == 0:
-            raise ValueError("No requirements found for badge template")
-
-        fulfilled_requirements_count = Fulfillment.objects.filter(requirement__template=self).count()
-        return fulfilled_requirements_count / requirements_count
 
 
 class CredlyBadgeTemplate(BadgeTemplate):
@@ -259,6 +247,18 @@ class BadgeProgress(models.Model):
 
     def __str__(self):
         return f"BadgeProgress:{self.username}"
+    
+    @property
+    def ratio(self) -> float:
+        """
+        Calculate badge template progress ratio.
+        """
+        requirements_count = BadgeRequirement.objects.filter(template=self.template).count()
+        if requirements_count == 0:
+            raise ValueError("No requirements found for badge template")
+
+        fulfilled_requirements_count = Fulfillment.objects.filter(progress=self, requirement__template=self.template).count()
+        return fulfilled_requirements_count / requirements_count
 
 
 class Fulfillment(models.Model):
