@@ -94,6 +94,30 @@ class BadgeRequirementTestCase(TestCase):
         self.assertIn(self.requirement3, requirements)
 
 
+class RequirementFulfillmentResetTestCase(TestCase):
+    def setUp(self):
+        self.site = Site.objects.create(domain="test_domain", name="test_name")
+        self.badge_template = BadgeTemplate.objects.create(uuid=uuid.uuid4(), name="test_template1", state="draft", site=self.site)
+        self.badge_progress = BadgeProgress.objects.create(template=self.badge_template, username='test1')
+        self.badge_requirement = BadgeRequirement.objects.create(template=self.badge_template, event_type="org.openedx.learning.course.passing.status.updated.v1")
+        Fulfillment.objects.create(progress=self.badge_progress, requirement=self.badge_requirement)
+    
+    def test_fulfillment_reset_wrong_username(self):
+        self.badge_requirement.reset('asd')
+        fulfillment = Fulfillment.objects.filter(progress__username='test1').exists()
+        self.assertTrue(fulfillment)
+
+    def test_fulfillment_reset_success(self):
+        self.badge_requirement.reset('test1')
+        fulfillment = Fulfillment.objects.filter(progress__username='test1').exists()
+        self.assertFalse(fulfillment)
+
+    def test_fulfillment_full_reset_success(self):
+        self.badge_progress.reset()
+        fulfillment = Fulfillment.objects.filter(progress__username='test1').exists()
+        self.assertFalse(fulfillment)
+
+        
 class RequirementFulfillmentCheckTestCase(TestCase):
     def setUp(self):
         self.site = Site.objects.create(domain="test_domain", name="test_name")
