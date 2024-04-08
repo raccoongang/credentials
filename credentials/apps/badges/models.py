@@ -235,10 +235,9 @@ class BadgeProgress(models.Model):
 
     def __str__(self):
         return f"BadgeProgress:{self.username}"
-    
-    @staticmethod
-    def reset(username: str):
-        Fulfillment.objects.filter(progress__username=username).delete()
+
+    def reset(self):
+        Fulfillment.objects.filter(progress=self).delete()
 
 
 class Fulfillment(models.Model):

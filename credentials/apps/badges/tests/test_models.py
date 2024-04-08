@@ -118,15 +118,8 @@ class RequirementFulfillmentResetTestCase(TestCase):
         self.badge_requirement.reset('test1')
         fulfillment = Fulfillment.objects.filter(progress__username='test1').exists()
         self.assertFalse(fulfillment)
-    
-    def test_fulfillment_full_reset_wrong_username(self):
-        Fulfillment.objects.create(progress=self.badge_progress, requirement=self.badge_requirement)
-
-        BadgeProgress.reset('test2')
-        fulfillment = Fulfillment.objects.filter(progress__username='test1').exists()
-        self.assertTrue(fulfillment)
 
     def test_fulfillment_full_reset_success(self):
-        BadgeProgress.reset('test1')
+        self.badge_progress.reset()
         fulfillment = Fulfillment.objects.filter(progress__username='test1').exists()
         self.assertFalse(fulfillment)
