@@ -8,7 +8,8 @@ from django.core.management import call_command
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .admin_forms import BadgePenaltyForm, CredlyOrganizationAdminForm, PenaltyDataRuleForm
+from .admin_forms import BadgePenaltyForm, BadgeRequirementForm, CredlyOrganizationAdminForm, DataRuleForm, PenaltyDataRuleForm
+
 from .models import (
     BadgePenalty,
     BadgeProgress,
@@ -27,6 +28,7 @@ class BadgeRequirementInline(admin.TabularInline):
     model = BadgeRequirement
     show_change_link = True
     extra = 0
+    form = BadgeRequirementForm
 
 
 class BadgePenaltyInline(admin.TabularInline):
@@ -44,11 +46,7 @@ class FulfillmentInline(admin.TabularInline):
 class DataRuleInline(admin.TabularInline):
     model = DataRule
     extra = 0
-    fields = [
-        "data_path",
-        "operator",
-        "value",
-    ]
+    form = DataRuleForm
 
 
 class CredlyOrganizationAdmin(admin.ModelAdmin):
@@ -163,6 +161,7 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         "template",
         "event_type",
     ]
+    form = BadgeRequirementForm
 
 
 class BadgePenaltyAdmin(admin.ModelAdmin):
