@@ -3,10 +3,12 @@ Revocation pipeline - badge regression.
 """
 import uuid
 
+from typing import List
+
 from openedx_events.learning.data import BadgeData, BadgeTemplateData, UserData, UserPersonalData
 from openedx_events.learning.signals import BADGE_REVOKED
 
-from ..models import CredlyBadgeTemplate
+from ..models import BadgePenalty, CredlyBadgeTemplate
 
 
 def notify_badge_revoked(username, badge_template_uuid):  # pylint: disable=unused-argument
@@ -41,3 +43,6 @@ def notify_badge_revoked(username, badge_template_uuid):  # pylint: disable=unus
     )
 
     BADGE_REVOKED.send_event(badge=badge_data)
+
+def discover_penalties(event_type: str) -> List[BadgePenalty]:
+    return BadgePenalty.objects.filter(event_type=event_type)
