@@ -84,15 +84,18 @@ class BadgeTemplate(AbstractCredential):
     def by_uuid(cls, template_uuid):
         return cls.objects.filter(uuid=template_uuid, origin=cls.ORIGIN).first()
     
-    def user_progress(username: str) -> float:
+    def user_progress(self, username: str) -> float:
         """
         Calculate user progress for badge template.
         """
-        requirements_count = BadgeRequirement.filter(template=self).count()
-        fulfilled_requirements_count = Fulfillment.filter(progress__username=username, requirement__template=self).count()
+        requirements_count = BadgeRequirement.objects.filter(template=self).count()
+        if requirements_count == 0:
+            raise ValueError("No requirements found for badge template")
+
+        fulfilled_requirements_count = Fulfillment.objects.filter(progress__username=username, requirement__template=self).count()
         return fulfilled_requirements_count / requirements_count
     
-    def user_completion(username: str) -> bool:
+    def user_completion(self, username: str) -> bool:
         """
         Check if user completed badge template.
         """
@@ -103,8 +106,11 @@ class BadgeTemplate(AbstractCredential):
         """
         Calculate badge template progress ratio.
         """
-        requirements_count = BadgeRequirement.filter(template=self).count()
-        fulfilled_requirements_count = Fulfillment.filter(requirement__template=self).count()
+        requirements_count = BadgeRequirement.objects.filter(template=self).count()
+        if requirements_count == 0:
+            raise ValueError("No requirements found for badge template")
+
+        fulfilled_requirements_count = Fulfillment.objects.filter(requirement__template=self).count()
         return fulfilled_requirements_count / requirements_count
 
 
