@@ -8,7 +8,7 @@ from django.core.management import call_command
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .admin_forms import CredlyOrganizationAdminForm
+from .admin_forms import CredlyOrganizationAdminForm, BadgeRequirementForm, DataRuleForm
 from .models import (
     BadgeProgress,
     BadgeRequirement,
@@ -25,17 +25,7 @@ class BadgeRequirementInline(admin.TabularInline):
     model = BadgeRequirement
     show_change_link = True
     extra = 0
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = list(super().get_readonly_fields(request, obj))
-        if obj and obj.is_active:
-            readonly_fields.extend([
-                "template",
-                "event_type",
-                "effect",
-                "description",
-            ])
-        return readonly_fields
+    form = BadgeRequirementForm
 
 class FulfillmentInline(admin.TabularInline):
     model = Fulfillment
@@ -46,21 +36,7 @@ class DataRuleInline(admin.TabularInline):
     model = DataRule
     extra = 0
     readonly_fields = ("operator",)
-    fields = [
-        "data_path",
-        "operator",
-        "value",
-    ]
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = list(super().get_readonly_fields(request, obj))
-        if obj and obj.template.is_active:
-            readonly_fields.extend([
-                "data_path",
-                "operator",
-                "value",
-            ])
-        return readonly_fields
+    form = DataRuleForm
 
 
 class CredlyOrganizationAdmin(admin.ModelAdmin):
@@ -167,18 +143,7 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         "event_type",
         "effect",
     ]
-
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = list(super().get_readonly_fields(request, obj))
-        if obj and obj.template.is_active:
-            readonly_fields.extend([
-                "template",
-                "event_type",
-                "effect",
-                "description",
-            ])
-        return readonly_fields
+    form = BadgeRequirementForm
 
 
 class BadgeProgressAdmin(admin.ModelAdmin):
