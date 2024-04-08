@@ -367,3 +367,7 @@ class CredlyBadge(UserCredential):
         help_text=_("Credly badge issuing state"),
         default=STATES.created,
     )
+
+    @property
+    def is_issued(self):
+        return self.uuid and (self.state in ["pending", "accepted", "rejected"])
