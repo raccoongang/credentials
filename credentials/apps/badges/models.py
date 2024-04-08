@@ -92,8 +92,10 @@ class BadgeTemplate(AbstractCredential):
         if requirements_count == 0:
             raise ValueError("No requirements found for badge template")
 
-        fulfilled_requirements_count = Fulfillment.objects.filter(progress__username=username, requirement__template=self).count()
-        return fulfilled_requirements_count / requirements_count
+        progress = BadgeProgress.objects.filter(username=username, template=self).first()
+        if progress is None:
+            raise ValueError("No progress found for badge template")
+        return progress.ratio
     
     def user_completion(self, username: str) -> bool:
         """
@@ -264,7 +266,9 @@ class BadgeProgress(models.Model):
             raise ValueError("No requirements found for badge template")
 
         fulfilled_requirements_count = Fulfillment.objects.filter(progress=self, requirement__template=self.template).count()
-        return fulfilled_requirements_count / requirements_count
+        if fulfilled_requirements_count == 0:
+            raise ValueError("No fulfilled requirements found for badge template")
+        return round(fulfilled_requirements_count / requirements_count, 2)
 
     def reset(self):
         Fulfillment.objects.filter(progress=self).delete()

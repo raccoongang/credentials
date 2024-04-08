@@ -160,17 +160,23 @@ class BadgeTemplateUserProgressTestCase(TestCase):
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
         )
+        self.requirement3 = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type="org.openedx.learning.ccx.course.passing.status.updated.v1",
+            description="Test description",
+        )
 
     def test_user_progress_success(self):
         Fulfillment.objects.create(
             progress=BadgeProgress.objects.create(username="test_user", template=self.badge_template),
             requirement=self.requirement1,
         )
-        self.assertEqual(self.badge_template.user_progress("test_user"), 0.5)
+        self.assertEqual(self.badge_template.user_progress("test_user"), 0.33)
     
     def test_user_progress_no_fulfillments(self):
         Fulfillment.objects.filter(progress__template=self.badge_template).delete()
-        self.assertEqual(self.badge_template.user_progress("test_user"), 0.0)
+        with self.assertRaises(ValueError):
+            self.badge_template.user_progress("test_user")
     
     def test_user_progress_no_requirements(self):
         BadgeRequirement.objects.filter(template=self.badge_template).delete()
@@ -198,7 +204,8 @@ class BadgeTemplateUserCompletionTestCase(TestCase):
         self.assertTrue(self.badge_template.user_completion("test_user"))
 
     def test_user_completion_failure(self):
-        self.assertFalse(self.badge_template.user_completion("test_usfer"))
+        with self.assertRaises(ValueError):
+            self.badge_template.user_completion("test_duser")
 
     def test_user_completion_no_requirements(self):
         BadgeRequirement.objects.filter(template=self.badge_template).delete()
@@ -217,17 +224,23 @@ class BadgeTemplateRatioTestCase(TestCase):
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
         )
+        self.requirement2 = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type="org.openedx.learning.course.passing.status.updated.v1",
+            description="Test description",
+        )
         self.progress = BadgeProgress.objects.create(username="test_user", template=self.badge_template)
 
     def test_ratio_no_fulfillments(self):
-        self.assertEqual(self.progress.ratio, 0.0)
+        with self.assertRaises(ValueError):
+            self.progress.ratio
 
     def test_ratio_success(self):
         Fulfillment.objects.create(
             progress=self.progress,
             requirement=self.requirement1,
         )
-        self.assertEqual(self.progress.ratio, 1.0)
+        self.assertEqual(self.progress.ratio, 0.50)
 
     def test_ratio_no_requirements(self):
         BadgeRequirement.objects.filter(template=self.badge_template).delete()
