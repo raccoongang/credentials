@@ -159,10 +159,16 @@ class BadgeRequirement(models.Model):
             super().save(*args, **kwargs)
         else:
             raise ValidationError("Cannot update BadgeRequirement for active BadgeTemplate")
-    
+
+    def reset(self, username: str):
+        Fulfillment.objects.filter(requirement=self, progress__username=username, progress__template=self.template).delete()
+
     def is_fullfiled(self, username: str) -> bool:
         return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
 
+    def fulfill(self, username: str):
+        progress, _ = BadgeProgress.objects.get_or_create(template=self.template, username=username)
+        return Fulfillment.objects.create(progress=progress, requirement=self)
 
 class DataRule(models.Model):
     """
@@ -259,6 +265,9 @@ class BadgeProgress(models.Model):
 
         fulfilled_requirements_count = Fulfillment.objects.filter(progress=self, requirement__template=self.template).count()
         return fulfilled_requirements_count / requirements_count
+
+    def reset(self):
+        Fulfillment.objects.filter(progress=self).delete()
 
 
 class Fulfillment(models.Model):

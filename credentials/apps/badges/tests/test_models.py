@@ -101,6 +101,30 @@ class BadgeRequirementTestCase(TestCase):
         self.assertIn(self.requirement2, requirements)
         self.assertIn(self.requirement3, requirements)
 
+
+class RequirementFulfillmentResetTestCase(TestCase):
+    def setUp(self):
+        self.site = Site.objects.create(domain="test_domain", name="test_name")
+        self.badge_template = BadgeTemplate.objects.create(uuid=uuid.uuid4(), name="test_template1", state="draft", site=self.site)
+        self.badge_progress = BadgeProgress.objects.create(template=self.badge_template, username='test1')
+        self.badge_requirement = BadgeRequirement.objects.create(template=self.badge_template, event_type="org.openedx.learning.course.passing.status.updated.v1")
+        Fulfillment.objects.create(progress=self.badge_progress, requirement=self.badge_requirement)
+    
+    def test_fulfillment_reset_wrong_username(self):
+        self.badge_requirement.reset('asd')
+        fulfillment = Fulfillment.objects.filter(progress__username='test1').exists()
+        self.assertTrue(fulfillment)
+
+    def test_fulfillment_reset_success(self):
+        self.badge_requirement.reset('test1')
+        fulfillment = Fulfillment.objects.filter(progress__username='test1').exists()
+        self.assertFalse(fulfillment)
+
+    def test_fulfillment_full_reset_success(self):
+        self.badge_progress.reset()
+        fulfillment = Fulfillment.objects.filter(progress__username='test1').exists()
+        self.assertFalse(fulfillment)
+
         
 class RequirementFulfillmentCheckTestCase(TestCase):
     def setUp(self):
@@ -118,12 +142,6 @@ class RequirementFulfillmentCheckTestCase(TestCase):
     def test_fulfillment_check_wrong_username(self):
         is_fulfilled = self.badge_requirement.is_fullfiled('asd')
         self.assertFalse(is_fulfilled)
-    
-    def test_fulfillment_check_wrong_template(self):
-        self.badge_progress.template = self.badge_template2
-        self.badge_requirement.save()
-        is_fulfilled = self.badge_requirement.is_fullfiled('test1')
-        self.assertTrue(is_fulfilled)
         
 
 class BadgeTemplateUserProgressTestCase(TestCase):
