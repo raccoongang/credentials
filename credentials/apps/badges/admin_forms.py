@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .credly.api_client import CredlyAPIClient
 from .credly.exceptions import CredlyAPIError
-from .models import CredlyOrganization
+from .models import CredlyOrganization, DataRule, BadgeRequirement
 
 
 class CredlyOrganizationAdminForm(forms.ModelForm):
@@ -58,3 +58,29 @@ class CredlyOrganizationAdminForm(forms.ModelForm):
                 self.api_data = org_data
         except CredlyAPIError as err:
             raise forms.ValidationError(message=str(err))
+
+
+class BadgeRequirementForm(forms.ModelForm):
+    class Meta:
+        model = BadgeRequirement
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and hasattr(self.instance, 'template') and self.instance.template.is_active:
+            for field_name in self.fields:
+                if field_name in ("template", "event_type", "description"):
+                    self.fields[field_name].disabled = True
+
+
+class DataRuleForm(forms.ModelForm):
+    class Meta:
+        model = DataRule
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and hasattr(self.instance, 'requirement') and self.instance.requirement.template.is_active:
+            for field_name in self.fields:
+                if field_name in ("data_path", "operator", "value"):
+                    self.fields[field_name].disabled = True
