@@ -11,8 +11,10 @@ from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
+from openedx_events.learning.data import BadgeData, BadgeTemplateData, UserData, UserPersonalData
 
 from credentials.apps.badges.utils import is_datapath_valid
+from credentials.apps.core.api import get_user_by_username
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
 
 
@@ -367,3 +369,27 @@ class CredlyBadge(UserCredential):
         help_text=_("Credly badge issuing state"),
         default=STATES.created,
     )
+
+    def as_badge_data(self, badge_template: CredlyBadgeTemplate) -> BadgeData:
+        user = get_user_by_username(self.username)
+
+        badge_data = BadgeData(
+            uuid=str(uuid.uuid4()),
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.username,
+                    email=user.email,
+                    name=user.name,
+                ),
+                id=user.lms_id,
+                is_active=user.is_active,
+            ),
+            template=BadgeTemplateData(
+                uuid=str(badge_template.uuid),
+                origin=badge_template.origin,
+                name=badge_template.name,
+                description=badge_template.description,
+                image_url=str(badge_template.icon),
+            )
+        )
+        return badge_data
