@@ -6,7 +6,7 @@ coverage:
         target: auto
     project:
       default:
-        target: auto
+        target: 95
 ignore:
   - credentials/settings/production.py
   - credentials/settings/devstack.py
