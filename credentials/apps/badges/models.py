@@ -21,12 +21,8 @@ class CredlyOrganization(TimeStampedModel):
     Credly Organization configuration.
     """
 
-    uuid = models.UUIDField(
-        unique=True, help_text=_("Put your Credly Organization ID here.")
-    )
-    api_key = models.CharField(
-        max_length=255, help_text=_("Credly API shared secret for Credly Organization.")
-    )
+    uuid = models.UUIDField(unique=True, help_text=_("Put your Credly Organization ID here."))
+    api_key = models.CharField(max_length=255, help_text=_("Credly API shared secret for Credly Organization."))
     name = models.CharField(
         max_length=255,
         null=True,
@@ -61,18 +57,14 @@ class AbstractDataRule(models.Model):
 
     data_path = models.CharField(
         max_length=255,
-        help_text=_(
-            'Public signal\'s data payload nested property path, e.g: "user.pii.username".'
-        ),
+        help_text=_('Public signal\'s data payload nested property path, e.g: "user.pii.username".'),
         verbose_name=_("key path"),
     )
     operator = models.CharField(
         max_length=32,
         choices=OPERATORS,
         default=OPERATORS.eq,
-        help_text=_(
-            "Expected value comparison operator. https://docs.python.org/3/library/operator.html"
-        ),
+        help_text=_("Expected value comparison operator. https://docs.python.org/3/library/operator.html"),
     )
     value = models.CharField(
         max_length=255,
@@ -93,17 +85,11 @@ class BadgeTemplate(AbstractCredential):
 
     STATES = Choices("draft", "active", "archived")
 
-    uuid = models.UUIDField(
-        unique=True, default=uuid.uuid4, help_text=_("Unique badge template ID.")
-    )
+    uuid = models.UUIDField(unique=True, default=uuid.uuid4, help_text=_("Unique badge template ID."))
     name = models.CharField(max_length=255, help_text=_("Badge template name."))
-    description = models.TextField(
-        null=True, blank=True, help_text=_("Badge template description.")
-    )
+    description = models.TextField(null=True, blank=True, help_text=_("Badge template description."))
     icon = models.ImageField(upload_to="badge_templates/icons", null=True, blank=True)
-    origin = models.CharField(
-        max_length=128, null=True, blank=True, help_text=_("Badge template type.")
-    )
+    origin = models.CharField(max_length=128, null=True, blank=True, help_text=_("Badge template type."))
     state = StatusField(
         choices_name="STATES",
         help_text=_("Credly badge template state (auto-managed)."),
@@ -122,7 +108,7 @@ class BadgeTemplate(AbstractCredential):
     @classmethod
     def by_uuid(cls, template_uuid):
         return cls.objects.filter(uuid=template_uuid, origin=cls.ORIGIN).first()
-    
+
     def user_progress(self, username: str) -> float:
         """
         Calculate user progress for badge template.
@@ -131,7 +117,7 @@ class BadgeTemplate(AbstractCredential):
         if progress is None:
             return 0.00
         return progress.ratio
-    
+
     def user_completion(self, username: str) -> bool:
         """
         Check if user completed badge template.
@@ -158,7 +144,9 @@ class CredlyBadgeTemplate(BadgeTemplate):
         Build external Credly dashboard URL.
         """
         credly_host_base_url = "https://sandbox.credly.com"
-        return f"{credly_host_base_url}/mgmt/organizations/{self.organization.uuid}/badges/templates/{self.uuid}/details"
+        return (
+            f"{credly_host_base_url}/mgmt/organizations/{self.organization.uuid}/badges/templates/{self.uuid}/details"
+        )
 
 
 class BadgeRequirement(models.Model):
@@ -169,7 +157,7 @@ class BadgeRequirement(models.Model):
             To achieve "OR" processing logic for 2 requirement one must group them (put identical group ID).
     """
 
-    EVENT_TYPES = Choices(*settings.BADGES_CONFIG['events'])
+    EVENT_TYPES = Choices(*settings.BADGES_CONFIG["events"])
 
     template = models.ForeignKey(
         BadgeTemplate,
@@ -183,9 +171,7 @@ class BadgeRequirement(models.Model):
             'Public signal type. Use namespaced types, e.g: "org.openedx.learning.student.registration.completed.v1"'
         ),
     )
-    description = models.TextField(
-        null=True, blank=True, help_text=_("Provide more details if needed.")
-    )
+    description = models.TextField(null=True, blank=True, help_text=_("Provide more details if needed."))
 
     group = models.CharField(
         max_length=255,
@@ -196,7 +182,7 @@ class BadgeRequirement(models.Model):
 
     def __str__(self):
         return f"BadgeRequirement:{self.id}:{self.template.uuid}"
-    
+
     def save(self, *args, **kwargs):
         # Check if the related BadgeTemplate is active
         if not self.template.is_active:
@@ -205,7 +191,11 @@ class BadgeRequirement(models.Model):
             raise ValidationError("Cannot update BadgeRequirement for active BadgeTemplate")
 
     def reset(self, username: str):
-        Fulfillment.objects.filter(requirement=self, progress__username=username, progress__template=self.template).delete()
+        Fulfillment.objects.filter(
+            requirement=self,
+            progress__username=username,
+            progress__template=self.template,
+        ).delete()
 
     def is_fullfiled(self, username: str) -> bool:
         return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
@@ -214,11 +204,16 @@ class BadgeRequirement(models.Model):
         progress, _ = BadgeProgress.objects.get_or_create(template=self.template, username=username)
         return Fulfillment.objects.create(progress=progress, requirement=self)
 
+    def apply_rules(self, **kwargs):
+        pass
+
+
 class DataRule(AbstractDataRule):
     """
     Specifies expected data attribute value for event payload.
     NOTE: all data rules for a single requirement follow "AND" processing logic.
     """
+
     requirement = models.ForeignKey(
         BadgeRequirement,
         on_delete=models.CASCADE,
@@ -230,7 +225,7 @@ class DataRule(AbstractDataRule):
 
     def __str__(self):
         return f"{self.requirement.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
-    
+
     def save(self, *args, **kwargs):
         if not is_datapath_valid(self.data_path, self.requirement.event_type):
             raise ValidationError("Invalid data path for event type")
@@ -246,7 +241,7 @@ class BadgePenalty(models.Model):
     """
     Describes badge regression rules for particular BadgeRequirement.
     """
-    
+
     template = models.ForeignKey(
         BadgeTemplate,
         on_delete=models.CASCADE,
@@ -256,15 +251,23 @@ class BadgePenalty(models.Model):
         BadgeRequirement,
         help_text=_("Badge requirements for which this penalty is defined."),
     )
-    description = models.TextField(
-        null=True, blank=True, help_text=_("Provide more details if needed.")
-    )
+    # event_type = models.CharField(
+    #     max_length=255,
+    #     choices=EVENT_TYPES,
+    #     help_text=_(
+    #         'Public signal type. Use namespaced types, e.g: "org.openedx.learning.student.registration.completed.v1"'
+    #     ),
+    # )
+    description = models.TextField(null=True, blank=True, help_text=_("Provide more details if needed."))
+
+    class Meta:
+        verbose_name_plural = "Badge penalties"
 
     def __str__(self):
         return f"BadgePenalty:{self.id}:{self.template.uuid}"
 
-    class Meta:
-        verbose_name_plural = "Badge penalties"
+    def apply_rules(self, **kwargs):
+        pass
 
 
 class PenaltyDataRule(AbstractDataRule):
@@ -272,12 +275,13 @@ class PenaltyDataRule(AbstractDataRule):
     Specifies expected data attribute value for penalty rule.
     NOTE: all data rules for a single penalty follow "AND" processing logic.
     """
+
     penalty = models.ForeignKey(
         BadgePenalty,
         on_delete=models.CASCADE,
         help_text=_("Parent penalty for this data rule."),
     )
-    
+
     def save(self, *args, **kwargs):
         # Check if the related BadgeTemplate is active
         if not self.penalty.template.is_active:
@@ -318,7 +322,7 @@ class BadgeProgress(models.Model):
 
     def __str__(self):
         return f"BadgeProgress:{self.username}"
-    
+
     @property
     def ratio(self) -> float:
         """
@@ -328,7 +332,9 @@ class BadgeProgress(models.Model):
         if requirements_count == 0:
             return 0.00
 
-        fulfilled_requirements_count = Fulfillment.objects.filter(progress=self, requirement__template=self.template).count()
+        fulfilled_requirements_count = Fulfillment.objects.filter(
+            progress=self, requirement__template=self.template
+        ).count()
         if fulfilled_requirements_count == 0:
             return 0.00
         return round(fulfilled_requirements_count / requirements_count, 2)
@@ -358,9 +364,7 @@ class CredlyBadge(UserCredential):
     - tracks distributed (external Credly service) state for Credly badge.
     """
 
-    STATES = Choices(
-        "created", "no_response", "error", "pending", "accepted", "rejected", "revoked"
-    )
+    STATES = Choices("created", "no_response", "error", "pending", "accepted", "rejected", "revoked")
 
     state = StatusField(
         choices_name="STATES",

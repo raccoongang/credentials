@@ -50,10 +50,7 @@ def handle_badge_completion(sender, username, badge_template_id, **kwargs):  # p
     - badge template ID
     """
 
-    CredlyBadgeTemplateIssuer().award(
-        badge_template_id,
-        username
-    )
+    CredlyBadgeTemplateIssuer().award(badge_template_id, username)
 
 
 @receiver(BADGE_PROGRESS_INCOMPLETE)

@@ -68,23 +68,16 @@ class BadgeTemplateIssuer(AbstractCredentialIssuer):
 
     def award(self, credential_id, username):
         credential = self.get_credential(credential_id)
-        user_credential = self.issue_credential(
-            credential,
-            username
-        )
+        user_credential = self.issue_credential(credential, username)
 
-        notify_badge_awarded(username, credential.uuid)
+        notify_badge_awarded(user_credential)
         return user_credential
 
     def revoke(self, credential_id, username):
         credential = self.get_credential(credential_id)
-        user_credential = self.issue_credential(
-            credential,
-            username,
-            status=UserCredentialStatus.REVOKED
-        )
+        user_credential = self.issue_credential(credential, username, status=UserCredentialStatus.REVOKED)
 
-        notify_badge_revoked(username, credential.uuid)
+        notify_badge_revoked(user_credential)
         return user_credential
 
 
