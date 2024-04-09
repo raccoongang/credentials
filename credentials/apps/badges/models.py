@@ -282,9 +282,8 @@ class PenaltyDataRule(AbstractDataRule):
         unique_together = ("penalty", "data_path", "operator", "value")
     
     def save(self, *args, **kwargs):
-        for requirement in self.penalty.requirements.all():
-            if not is_datapath_valid(self.data_path, requirement.event_type):
-                raise ValidationError("Invalid data path for event type")
+        if not is_datapath_valid(self.data_path, self.penalty.event_type):
+            raise ValidationError("Invalid data path for event type")
 
         # Check if the related BadgeTemplate is active
         if not self.penalty.template.is_active:
