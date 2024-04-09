@@ -16,6 +16,7 @@ django
 django-cors-headers
 django-extensions
 django-filter
+django-model-utils
 django-ratelimit
 django-rest-swagger
 django-simple-history
@@ -51,6 +52,9 @@ segment-analytics-python
 social-auth-app-django
 xss-utils
 
-
 # TODO Install in configuration
 git+https://github.com/openedx/credentials-themes.git@0.4.8#egg=edx_credentials_themes==0.4.8
+git+https://github.com/openedx/event-bus-redis.git@v0.4.0
+
+# TODO: switch to upstream once PR is merged: https://github.com/openedx/openedx-events/pull/303
+git+https://github.com/raccoongang/openedx-events.git@aci.main
