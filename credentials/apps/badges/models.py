@@ -252,7 +252,7 @@ class BadgePenalty(models.Model):
     template = models.ForeignKey(
         BadgeTemplate,
         on_delete=models.CASCADE,
-        help_text=_("Badge template this requirement serves for."),
+        help_text=_("Badge template this penalty serves for."),
     )
     event_type = models.CharField(
         max_length=255,
