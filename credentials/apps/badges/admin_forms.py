@@ -96,7 +96,7 @@ class BadgeRequirementForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance and hasattr(self.instance, 'template') and self.instance.template.is_active:
             for field_name in self.fields:
-                if field_name in ("template", "event_type", "description"):
+                if field_name in ("template", "event_type", "description", "group"):
                     self.fields[field_name].disabled = True
 
 

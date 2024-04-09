@@ -199,6 +199,9 @@ class BadgeRequirement(models.Model):
     
     def save(self, *args, **kwargs):
         # Check if the related BadgeTemplate is active
+        if not self.id:
+            super().save(*args, **kwargs)
+            return
         if not self.template.is_active:
             super().save(*args, **kwargs)
         else:
@@ -260,6 +263,16 @@ class BadgePenalty(models.Model):
         null=True, blank=True, help_text=_("Provide more details if needed.")
     )
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            super().save(*args, **kwargs)
+            return
+        # Check if the related BadgeTemplate is active
+        if not self.template.is_active:
+            super().save(*args, **kwargs)
+        else:
+            raise ValidationError("Cannot update BadgePenalty for active BadgeTemplate")
+
     def __str__(self):
         return f"BadgePenalty:{self.id}:{self.template.uuid}"
 
@@ -284,12 +297,13 @@ class PenaltyDataRule(AbstractDataRule):
             super().save(*args, **kwargs)
         else:
             raise ValidationError("Cannot update PenaltyDataRule for active BadgeTemplate")
-
+    
     def __str__(self):
         return f"{self.penalty.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
 
     class Meta:
         unique_together = ("penalty", "data_path", "operator", "value")
+        
 
 
 class BadgeProgress(models.Model):
