@@ -50,6 +50,59 @@ class DataRulesTestCase(TestCase):
         self.assertIn(data_rule2, data_rules)
 
 
+class RequirementApplyRulesCheckTestCase(TestCase):
+    def setUp(self):
+        self.site = Site.objects.create(domain="test_domain", name="test_name")
+        self.badge_template1 = BadgeTemplate.objects.create(
+            uuid=uuid.uuid4(), name="test_template1", state="draft", site=self.site
+        )
+        self.badge_template2 = BadgeTemplate.objects.create(
+            uuid=uuid.uuid4(), name="test_template2", state="draft", site=self.site
+        )
+        self.badge_requirement = BadgeRequirement.objects.create(
+            template=self.badge_template1, event_type="org.openedx.learning.course.passing.status.updated.v1"
+        )
+        self.data_rule1 = DataRule.objects.create(
+            requirement=self.badge_requirement,
+            data_path="course_passing_status.user.pii.username",
+            operator="eq",
+            value="test-username",
+        )
+        self.data_rule2 = DataRule.objects.create(
+            requirement=self.badge_requirement,
+            data_path="course_passing_status.user.pii.email",
+            operator="eq",
+            value="test@example.com",
+        )
+        self.data_rule = DataRule.objects.create
+
+    def test_apply_rules_check_success(self):
+        data = {
+            'course_passing_status': {
+                'user': {
+                    'pii': {
+                        'username': 'test-username',
+                        'email': 'test@example.com'
+                    }
+                }
+            }
+        }
+        self.assertTrue(self.badge_requirement.apply_rules(data))
+
+    def test_apply_rules_check_failed(self):
+        data = {
+            'course_passing_status': {
+                'user': {
+                    'pii': {
+                        'username': 'test-username2',
+                        'email': 'test@example.com'
+                    }
+                }
+            }
+        }
+        self.assertFalse(self.badge_requirement.apply_rules(data))
+
+
 class BadgeRequirementTestCase(TestCase):
     def setUp(self):
         self.organization = CredlyOrganization.objects.create(
