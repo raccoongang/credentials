@@ -242,6 +242,8 @@ class BadgePenalty(models.Model):
     Describes badge regression rules for particular BadgeRequirement.
     """
 
+    EVENT_TYPES = Choices(*settings.BADGES_CONFIG["events"])
+
     template = models.ForeignKey(
         BadgeTemplate,
         on_delete=models.CASCADE,
@@ -258,13 +260,6 @@ class BadgePenalty(models.Model):
         BadgeRequirement,
         help_text=_("Badge requirements for which this penalty is defined."),
     )
-    # event_type = models.CharField(
-    #     max_length=255,
-    #     choices=EVENT_TYPES,
-    #     help_text=_(
-    #         'Public signal type. Use namespaced types, e.g: "org.openedx.learning.student.registration.completed.v1"'
-    #     ),
-    # )
     description = models.TextField(null=True, blank=True, help_text=_("Provide more details if needed."))
 
     class Meta:
