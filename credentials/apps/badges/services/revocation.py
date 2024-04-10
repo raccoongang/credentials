@@ -1,14 +1,12 @@
 """
 Revocation pipeline - badge regression.
 """
-import uuid
 
 from typing import List
 
-from openedx_events.learning.data import BadgeData, BadgeTemplateData, UserData, UserPersonalData
 from openedx_events.learning.signals import BADGE_REVOKED
 
-from ..models import BadgePenalty, CredlyBadgeTemplate
+from ..models import BadgePenalty, UserCredential
 
 
 def notify_badge_revoked(username, badge_template_uuid):  # pylint: disable=unused-argument
@@ -18,31 +16,12 @@ def notify_badge_revoked(username, badge_template_uuid):  # pylint: disable=unus
     - username
     - badge template ID
     """
-    badge_template = CredlyBadgeTemplate.by_uuid(badge_template_uuid)
+
     # user = get_user_by_username(username)
 
-    # UserCredential.as_badge_data():
-    badge_data = BadgeData(
-        uuid=str(uuid.uuid4()),
-        user=UserData(
-            pii=UserPersonalData(
-                username='event_user-username',
-                email='event_user-email',
-                name='event_user-name',
-            ),
-            id=1,
-            is_active=True,
-        ),
-        template=BadgeTemplateData(
-            uuid=str(badge_template.uuid),
-            origin=badge_template.origin,
-            name=badge_template.name,
-            description=badge_template.description,
-            image_url=str(badge_template.icon),
-        ),
-    )
-
+    badge_data = UserCredential.objects.get(username=username, credential__uuid=badge_template_uuid).as_badge_data()
     BADGE_REVOKED.send_event(badge=badge_data)
+
 
 def discover_penalties(event_type: str) -> List[BadgePenalty]:
     return BadgePenalty.objects.filter(event_type=event_type)

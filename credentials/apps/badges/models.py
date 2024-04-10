@@ -382,8 +382,9 @@ class CredlyBadge(UserCredential):
         default=STATES.created,
     )
 
-    def as_badge_data(self, badge_template: CredlyBadgeTemplate) -> BadgeData:
+    def as_badge_data(self) -> BadgeData:
         user = get_user_by_username(self.username)
+        badge_template = self.credential
 
         badge_data = BadgeData(
             uuid=str(uuid.uuid4()),
