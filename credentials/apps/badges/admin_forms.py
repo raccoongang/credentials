@@ -60,7 +60,6 @@ class CredlyOrganizationAdminForm(forms.ModelForm):
             raise forms.ValidationError(message=str(err))
 
 
-            
 class BadgePenaltyForm(forms.ModelForm):
     class Meta:
         model = BadgePenalty
@@ -85,6 +84,7 @@ class BadgePenaltyForm(forms.ModelForm):
         return cleaned_data
 
 
+
 class PenaltyDataRuleForm(forms.ModelForm):
     class Meta:
         model = PenaltyDataRule
@@ -92,11 +92,11 @@ class PenaltyDataRuleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and hasattr(self.instance, 'penalty') and self.instance.penalty.template.is_active:
+        if self.instance and hasattr(self.instance, "penalty") and self.instance.penalty.template.is_active:
             for field_name in self.fields:
                 if field_name in ("data_path", "operator", "value"):
                     self.fields[field_name].disabled = True
-            
+
 
 class BadgeRequirementForm(forms.ModelForm):
     class Meta:
@@ -105,9 +105,9 @@ class BadgeRequirementForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and hasattr(self.instance, 'template') and self.instance.template.is_active:
+        if self.instance and hasattr(self.instance, "template") and self.instance.template.is_active:
             for field_name in self.fields:
-                if field_name in ("template", "event_type", "description"):
+                if field_name in ("template", "event_type", "description", "group"):
                     self.fields[field_name].disabled = True
 
 
@@ -118,7 +118,7 @@ class DataRuleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and hasattr(self.instance, 'requirement') and self.instance.requirement.template.is_active:
+        if self.instance and hasattr(self.instance, "requirement") and self.instance.requirement.template.is_active:
             for field_name in self.fields:
                 if field_name in ("data_path", "operator", "value"):
                     self.fields[field_name].disabled = True

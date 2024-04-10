@@ -45,9 +45,7 @@ class CredlyWebhook(APIView):
         """
         credly_api_client = CredlyAPIClient(request.data.get("organization_id"))
 
-        event_info_response = credly_api_client.fetch_event_information(
-            request.data.get("id")
-        )
+        event_info_response = credly_api_client.fetch_event_information(request.data.get("id"))
         event_type = request.data.get("event_type")
 
         if event_type == "badge_template.created":

@@ -2,15 +2,20 @@
 Main processing logic.
 """
 
-from openedx_events.learning.data import CoursePassingStatusData
+import logging
 
+from credentials.apps.badges.exceptions import (
+    BadgesProcessingError,
+    StopEventProcessing,
+)
 from credentials.apps.core.api import get_or_create_user_from_event_data
 
-from ..models import CredlyBadgeTemplate
-from ..signals import BADGE_PROGRESS_COMPLETE, BADGE_PROGRESS_INCOMPLETE
-from ..services.awarding import discover_requirements
-from ..services.revocation import discover_penalties
-from ..utils import keypath, get_user_data
+from ..services.awarding import process_requirements
+from ..services.revocation import process_penalties
+from ..utils import extract_payload, get_user_data
+
+
+logger = logging.getLogger(__name__)
 
 
 def process_event(sender, **kwargs):
@@ -19,63 +24,56 @@ def process_event(sender, **kwargs):
 
     Responsibilities:
         - event's User identification (whose action);
-        - ...
+        - requirements processing;
+        - penalties processing;
     """
-    # create/update signal User:
-    # user_data = get_user_data(kwargs) - not yet implemented
-    # event_user = get_or_create_user_from_event_data(user_data)
 
-    # incoming signals (e.g. Messages) processing pipeline:
-    # - identify user in the Message;
-    #   - check if such user exist (update or create);
-    # - collect all Requirements for Message event type;
-    #   - no Requirements - nothing to process - STOP;
-    # - for each found Requirement:
-    #   - see its `effect` (award | revoke)
+    event_type = sender.event_type
 
-    #   AWARD FLOW:
-    #   - check if the related badge template already completed
-    #       - if BadgeProgress exists and BadgeProgress.complete == true >> badge already earned - STOP;
-    #   - check if it is not fulfilled yet
-    #       - if fulfilled (related Fulfillment exists) - STOP;
-    #   - apply payload rules (data-rules);
-    #   - if applied - fulfill the Requirement:
-    #       - create related Fulfillment
-    #       - update of create BadgeProgress
-    #   - BadgeProgress completeness check - check if it was enough for badge earning
-    #       - if BadgeProgress.complete == true
-    #           - emit BADGE_PROGRESS_COMPLETE >> handle_badge_completion
-    #
-    #   REVOKE FLOW:
-    #   - TBD
-    #   - ...
-    #   - BADGE_PROGRESS_INCOMPLETE emitted >> handle_badge_regression (possibly, we need a flag here)
+    try:
+        # user identification
+        username = identify_user(event_type=event_type, event_payload=extract_payload(kwargs))
 
-    user_data = get_user_data(kwargs)
-    username = get_or_create_user_from_event_data(user_data)[0].username
-    requirements = discover_requirements(sender)
-    penalties = discover_penalties(sender)
+        # requirements processing
+        process_requirements(event_type, username, extract_payload(kwargs, as_dict=True))
 
-    # faked: related to the BadgeRequirement template (in real processing):
-    badge_template_id = CredlyBadgeTemplate.objects.first().id
+        # penalties processing
+        # process_penalties(event_type, username, extract_payload(kwargs, as_dict=True))
+
+    except StopEventProcessing:
+        # controlled processing dropping
+        return
+
+    except BadgesProcessingError as error:
+        logger.error(f"Badges processing error: {error}")
+        return
 
 
-    if (
-        keypath(kwargs, "course_passing_status.status")
-        == CoursePassingStatusData.PASSING
-    ):
-        BADGE_PROGRESS_COMPLETE.send(
-            sender=sender,
-            username=keypath(kwargs, "course_passing_status.user.pii.username"),
-            badge_template_id=badge_template_id,
-        )
+def identify_user(*, event_type, event_payload):
+    """
+    Identifies event user based on provided keyword arguments and returns the username.
 
-    if (
-        keypath(kwargs, "course_passing_status.status")
-        == CoursePassingStatusData.FAILING
-    ):
-        BADGE_PROGRESS_INCOMPLETE.send(
-            sender=sender,
-            username=keypath(kwargs, "course_passing_status.user.pii.username"),
-            badge_template_id=badge_template_id,
-        )
+    This function extracts user data from the given event's keyword arguments, attempts to identify existing user
+    or creates a new user based on this data, and then returns the username.
+
+    Args:
+        **kwargs: public event keyword arguments containing user identification data.
+
+    Returns:
+        str: The username of the identified (and created if needed) user.
+
+    Raises:
+        BadgesProcessingError: if user data was not found.
+    """
+
+    user_data = get_user_data(event_payload)
+
+    # FIXME: didn't find!
+    user_data = event_payload["course_passing_status"].user
+
+    if not user_data:
+        message = f"User data cannot be found (got: {user_data}): {event_payload}. Does event {event_type} include user data at all?"
+        raise BadgesProcessingError(message)
+
+    user, __ = get_or_create_user_from_event_data(user_data)
+    return user.username
