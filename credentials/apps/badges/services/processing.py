@@ -53,17 +53,6 @@ def identify_user(*, event_type, event_payload):
     """
     Identifies event user based on provided keyword arguments and returns the username.
 
-    if (
-        keypath(kwargs, "course_passing_status.status")
-        == CoursePassingStatusData.FAILING
-    ):
-        process_penalties(sender, username, kwargs)
-
-        BADGE_PROGRESS_INCOMPLETE.send(
-            sender=sender,
-            username=keypath(kwargs, "course_passing_status.user.pii.username"),
-            badge_template_id=badge_template_id,
-        )
     This function extracts user data from the given event's keyword arguments, attempts to identify existing user
     or creates a new user based on this data, and then returns the username.
 

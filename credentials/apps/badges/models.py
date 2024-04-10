@@ -194,7 +194,6 @@ class BadgeRequirement(models.Model):
         Fulfillment.objects.filter(
             requirement=self,
             progress__username=username,
-            progress__template=self.template,
         ).delete()
 
     def is_fullfiled(self, username: str) -> bool:
@@ -293,6 +292,10 @@ class BadgePenalty(models.Model):
     
     def apply_rules(self, data: dict) -> bool:
         return all(rule.apply(data) for rule in self.rules.all())
+    
+    def reset_requirements(self, username: str):
+        for requirement in self.requirements.all():
+            requirement.reset(username)
     
     @property
     def is_active(self):

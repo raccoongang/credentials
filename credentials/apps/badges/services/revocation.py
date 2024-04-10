@@ -11,9 +11,12 @@ from openedx_events.learning.data import (
     UserData,
     UserPersonalData,
 )
+from openedx_events.learning.data import CoursePassingStatusData
 from openedx_events.learning.signals import BADGE_REVOKED
 
-from credentials.apps.badges.models import BadgePenalty, Fulfillment
+from credentials.apps.badges.signals.signals import BADGE_PROGRESS_INCOMPLETE
+from credentials.apps.badges.utils import keypath
+from credentials.apps.badges.models import BadgePenalty, CredlyBadgeTemplate
 
 
 def discover_penalties(event_type: str) -> List[BadgePenalty]:
@@ -36,18 +39,23 @@ def process_penalties(event_type, username, payload_dict):
             - emit BADGE_PROGRESS_INCOMPLETE >> handle_badge_incompletion
     """
 
+    # TEMP: remove this stub after processing is implemented
+
+    if keypath(payload_dict, "course_passing_status.status") == CoursePassingStatusData.FAILING:
+        BADGE_PROGRESS_INCOMPLETE.send(
+            sender=None,
+            username=username,
+            badge_template_id=CredlyBadgeTemplate.objects.first().id,
+        )
+
+    # :TEMP
 
     penalties = discover_penalties(event_type=event_type)
     for penalty in penalties:
         if not penalty.is_active:
             continue
         if penalty.apply_rules(payload_dict):
-            [
-                fulfillment.progress.reset()
-                for fulfillment in Fulfillment.objects.filter(
-                    requirement__in=penalty.requirements.all(), progress__username=username
-                )
-            ]
+            penalty.reset_requirements(username)
 
 
 def notify_badge_revoked(user_credential):  # pylint: disable=unused-argument
