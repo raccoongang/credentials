@@ -58,27 +58,36 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
         self.CCX_COURSE_PASSING_EVENT = "org.openedx.learning.ccx.course.passing.status.updated.v1"
 
     def test_discovery_eventtype_related_penalties(self):
-        BadgePenalty.objects.create(template=self.badge_template).requirements.set(
+        BadgePenalty.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+        ).requirements.set([
             BadgeRequirement.objects.create(
                 template=self.badge_template,
                 event_type=self.COURSE_PASSING_EVENT,
                 description="Test course passing award description",
             )
-        )
-        BadgePenalty.objects.create(template=self.badge_template).requirements.set(
+        ])
+        BadgePenalty.objects.create(
+            template=self.badge_template,
+            event_type=self.CCX_COURSE_PASSING_EVENT,
+        ).requirements.set([
             BadgeRequirement.objects.create(
                 template=self.badge_template,
                 event_type=self.CCX_COURSE_PASSING_EVENT,
                 description="Test ccx course passing award description",
             )
-        )
-        BadgePenalty.objects.create(template=self.badge_template).requirements.set(
+        ])
+        BadgePenalty.objects.create(
+            template=self.badge_template,
+            event_type=self.CCX_COURSE_PASSING_EVENT,
+        ).requirements.set([
             BadgeRequirement.objects.create(
                 template=self.badge_template,
                 event_type=self.CCX_COURSE_PASSING_EVENT,
                 description="Test ccx course passing revoke description",
             )
-        )
+        ])
         course_passing_penalties = discover_penalties(event_type=self.COURSE_PASSING_EVENT)
         ccx_course_passing_penalties = discover_penalties(event_type=self.CCX_COURSE_PASSING_EVENT)
         self.assertEqual(course_passing_penalties.count(), 1)

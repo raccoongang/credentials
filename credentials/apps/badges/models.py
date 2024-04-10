@@ -2,19 +2,20 @@
 Badges DB models.
 """
 
+import operator
 import uuid
 
 from django.conf import settings
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
 from openedx_events.learning.data import BadgeData, BadgeTemplateData, UserData, UserPersonalData
 
-from credentials.apps.badges.utils import is_datapath_valid
 from credentials.apps.core.api import get_user_by_username
+from credentials.apps.badges.utils import is_datapath_valid, keypath
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
 
 
@@ -186,14 +187,10 @@ class BadgeRequirement(models.Model):
         return f"BadgeRequirement:{self.id}:{self.template.uuid}"
 
     def save(self, *args, **kwargs):
-        # Check if the related BadgeTemplate is active
-        if not self.id:
-            super().save(*args, **kwargs)
-            return
-        if not self.template.is_active:
-            super().save(*args, **kwargs)
-        else:
-            raise ValidationError("Cannot update BadgeRequirement for active BadgeTemplate")
+        if self.is_active:
+            raise ValidationError("Configuration updates are blocked on active badge templates")
+
+        super().save(*args, **kwargs)
 
     def reset(self, username: str):
         Fulfillment.objects.filter(
@@ -209,8 +206,19 @@ class BadgeRequirement(models.Model):
         progress, _ = BadgeProgress.objects.get_or_create(template=self.template, username=username)
         return Fulfillment.objects.create(progress=progress, requirement=self)
 
-    def apply_rules(self, **kwargs):
-        pass
+    def apply_rules(self, data: dict) -> bool:
+        for rule in self.datarule_set.all():
+            comparison_func = getattr(operator, rule.operator, None)
+            if comparison_func:
+                data_value = str(keypath(data, rule.data_path))
+                result = comparison_func(data_value, rule.value)
+                if not result:
+                    return False
+        return True
+
+    @property
+    def is_active(self):
+        return self.template.is_active
 
 
 class DataRule(AbstractDataRule):
@@ -235,11 +243,14 @@ class DataRule(AbstractDataRule):
         if not is_datapath_valid(self.data_path, self.requirement.event_type):
             raise ValidationError("Invalid data path for event type")
 
-        # Check if the related BadgeTemplate is active
-        if not self.requirement.template.is_active:
-            super().save(*args, **kwargs)
-        else:
-            raise ValidationError("Cannot update DataRule for active BadgeTemplate")
+        if self.is_active:
+            raise ValidationError("Configuration updates are blocked on active badge templates")
+
+        super().save(*args, **kwargs)
+
+    @property
+    def is_active(self):
+        return self.requirement.template.is_active
 
 
 class BadgePenalty(models.Model):
@@ -271,20 +282,20 @@ class BadgePenalty(models.Model):
         verbose_name_plural = "Badge penalties"
 
     def save(self, *args, **kwargs):
-        if not self.id:
-            super().save(*args, **kwargs)
-            return
-        # Check if the related BadgeTemplate is active
-        if not self.template.is_active:
-            super().save(*args, **kwargs)
-        else:
-            raise ValidationError("Cannot update BadgePenalty for active BadgeTemplate")
+        if self.is_active:
+            raise ValidationError("Configuration updates are blocked on active badge templates")
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"BadgePenalty:{self.id}:{self.template.uuid}"
 
     def apply_rules(self, **kwargs):
         pass
+
+    @property
+    def is_active(self):
+        return self.template.is_active
 
 
 class PenaltyDataRule(AbstractDataRule):
@@ -307,16 +318,17 @@ class PenaltyDataRule(AbstractDataRule):
             raise ValidationError("Invalid data path for event type")
 
         # Check if the related BadgeTemplate is active
-        if not self.penalty.template.is_active:
-            super().save(*args, **kwargs)
-        else:
-            raise ValidationError("Cannot update PenaltyDataRule for active BadgeTemplate")
-    
+        if self.is_active:
+            raise ValidationError("Configuration updates are blocked on active badge templates")
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.penalty.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
 
-    class Meta:
-        unique_together = ("penalty", "data_path", "operator", "value")
+    @property
+    def is_active(self):
+        return self.requirement.template.is_active
 
 
 class BadgeProgress(models.Model):

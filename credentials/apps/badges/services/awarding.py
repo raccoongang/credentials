@@ -7,7 +7,13 @@ from typing import List
 
 from openedx_events.learning.signals import BADGE_AWARDED
 
-from ..models import BadgeRequirement, UserCredential
+from credentials.apps.badges.models import BadgeRequirement, CredlyBadgeTemplate, UserCredential
+from credentials.apps.badges.signals import BADGE_PROGRESS_COMPLETE
+from credentials.apps.badges.utils import keypath
+
+
+def discover_requirements(event_type: str) -> List[BadgeRequirement]:
+    return BadgeRequirement.objects.filter(event_type=event_type)
 
 
 def process_requirements(event_type, username, payload_dict):
@@ -40,9 +46,11 @@ def process_requirements(event_type, username, payload_dict):
 
     # actual processing goes here:
 
-    # for requirement in requirements:
-    #     requirement.apply_rules(**kwargs)
-    #     requirement.fulfill(username)
+    for requirement in requirements:
+        if not requirement.is_active:
+            continue
+        if requirement.apply_rules(payload_dict):
+            requirement.fulfill(username)
 
 
 def notify_badge_awarded(user_credential):  # pylint: disable=unused-argument
@@ -57,7 +65,3 @@ def notify_badge_awarded(user_credential):  # pylint: disable=unused-argument
 
     badge_data = UserCredential.objects.get(username=username, credential__uuid=badge_template_uuid).as_badge_data()
     BADGE_AWARDED.send_event(badge=badge_data)
-
-
-def discover_requirements(event_type: str) -> List[BadgeRequirement]:
-    return BadgeRequirement.objects.filter(event_type=event_type)
