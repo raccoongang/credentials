@@ -16,7 +16,7 @@ from openedx_events.learning.signals import BADGE_REVOKED
 
 from credentials.apps.badges.signals.signals import BADGE_PROGRESS_INCOMPLETE
 from credentials.apps.badges.utils import keypath
-from credentials.apps.badges.models import BadgePenalty, CredlyBadgeTemplate
+from credentials.apps.badges.models import BadgePenalty, CredlyBadgeTemplate, UserCredential
 
 
 def discover_penalties(event_type: str) -> List[BadgePenalty]:
@@ -66,27 +66,7 @@ def notify_badge_revoked(user_credential):  # pylint: disable=unused-argument
     - badge template ID
     """
 
-    # TODO: make user-credential responsible for its conversion into signal payload:
-    # e.g.: badge_data = CredlyBadge.as_badge_data()
+    # user = get_user_by_username(username)
 
-    badge_data = BadgeData(
-        uuid=str(uuid.uuid4()),
-        user=UserData(
-            pii=UserPersonalData(
-                username="event_user-username",
-                email="event_user-email",
-                name="event_user-name",
-            ),
-            id=1,
-            is_active=True,
-        ),
-        template=BadgeTemplateData(
-            uuid=str(uuid.uuid4()),
-            origin="faked.origin",
-            name="faked.name",
-            description="feaked.description",
-            image_url="faked.badge_template.icon",
-        ),
-    )
-
+    badge_data = UserCredential.objects.get(username=username, credential__uuid=badge_template_uuid).as_badge_data()
     BADGE_REVOKED.send_event(badge=badge_data)
