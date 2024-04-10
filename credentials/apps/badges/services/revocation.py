@@ -7,11 +7,11 @@ import uuid
 
 from typing import List
 
+from ecommerce.ecommerce.extensions import fulfillment
 from openedx_events.learning.data import BadgeData, BadgeTemplateData, UserData, UserPersonalData
 from openedx_events.learning.signals import BADGE_REVOKED
 
-from ..models import BadgePenalty, BadgeProgress, CredlyBadgeTemplate, Fulfillment
-from ..utils import keypath
+from credentials.apps.badges.models import BadgePenalty, CredlyBadgeTemplate, Fulfillment
 
 
 def notify_badge_revoked(username, badge_template_uuid):  # pylint: disable=unused-argument
@@ -52,15 +52,15 @@ def discover_penalties(event_type: str) -> List[BadgePenalty]:
     return BadgePenalty.objects.filter(event_type=event_type)
 
 
-def apply_penalties(penalties: List[BadgePenalty], username, kwargs: dict):
+def process_penalties(event_type, username, payload_dict):
+    penalties = discover_penalties(event_type)
     for penalty in penalties:
-        for datarule in penalty.penaltydatarule_set.all():
-            if not getattr(operator, datarule.operator)(datarule.value, keypath(kwargs, datarule.data_path)):
-                break
-        else:
+        if not penalty.is_active:
+            continue
+        if penalty.apply_rules(payload_dict):
             [
                 fulfillment.progress.reset()
                 for fulfillment in Fulfillment.objects.filter(
-                    requirement__in=penalty.requirements.all(), progress__username=username
+                    requirements__in=penalty.requirements.all(), progress__username=username
                 )
             ]

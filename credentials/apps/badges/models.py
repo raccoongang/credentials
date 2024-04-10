@@ -2,6 +2,8 @@
 Badges DB models.
 """
 
+import operator
+from unittest import result
 import uuid
 
 from django.conf import settings
@@ -12,7 +14,7 @@ from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
 
-from credentials.apps.badges.utils import is_datapath_valid
+from credentials.apps.badges.utils import is_datapath_valid, keypath
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
 
 
@@ -265,6 +267,20 @@ class BadgePenalty(models.Model):
 
     class Meta:
         verbose_name_plural = "Badge penalties"
+    
+    def apply_rules(self, data: dict) -> bool:
+        for rule in self.penaltydatarule_set.all():
+            comparison_func = getattr(operator, rule.operator, None)
+            if comparison_func:
+                data_value = str(keypath(data, rule.data_path))
+                result = comparison_func(data_value, rule.value)
+                if not result:
+                    return False
+        return True
+    
+    @property
+    def is_active(self):
+        return self.template.is_active
 
 
 class PenaltyDataRule(AbstractDataRule):
