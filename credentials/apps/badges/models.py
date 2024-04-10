@@ -249,10 +249,19 @@ class BadgePenalty(models.Model):
     Describes badge regression rules for particular BadgeRequirement.
     """
     
+    EVENT_TYPES = Choices(*settings.BADGES_CONFIG['events'])
+
     template = models.ForeignKey(
         BadgeTemplate,
         on_delete=models.CASCADE,
         help_text=_("Badge template this penalty serves for."),
+    )
+    event_type = models.CharField(
+        max_length=255,
+        choices=EVENT_TYPES,
+        help_text=_(
+            'Public signal type. Use namespaced types, e.g: "org.openedx.learning.student.registration.completed.v1"'
+        ),
     )
     requirements = models.ManyToManyField(
         BadgeRequirement,
@@ -279,8 +288,14 @@ class PenaltyDataRule(AbstractDataRule):
         on_delete=models.CASCADE,
         help_text=_("Parent penalty for this data rule."),
     )
+
+    class Meta:
+        unique_together = ("penalty", "data_path", "operator", "value")
     
     def save(self, *args, **kwargs):
+        if not is_datapath_valid(self.data_path, self.penalty.event_type):
+            raise ValidationError("Invalid data path for event type")
+
         # Check if the related BadgeTemplate is active
         if not self.penalty.template.is_active:
             super().save(*args, **kwargs)
@@ -289,9 +304,6 @@ class PenaltyDataRule(AbstractDataRule):
 
     def __str__(self):
         return f"{self.penalty.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
-
-    class Meta:
-        unique_together = ("penalty", "data_path", "operator", "value")
 
 
 class BadgeProgress(models.Model):
@@ -393,3 +405,7 @@ class CredlyBadge(UserCredential):
             )
         )
         return badge_data
+
+    @property
+    def is_issued(self):
+        return self.uuid and (self.state in ["pending", "accepted", "rejected"])
