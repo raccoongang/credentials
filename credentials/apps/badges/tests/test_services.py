@@ -91,7 +91,7 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
                 event_type=self.CCX_COURSE_PASSING_EVENT,
                 description="Test ccx course passing revoke description",
             )
-        )
+        ])
         course_passing_penalties = discover_penalties(event_type=self.COURSE_PASSING_EVENT)
         ccx_course_passing_penalties = discover_penalties(event_type=self.CCX_COURSE_PASSING_EVENT)
         self.assertEqual(course_passing_penalties.count(), 1)
