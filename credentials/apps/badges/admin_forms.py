@@ -67,10 +67,22 @@ class BadgePenaltyForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and hasattr(self.instance, "template") and self.instance.template.is_active:
-            for field_name in self.fields:
-                if field_name in ("template", "requirements", "description", "event_type"):
-                    self.fields[field_name].disabled = True
+
+        if self.instance and hasattr(self.instance, 'template'):
+            self.fields['requirements'].queryset = BadgeRequirement.objects.filter(template=self.instance.template) # what to do on add if template is not yet set?
+            if self.instance.template.is_active:
+                for field_name in self.fields:
+                    if field_name in ("template", "requirements", "description"):
+                        self.fields[field_name].disabled = True
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        requirements = cleaned_data.get("requirements")
+ 
+        if requirements and not all([requirement.template.id == cleaned_data.get("template").id for requirement in requirements]):
+            raise forms.ValidationError("All requirements must belong to the same template.")
+        return cleaned_data
+
 
 
 class PenaltyDataRuleForm(forms.ModelForm):
