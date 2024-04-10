@@ -62,9 +62,7 @@ class CredlyAPIClient:
         self.api_key = api_key
         self.organization_id = organization_id
 
-        self.base_api_url = urljoin(
-            get_credly_api_base_url(settings), f"organizations/{self.organization_id}/"
-        )
+        self.base_api_url = urljoin(get_credly_api_base_url(settings), f"organizations/{self.organization_id}/")
 
     def _get_organization(self, organization_id):
         """
@@ -93,9 +91,7 @@ class CredlyAPIClient:
         """
         url = urljoin(self.base_api_url, url_suffix)
         logger.debug(f"Credly API: {method.upper()} {url}")
-        response = requests.request(
-            method.upper(), url, headers=self._get_headers(), json=data
-        )
+        response = requests.request(method.upper(), url, headers=self._get_headers(), json=data)
         self._raise_for_error(response)
         return response.json()
 
@@ -112,9 +108,7 @@ class CredlyAPIClient:
         try:
             response.raise_for_status()
         except HTTPError:
-            logger.error(
-                f"Error while processing Credly API request: {response.status_code} - {response.text}"
-            )
+            logger.error(f"Error while processing Credly API request: {response.status_code} - {response.text}")
             raise CredlyAPIError(f"Credly API:{response.text}({response.status_code})")
 
     def _get_headers(self):
