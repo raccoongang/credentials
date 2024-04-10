@@ -48,7 +48,7 @@ class TestKeypathCheck(unittest.TestCase):
     def test_datapath_valid_success(self):
         is_valid = is_datapath_valid("course_passing_status.user.pii.username", self.event_type)
         self.assertTrue(is_valid)
-    
+
     def test_datapath_valid_failure(self):
         is_valid = is_datapath_valid("course_passing_status.user.username", self.event_type)
         self.assertFalse(is_valid)
@@ -56,14 +56,32 @@ class TestKeypathCheck(unittest.TestCase):
 
 class TestGetUserData(unittest.TestCase):
     def setUp(self):
-        self.course_data_1 = CourseData(course_key="CS101", display_name="Introduction to Computer Science", start=datetime(2024, 4, 1), end=datetime(2024, 6, 1))
-        self.user_data_1 = UserData(id=1, is_active=True, pii=UserPersonalData(username="user1", email="user1@example.com", name="John Doe"))
+        self.course_data_1 = CourseData(
+            course_key="CS101",
+            display_name="Introduction to Computer Science",
+            start=datetime(2024, 4, 1),
+            end=datetime(2024, 6, 1),
+        )
+        self.user_data_1 = UserData(
+            id=1, is_active=True, pii=UserPersonalData(username="user1", email="user1@example.com", name="John Doe")
+        )
 
-        self.course_data_2 = CourseData(course_key="PHY101", display_name="Introduction to Physics", start=datetime(2024, 4, 15), end=datetime(2024, 7, 15))
-        self.user_data_2 = UserData(id=2, is_active=False, pii=UserPersonalData(username="user2", email="user2@example.com", name="Jane Doe"))
+        self.course_data_2 = CourseData(
+            course_key="PHY101",
+            display_name="Introduction to Physics",
+            start=datetime(2024, 4, 15),
+            end=datetime(2024, 7, 15),
+        )
+        self.user_data_2 = UserData(
+            id=2, is_active=False, pii=UserPersonalData(username="user2", email="user2@example.com", name="Jane Doe")
+        )
 
-        self.passing_status_1 = CoursePassingStatusData(status=CoursePassingStatusData.PASSING, course=self.course_data_1, user=self.user_data_1)
-        self.failing_status_1 = CoursePassingStatusData(status=CoursePassingStatusData.FAILING, course=self.course_data_2, user=self.user_data_2)
+        self.passing_status_1 = CoursePassingStatusData(
+            status=CoursePassingStatusData.PASSING, course=self.course_data_1, user=self.user_data_1
+        )
+        self.failing_status_1 = CoursePassingStatusData(
+            status=CoursePassingStatusData.FAILING, course=self.course_data_2, user=self.user_data_2
+        )
 
     def test_get_user_data_from_course_enrollment(self):
         result_1 = get_user_data(self.passing_status_1)

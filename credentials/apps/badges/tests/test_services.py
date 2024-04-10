@@ -68,7 +68,7 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
         self.CCX_COURSE_PASSING_EVENT = "org.openedx.learning.ccx.course.passing.status.updated.v1"
 
     def test_discovery_eventtype_related_penalties(self):
-        penalty1 = BadgePenalty.objects.create(template=self.badge_template)
+        penalty1 = BadgePenalty.objects.create(template=self.badge_template, event_type=self.COURSE_PASSING_EVENT)
         penalty1.requirements.add(
             BadgeRequirement.objects.create(
                 template=self.badge_template,
@@ -76,7 +76,7 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
                 description="Test course passing award description",
             )
         )
-        penalty2 = BadgePenalty.objects.create(template=self.badge_template)
+        penalty2 = BadgePenalty.objects.create(template=self.badge_template, event_type=self.CCX_COURSE_PASSING_EVENT)
         penalty2.requirements.add(
             BadgeRequirement.objects.create(
                 template=self.badge_template,
@@ -84,7 +84,7 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
                 description="Test ccx course passing award description",
             )
         )
-        penalty3 = BadgePenalty.objects.create(template=self.badge_template)
+        penalty3 = BadgePenalty.objects.create(template=self.badge_template, event_type=self.CCX_COURSE_PASSING_EVENT)
         penalty3.requirements.add(
             BadgeRequirement.objects.create(
                 template=self.badge_template,
@@ -154,23 +154,26 @@ class TestProcessPenalties(TestCase):
         self.assertEqual(Fulfillment.objects.filter(progress=progress, requirement=requirement1).count(), 1)
         self.assertEqual(Fulfillment.objects.filter(progress=progress, requirement=requirement1).count(), 1)
 
-        BadgePenalty.objects.create(
+        bp = BadgePenalty.objects.create(
             template=self.badge_template, event_type=self.COURSE_PASSING_EVENT
-        ).requirements.set(
+        )
+        bp.requirements.set(
             (requirement1, requirement2),
         )
         PenaltyDataRule.objects.create(
-            penalty=BadgePenalty.objects.first(),
+            penalty=bp,
             data_path="course_passing_status.user.pii.username",
             operator="ne",
             value="test_username1",
         )
         PenaltyDataRule.objects.create(
-            penalty=BadgePenalty.objects.first(),
+            penalty=bp,
             data_path="course_passing_status.user.pii.email",
             operator="ne",
             value="test_email1",
         )
+        self.badge_template.is_active = True
+        self.badge_template.save()
         kwargs = {
             "course_passing_status": {
                 "user": {

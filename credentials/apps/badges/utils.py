@@ -1,6 +1,6 @@
-import attr
 import inspect
 
+import attr
 from attrs import asdict
 from django.conf import settings
 from openedx_events.learning.data import UserData
@@ -58,19 +58,22 @@ def is_datapath_valid(datapath: str, event_type: str) -> bool:
     event_types = get_badging_event_types()
     if event_type not in event_types:
         return False
-    obj = OpenEdxPublicSignal.get_signal_by_type(event_type).init_data[path[0]]
-    for key in path[1:]:
-        try:
-            field_type = [field for field in attr.fields(obj) if field.name == key][0].type
-        except IndexError:
-            return False
-        else:
-            obj = field_type
-            if not attr.has(obj):
-                if key == path[-1]:
-                    return True
+    try:
+        obj = OpenEdxPublicSignal.get_signal_by_type(event_type).init_data[path[0]]
+    except KeyError:
+        return False
+    else:
+        for key in path[1:]:
+            try:
+                field_type = [field for field in attr.fields(obj) if field.name == key][0].type
+            except IndexError:
                 return False
-    
+            else:
+                obj = field_type
+                if not attr.has(obj):
+                    if key == path[-1]:
+                        return True
+                    return False
 
 
 def get_user_data(data) -> UserData:
@@ -85,7 +88,7 @@ def get_user_data(data) -> UserData:
     """
     if isinstance(data, UserData):
         return data
-    
+
     for _, attr_value in inspect.getmembers(data):
         if isinstance(attr_value, UserData):
             return attr_value
@@ -94,3 +97,19 @@ def get_user_data(data) -> UserData:
             if user_data:
                 return user_data
     return None
+
+
+def extract_payload(public_signal_kwargs: dict, as_dict=False) -> dict:
+    """
+    Extracts the event payload from the event data.
+
+    Parameters:
+        - payload: The event data.
+        - as_dict: Transform returned dict to primitives.
+
+    Returns:
+        dict: The event "cleaned" payload.
+    """
+    for key, value in public_signal_kwargs.items():
+        if attr.has(value):
+            return {key: asdict(value)} if as_dict else {key: value}
