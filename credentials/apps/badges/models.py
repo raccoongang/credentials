@@ -277,8 +277,14 @@ class PenaltyDataRule(AbstractDataRule):
         on_delete=models.CASCADE,
         help_text=_("Parent penalty for this data rule."),
     )
+
+    class Meta:
+        unique_together = ("penalty", "data_path", "operator", "value")
     
     def save(self, *args, **kwargs):
+        if not is_datapath_valid(self.data_path, self.penalty.event_type):
+            raise ValidationError("Invalid data path for event type")
+
         # Check if the related BadgeTemplate is active
         if not self.penalty.template.is_active:
             super().save(*args, **kwargs)
@@ -287,9 +293,6 @@ class PenaltyDataRule(AbstractDataRule):
 
     def __str__(self):
         return f"{self.penalty.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
-
-    class Meta:
-        unique_together = ("penalty", "data_path", "operator", "value")
 
 
 class BadgeProgress(models.Model):
