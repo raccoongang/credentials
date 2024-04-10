@@ -51,10 +51,10 @@ def process_event(sender, **kwargs):
     #   - ...
     #   - BADGE_PROGRESS_INCOMPLETE emitted >> handle_badge_regression (possibly, we need a flag here)
 
-    user_data = get_user_data(kwargs)
-    username = get_or_create_user_from_event_data(user_data)[0].username
-    requirements = discover_requirements(sender)
-    penalties = discover_penalties(sender)
+    # user_data = get_user_data(kwargs)
+    # username = get_or_create_user_from_event_data(user_data)[0].username
+    # requirements = discover_requirements(sender)
+    # penalties = discover_penalties(sender)
 
     # faked: related to the BadgeRequirement template (in real processing):
     badge_template_id = CredlyBadgeTemplate.objects.first().id

@@ -70,7 +70,7 @@ class BadgePenaltyForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance and hasattr(self.instance, 'template') and self.instance.template.is_active:
             for field_name in self.fields:
-                if field_name in ("template", "requirements", "description"):
+                if field_name in ("template", "requirements", "description", "event_type"):
                     self.fields[field_name].disabled = True
 
 

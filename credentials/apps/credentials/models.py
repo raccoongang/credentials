@@ -162,7 +162,7 @@ class UserCredential(TimeStampedModel):
 
     credential_content_type = models.ForeignKey(
         ContentType,
-        limit_choices_to={"model__in": ("coursecertificate", "programcertificate", "badgetemplate")},
+        limit_choices_to={"model__in": ("coursecertificate", "programcertificate", "credlybadgetemplate")},
         on_delete=models.CASCADE,
     )
     credential_id = models.PositiveIntegerField()
@@ -177,7 +177,7 @@ class UserCredential(TimeStampedModel):
     download_url = models.CharField(
         max_length=255, blank=True, null=True, help_text=_("URL at which the credential can be downloaded")
     )
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uuid = models.UUIDField(blank=True, null=True, unique=True)
 
     class Meta:
         unique_together = (("username", "credential_content_type", "credential_id"),)
