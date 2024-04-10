@@ -2,6 +2,7 @@
 Admin section configuration.
 """
 
+from typing import Any
 from django.contrib import admin, messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
