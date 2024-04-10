@@ -3,7 +3,6 @@ Badges DB models.
 """
 
 import operator
-from unittest import result
 import uuid
 
 from django.conf import settings
