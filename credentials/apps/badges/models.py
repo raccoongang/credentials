@@ -196,7 +196,6 @@ class BadgeRequirement(models.Model):
         Fulfillment.objects.filter(
             requirement=self,
             progress__username=username,
-            progress__template=self.template,
         ).delete()
 
     def is_fullfiled(self, username: str) -> bool:
@@ -290,8 +289,19 @@ class BadgePenalty(models.Model):
     def __str__(self):
         return f"BadgePenalty:{self.id}:{self.template.uuid}"
 
-    def apply_rules(self, **kwargs):
-        pass
+    class Meta:
+        verbose_name_plural = "Badge penalties"
+    
+    def apply_rules(self, data: dict) -> bool:
+        return all(rule.apply(data) for rule in self.rules.all())
+    
+    def reset_requirements(self, username: str):
+        for requirement in self.requirements.all():
+            requirement.reset(username)
+    
+    @property
+    def is_active(self):
+        return self.template.is_active
 
     @property
     def is_active(self):
@@ -308,6 +318,7 @@ class PenaltyDataRule(AbstractDataRule):
         BadgePenalty,
         on_delete=models.CASCADE,
         help_text=_("Parent penalty for this data rule."),
+        related_name="rules",
     )
 
     class Meta:
@@ -326,6 +337,16 @@ class PenaltyDataRule(AbstractDataRule):
     def __str__(self):
         return f"{self.penalty.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
 
+    def apply(self, data: dict) -> bool:
+        comparison_func = getattr(operator, self.operator, None)
+        if comparison_func:
+            data_value = str(keypath(data, self.data_path))
+            return comparison_func(data_value, self.value)
+        return False
+
+    class Meta:
+        unique_together = ("penalty", "data_path", "operator", "value")
+        
     @property
     def is_active(self):
         return self.requirement.template.is_active
