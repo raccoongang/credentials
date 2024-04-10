@@ -4,8 +4,13 @@ This module provides classes for issuing badge credentials to users.
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
+from django.utils.translation import gettext as _
 
+from credentials.apps.badges.credly.api_client import CredlyAPIClient
+from credentials.apps.badges.credly.data import IssueBadgeData
+from credentials.apps.badges.credly.exceptions import CredlyAPIError
 from credentials.apps.badges.models import BadgeTemplate, CredlyBadge, CredlyBadgeTemplate, UserCredential
+from credentials.apps.core.api import get_user_by_username
 from credentials.apps.credentials.constants import UserCredentialStatus
 from credentials.apps.credentials.issuers import AbstractCredentialIssuer
 
@@ -88,3 +93,54 @@ class CredlyBadgeTemplateIssuer(BadgeTemplateIssuer):
 
     issued_credential_type = CredlyBadgeTemplate
     issued_user_credential_type = CredlyBadge
+
+    def issue_credly_badge(self, credential_id, user_credential):
+        user = get_user_by_username(user_credential.username)
+
+        credential = self.get_credential(credential_id)
+        credly_api = CredlyAPIClient(credential.organization.uuid)
+        issue_badge_data = IssueBadgeData(
+            recipient_email=user.email,
+            issued_to_first_name=(user.first_name or user.username),
+            issued_to_last_name=(user.last_name or user.username),
+            badge_template_id=str(credential.uuid),
+            issued_at=credential.created.strftime('%Y-%m-%d %H:%M:%S %z')
+        )
+        try:
+            response = credly_api.issue_badge(issue_badge_data)
+        except CredlyAPIError:
+            user_credential.state = 'error'
+            user_credential.save()
+            raise
+
+        user_credential.uuid = response.get('data').get('id')
+        user_credential.state = response.get('data').get('state')
+        user_credential.save()
+
+    def revoke_credly_badge(self, credential_id, user_credential):
+        credential = self.get_credential(credential_id)
+        credly_api = CredlyAPIClient(credential.organization.uuid)
+        revoke_data = {
+            "reason": _("Open edX internal user credential was revoked"),
+        }
+        try:
+            response = credly_api.revoke_badge(user_credential.uuid, revoke_data)
+        except CredlyAPIError:
+            user_credential.state = 'error'
+            user_credential.save()
+            raise
+
+        user_credential.state = response.get('data').get('state')
+        user_credential.save()
+
+    def award(self, credential_id, username):
+        user_credential = super().award(credential_id, username)
+        if not user_credential.is_issued:
+            self.issue_credly_badge(credential_id, user_credential)
+        return user_credential
+
+    def revoke(self, credential_id, username):
+        user_credential = super().revoke(credential_id, username)
+        if user_credential.is_issued:
+            self.revoke_credly_badge(credential_id, user_credential)
+        return user_credential

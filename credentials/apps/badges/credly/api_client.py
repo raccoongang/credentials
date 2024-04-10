@@ -91,7 +91,9 @@ class CredlyAPIClient:
         """
         url = urljoin(self.base_api_url, url_suffix)
         logger.debug(f"Credly API: {method.upper()} {url}")
-        response = requests.request(method.upper(), url, headers=self._get_headers(), data=data)
+        response = requests.request(
+            method.upper(), url, headers=self._get_headers(), json=data
+        )
         self._raise_for_error(response)
         return response.json()
 
@@ -161,14 +163,14 @@ class CredlyAPIClient:
         """
         return self.perform_request("post", "badges/", asdict(issue_badge_data))
 
-    def revoke_badge(self, badge_id):
+    def revoke_badge(self, badge_id, data):
         """
         Revoke a badge with the given badge ID.
 
         Args:
             badge_id (str): ID of the badge to revoke.
         """
-        return self.perform_request("put", f"badges/{badge_id}/revoke/")
+        return self.perform_request("put", f"badges/{badge_id}/revoke/", data=data)
 
     def sync_organization_badge_templates(self, site_id):
         """
