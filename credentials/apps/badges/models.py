@@ -2,17 +2,18 @@
 Badges DB models.
 """
 
+import operator
 import uuid
 
 from django.conf import settings
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
 
-from credentials.apps.badges.utils import is_datapath_valid
+from credentials.apps.badges.utils import is_datapath_valid, keypath
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
 
 
@@ -207,8 +208,19 @@ class BadgeRequirement(models.Model):
         progress, _ = BadgeProgress.objects.get_or_create(template=self.template, username=username)
         return Fulfillment.objects.create(progress=progress, requirement=self)
 
-    def apply_rules(self, **kwargs):
-        pass
+    def apply_rules(self, data: dict) -> bool:
+        for rule in self.datarule_set.all():
+            comparison_func = getattr(operator, rule.operator, None)
+            if comparison_func:
+                data_value = str(keypath(data, rule.data_path))
+                result = comparison_func(data_value, rule.value)
+                if not result:
+                    return False
+        return True
+
+    @property
+    def is_active(self):
+        return self.template.is_active
 
 
 class DataRule(AbstractDataRule):
