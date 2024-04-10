@@ -268,14 +268,7 @@ class BadgePenalty(models.Model):
         verbose_name_plural = "Badge penalties"
     
     def apply_rules(self, data: dict) -> bool:
-        for rule in self.penaltydatarule_set.all():
-            comparison_func = getattr(operator, rule.operator, None)
-            if comparison_func:
-                data_value = str(keypath(data, rule.data_path))
-                result = comparison_func(data_value, rule.value)
-                if not result:
-                    return False
-        return True
+        return all(rule.apply(data) for rule in self.rules.all())
     
     @property
     def is_active(self):
@@ -291,6 +284,7 @@ class PenaltyDataRule(AbstractDataRule):
         BadgePenalty,
         on_delete=models.CASCADE,
         help_text=_("Parent penalty for this data rule."),
+        related_name="rules",
     )
     
     def save(self, *args, **kwargs):
@@ -302,6 +296,13 @@ class PenaltyDataRule(AbstractDataRule):
 
     def __str__(self):
         return f"{self.penalty.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
+
+    def apply(self, data: dict) -> bool:
+        comparison_func = getattr(operator, self.operator, None)
+        if comparison_func:
+            data_value = str(keypath(data, self.data_path))
+            return comparison_func(data_value, self.value)
+        return False
 
     class Meta:
         unique_together = ("penalty", "data_path", "operator", "value")
