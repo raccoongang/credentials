@@ -104,17 +104,17 @@ class CredlyBadgeTemplateIssuer(BadgeTemplateIssuer):
             issued_to_first_name=(user.first_name or user.username),
             issued_to_last_name=(user.last_name or user.username),
             badge_template_id=str(credential.uuid),
-            issued_at=credential.created.strftime('%Y-%m-%d %H:%M:%S %z')
+            issued_at=credential.created.strftime("%Y-%m-%d %H:%M:%S %z"),
         )
         try:
             response = credly_api.issue_badge(issue_badge_data)
         except CredlyAPIError:
-            user_credential.state = 'error'
+            user_credential.state = "error"
             user_credential.save()
             raise
 
-        user_credential.uuid = response.get('data').get('id')
-        user_credential.state = response.get('data').get('state')
+        user_credential.uuid = response.get("data").get("id")
+        user_credential.state = response.get("data").get("state")
         user_credential.save()
 
     def revoke_credly_badge(self, credential_id, user_credential):
@@ -126,11 +126,11 @@ class CredlyBadgeTemplateIssuer(BadgeTemplateIssuer):
         try:
             response = credly_api.revoke_badge(user_credential.uuid, revoke_data)
         except CredlyAPIError:
-            user_credential.state = 'error'
+            user_credential.state = "error"
             user_credential.save()
             raise
 
-        user_credential.state = response.get('data').get('state')
+        user_credential.state = response.get("data").get("state")
         user_credential.save()
 
     def award(self, credential_id, username):

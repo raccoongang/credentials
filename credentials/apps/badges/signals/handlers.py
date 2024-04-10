@@ -62,7 +62,4 @@ def handle_badge_regression(sender, username, badge_template_id, **kwargs):  # p
     - badge template ID
     """
 
-    CredlyBadgeTemplateIssuer().revoke(
-        badge_template_id,
-        username
-    )
+    CredlyBadgeTemplateIssuer().revoke(badge_template_id, username)

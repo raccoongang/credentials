@@ -289,7 +289,6 @@ class PenaltyDataRule(AbstractDataRule):
         help_text=_("Parent penalty for this data rule."),
     )
 
-
     class Meta:
         unique_together = ("penalty", "data_path", "operator", "value")
 
