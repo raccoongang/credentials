@@ -2,12 +2,10 @@
 Revocation pipeline - badge regression.
 """
 
-import operator
 import uuid
 
 from typing import List
 
-from ecommerce.ecommerce.extensions import fulfillment
 from openedx_events.learning.data import BadgeData, BadgeTemplateData, UserData, UserPersonalData
 from openedx_events.learning.signals import BADGE_REVOKED
 

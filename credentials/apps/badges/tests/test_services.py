@@ -1,6 +1,5 @@
 import uuid
 
-from credentials.apps.badges.services.revocation import apply_penalties
 from django.contrib.sites.models import Site
 from django.test import TestCase
 
@@ -14,8 +13,9 @@ from ..models import (
     Fulfillment,
     PenaltyDataRule,
 )
-from ..services.awarding import discover_requirements
-from ..services.revocation import discover_penalties
+
+from credentials.apps.badges.services.awarding import discover_requirements
+from credentials.apps.badges.services.revocation import discover_penalties, process_penalties
 
 
 class BadgeRequirementDiscoveryTestCase(TestCase):
@@ -68,21 +68,24 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
         self.CCX_COURSE_PASSING_EVENT = "org.openedx.learning.ccx.course.passing.status.updated.v1"
 
     def test_discovery_eventtype_related_penalties(self):
-        BadgePenalty.objects.create(template=self.badge_template).requirements.set(
+        penalty1 = BadgePenalty.objects.create(template=self.badge_template)
+        penalty1.requirements.add(
             BadgeRequirement.objects.create(
                 template=self.badge_template,
                 event_type=self.COURSE_PASSING_EVENT,
                 description="Test course passing award description",
             )
         )
-        BadgePenalty.objects.create(template=self.badge_template).requirements.set(
+        penalty2 = BadgePenalty.objects.create(template=self.badge_template)
+        penalty2.requirements.add(
             BadgeRequirement.objects.create(
                 template=self.badge_template,
                 event_type=self.CCX_COURSE_PASSING_EVENT,
                 description="Test ccx course passing award description",
             )
         )
-        BadgePenalty.objects.create(template=self.badge_template).requirements.set(
+        penalty3 = BadgePenalty.objects.create(template=self.badge_template)
+        penalty3.requirements.add(
             BadgeRequirement.objects.create(
                 template=self.badge_template,
                 event_type=self.CCX_COURSE_PASSING_EVENT,
@@ -106,7 +109,7 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
         )
 
 
-class TestApplyPenalties(TestCase):
+class TestProcessPenalties(TestCase):
     def setUp(self):
         self.organization = CredlyOrganization.objects.create(
             uuid=uuid.uuid4(), api_key="test-api-key", name="test_organization"
@@ -118,7 +121,7 @@ class TestApplyPenalties(TestCase):
         self.COURSE_PASSING_EVENT = "org.openedx.learning.course.passing.status.updated.v1"
         self.CCX_COURSE_PASSING_EVENT = "org.openedx.learning.ccx.course.passing.status.updated.v1"
 
-    def test_apply_penalties_all_datarules_success(self):
+    def test_process_penalties_all_datarules_success(self):
         requirement1 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type=self.COURSE_PASSING_EVENT,
@@ -168,7 +171,6 @@ class TestApplyPenalties(TestCase):
             operator="ne",
             value="test_email1",
         )
-        penalties = discover_penalties(event_type=self.COURSE_PASSING_EVENT)
         kwargs = {
             "course_passing_status": {
                 "user": {
@@ -176,10 +178,10 @@ class TestApplyPenalties(TestCase):
                 }
             }
         }
-        apply_penalties(penalties, "test_username", kwargs)
+        process_penalties(self.COURSE_PASSING_EVENT, "test_username", kwargs)
         self.assertEqual(Fulfillment.objects.filter(progress=progress).count(), 0)
 
-    def test_apply_penalties_one_datarule_fail(self):
+    def test_process_penalties_one_datarule_fail(self):
         requirement1 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type=self.COURSE_PASSING_EVENT,
@@ -229,7 +231,6 @@ class TestApplyPenalties(TestCase):
             operator="ne",
             value="test_email",
         )
-        penalties = discover_penalties(event_type=self.COURSE_PASSING_EVENT)
         kwargs = {
             "course_passing_status": {
                 "user": {
@@ -237,5 +238,5 @@ class TestApplyPenalties(TestCase):
                 }
             }
         }
-        apply_penalties(penalties, "test_username", kwargs)
+        process_penalties(self.COURSE_PASSING_EVENT, "test_username", kwargs)
         self.assertEqual(Fulfillment.objects.filter(progress=progress).count(), 2)

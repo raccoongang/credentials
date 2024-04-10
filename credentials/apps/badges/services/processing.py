@@ -9,7 +9,7 @@ from credentials.apps.core.api import get_or_create_user_from_event_data
 from ..models import CredlyBadgeTemplate
 from ..signals import BADGE_PROGRESS_COMPLETE, BADGE_PROGRESS_INCOMPLETE
 from ..services.awarding import discover_requirements
-from ..services.revocation import apply_penalties, discover_penalties
+from ..services.revocation import process_penalties
 from ..utils import keypath, get_user_data
 
 
@@ -74,7 +74,7 @@ def process_event(sender, **kwargs):
         keypath(kwargs, "course_passing_status.status")
         == CoursePassingStatusData.FAILING
     ):
-        apply_penalties(penalties, username, kwargs)
+        process_penalties(sender, username, kwargs)
 
         BADGE_PROGRESS_INCOMPLETE.send(
             sender=sender,
