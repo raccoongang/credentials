@@ -33,7 +33,7 @@ def process_requirements(event_type, username, payload_dict):
     requirements = discover_requirements(event_type=event_type)
 
     for requirement in requirements:
-        if not requirement.is_active:
+        if not requirement.is_active or requirement.is_fulfilled(username):
             continue
         if requirement.apply_rules(payload_dict):
             requirement.fulfill(username)
