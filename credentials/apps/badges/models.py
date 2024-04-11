@@ -103,6 +103,8 @@ class BadgeTemplate(AbstractCredential):
         return self.name
 
     def save(self, *args, **kwargs):
+        if self.is_active and self.badgerequirement_set.count() == 0:
+            raise ValidationError("Badge template must have at least 1 Requirement set.")
         super().save()
         # auto-evaluate type:
         if not self.origin:
