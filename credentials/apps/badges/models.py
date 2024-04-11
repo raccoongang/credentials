@@ -293,7 +293,7 @@ class BadgePenalty(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"BadgePenalty:{self.id}"
+        return f"BadgePenalty:{self.id}:{self.template.uuid}"
 
     class Meta:
         verbose_name_plural = "Badge penalties"
