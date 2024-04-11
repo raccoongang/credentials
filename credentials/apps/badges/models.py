@@ -261,7 +261,7 @@ class BadgePenalty(models.Model):
     )
 
     def __str__(self):
-        return f"BadgePenalty:{self.id}:{self.template.uuid}"
+        return f"BadgePenalty:{self.id}"
 
     class Meta:
         verbose_name_plural = "Badge penalties"
