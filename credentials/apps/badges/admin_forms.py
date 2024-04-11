@@ -5,17 +5,9 @@ Badges admin forms.
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .credly.api_client import CredlyAPIClient
-from .credly.exceptions import CredlyAPIError
-from .models import BadgePenalty, BadgeRequirement, BadgeTemplate, CredlyOrganization, DataRule, PenaltyDataRule
-
-
-class BadgeTemplteValidationMixin:
-    def clean(self):
-        cleaned_data = super().clean()
-        if self.instance.is_active:
-            raise forms.ValidationError("Configuration updates are blocked on active badge templates")
-        return cleaned_data
+from credentials.apps.badges.credly.api_client import CredlyAPIClient
+from credentials.apps.badges.credly.exceptions import CredlyAPIError
+from credentials.apps.badges.models import BadgePenalty, CredlyOrganization, BadgeTemplate
 
 
 class CredlyOrganizationAdminForm(forms.ModelForm):
@@ -68,18 +60,10 @@ class CredlyOrganizationAdminForm(forms.ModelForm):
             raise forms.ValidationError(message=str(err))
 
 
-class BadgePenaltyForm(BadgeTemplteValidationMixin, forms.ModelForm):
+class BadgePenaltyForm(forms.ModelForm):
     class Meta:
         model = BadgePenalty
         fields = "__all__"
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if self.instance and hasattr(self.instance, "template"):
-            if self.instance.template.is_active:
-                for field_name in ("event_type", "template", "requirements", "description"):
-                    self.fields[field_name].disabled = True
 
     def clean(self):
         cleaned_data = super().clean()
@@ -90,45 +74,6 @@ class BadgePenaltyForm(BadgeTemplteValidationMixin, forms.ModelForm):
         ):
             raise forms.ValidationError("All requirements must belong to the same template.")
         return cleaned_data
-
-
-class PenaltyDataRuleForm(BadgeTemplteValidationMixin, forms.ModelForm):
-    class Meta:
-        model = PenaltyDataRule
-        fields = "__all__"
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and hasattr(self.instance, "penalty") and self.instance.is_active:
-            for field_name in self.fields:
-                if field_name in ("data_path", "operator", "value"):
-                    self.fields[field_name].disabled = True
-
-
-class BadgeRequirementForm(BadgeTemplteValidationMixin, forms.ModelForm):
-    class Meta:
-        model = BadgeRequirement
-        fields = "__all__"
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and hasattr(self.instance, "template") and self.instance.is_active:
-            for field_name in self.fields:
-                if field_name in ("template", "event_type", "description", "group"):
-                    self.fields[field_name].disabled = True
-
-
-class DataRuleForm(BadgeTemplteValidationMixin, forms.ModelForm):
-    class Meta:
-        model = DataRule
-        fields = "__all__"
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and hasattr(self.instance, "requirement") and self.instance.is_active:
-            for field_name in self.fields:
-                if field_name in ("data_path", "operator", "value"):
-                    self.fields[field_name].disabled = True
 
 
 class BadgeTemplateForm(forms.ModelForm):
