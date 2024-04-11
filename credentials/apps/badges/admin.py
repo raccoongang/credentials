@@ -8,7 +8,13 @@ from django.core.management import call_command
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .admin_forms import BadgePenaltyForm, BadgeRequirementForm, CredlyOrganizationAdminForm, DataRuleForm, PenaltyDataRuleForm
+from .admin_forms import (
+    BadgePenaltyForm,
+    BadgeRequirementForm,
+    CredlyOrganizationAdminForm,
+    DataRuleForm,
+    PenaltyDataRuleForm,
+)
 
 from .models import (
     BadgePenalty,
@@ -178,6 +184,7 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
     """
     Badge requirement penalty setup admin.
     """
+
     inlines = [
         DataRulePenaltyInline,
     ]

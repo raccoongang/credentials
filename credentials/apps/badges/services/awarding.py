@@ -1,17 +1,45 @@
 """
 Awarding pipeline - badge progression.
 """
-import uuid
 
 from typing import List
 
-from openedx_events.learning.data import BadgeData, BadgeTemplateData, UserData, UserPersonalData
 from openedx_events.learning.signals import BADGE_AWARDED
 
-from ..models import BadgeRequirement, CredlyBadgeTemplate
+from credentials.apps.badges.models import BadgeRequirement
+from credentials.apps.badges.signals import BADGE_PROGRESS_COMPLETE
 
 
-def notify_badge_awarded(username, badge_template_uuid):  # pylint: disable=unused-argument
+def discover_requirements(event_type: str) -> List[BadgeRequirement]:
+    return BadgeRequirement.objects.filter(event_type=event_type)
+
+
+def process_requirements(event_type, username, payload_dict):
+    """
+    AWARD FLOW:
+    - check if the related badge template already completed
+        - if BadgeProgress exists and BadgeProgress.complete == true >> badge already earned - STOP;
+    - check if it is not fulfilled yet
+        - if fulfilled (related Fulfillment exists) - STOP;
+    - apply payload rules (data-rules);
+    - if applied - fulfill the Requirement:
+        - create related Fulfillment
+        - update of create BadgeProgress
+    - BadgeProgress completeness check - check if it was enough for badge earning
+        - if BadgeProgress.complete == true
+            - emit BADGE_PROGRESS_COMPLETE >> handle_badge_completion
+    """
+
+    requirements = discover_requirements(event_type=event_type)
+
+    for requirement in requirements:
+        if not requirement.is_active:
+            continue
+        if requirement.apply_rules(payload_dict):
+            requirement.fulfill(username)
+
+
+def notify_badge_awarded(user_credential):  # pylint: disable=unused-argument
     """
     Emit public event about badge template completion.
 
@@ -19,32 +47,5 @@ def notify_badge_awarded(username, badge_template_uuid):  # pylint: disable=unus
     - badge template ID
     """
 
-    badge_template = CredlyBadgeTemplate.by_uuid(badge_template_uuid)
-    # user = get_user_by_username(username)
-
-    # UserCredential.as_badge_data() - user-credential is responsible for its conversion into payload:
-    badge_data = BadgeData(
-        uuid=str(uuid.uuid4()),
-        user=UserData(
-            pii=UserPersonalData(
-                username='event_user-username',
-                email='event_user-email',
-                name='event_user-name',
-            ),
-            id=1,
-            is_active=True,
-        ),
-        template=BadgeTemplateData(
-            uuid=str(badge_template.uuid),
-            origin=badge_template.origin,
-            name=badge_template.name,
-            description=badge_template.description,
-            image_url=str(badge_template.icon),
-        ),
-    )
-
+    badge_data = user_credential.as_badge_data()
     BADGE_AWARDED.send_event(badge=badge_data)
-
-
-def discover_requirements(event_type: str) -> List[BadgeRequirement]:
-    return BadgeRequirement.objects.filter(event_type=event_type)

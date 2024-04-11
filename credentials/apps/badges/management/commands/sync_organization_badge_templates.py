@@ -14,9 +14,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--site_id", type=int, help="Site ID.")
-        parser.add_argument(
-            "--organization_id", type=str, help="UUID of the organization."
-        )
+        parser.add_argument("--organization_id", type=str, help="UUID of the organization.")
 
     def handle(self, *args, **options):
         """
@@ -33,16 +31,12 @@ class Command(BaseCommand):
         organization_id = options.get("organization_id")
 
         if site_id is None:
-            logger.warning(
-                f"Side ID wasn't provided: assuming site_id = {DEFAULT_SITE_ID}"
-            )
+            logger.warning(f"Side ID wasn't provided: assuming site_id = {DEFAULT_SITE_ID}")
             site_id = DEFAULT_SITE_ID
 
         if organization_id:
             organizations_to_sync.append(organization_id)
-            logger.info(
-                f"Syncing badge templates for the single organization: {organization_id}"
-            )
+            logger.info(f"Syncing badge templates for the single organization: {organization_id}")
         else:
             organizations_to_sync = CredlyOrganization.get_all_organization_ids()
             logger.info(

@@ -1,14 +1,13 @@
-class BadgesError(Exception):
-    """
-    Generic Badges functionality error.
-    """
+"""
+Specific for Credly exceptions.
+"""
 
-    pass
+from credentials.apps.badges.exceptions import BadgesError
 
 
 class CredlyError(BadgesError):
     """
-    Badges error that is specific to the Credly backend.
+    Credly backend generic error.
     """
 
     pass
