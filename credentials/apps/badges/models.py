@@ -346,7 +346,6 @@ class PenaltyDataRule(AbstractDataRule):
 
     class Meta:
         unique_together = ("penalty", "data_path", "operator", "value")
-
     @property
     def is_active(self):
         return self.penalty.template.is_active
