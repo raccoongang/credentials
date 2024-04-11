@@ -9,5 +9,8 @@ Badges internal signals:
 from django.dispatch import Signal
 
 
+BADGE_REQUIREMENT_FULFILLED = Signal()
+BADGE_REQUIREMENT_REGRESSED = Signal()
+
 BADGE_PROGRESS_COMPLETE = Signal()
 BADGE_PROGRESS_INCOMPLETE = Signal()

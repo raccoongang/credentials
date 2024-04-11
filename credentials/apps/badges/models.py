@@ -15,6 +15,7 @@ from model_utils.fields import StatusField
 from openedx_events.learning.data import BadgeData, BadgeTemplateData, UserData, UserPersonalData
 
 from credentials.apps.core.api import get_user_by_username
+from credentials.apps.badges.signals import BADGE_REQUIREMENT_FULFILLED, BADGE_REQUIREMENT_REGRESSED
 from credentials.apps.badges.utils import is_datapath_valid, keypath
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
 
@@ -193,17 +194,20 @@ class BadgeRequirement(models.Model):
         super().save(*args, **kwargs)
 
     def reset(self, username: str):
-        Fulfillment.objects.filter(
+        fulfillments = Fulfillment.objects.filter(
             requirement=self,
             progress__username=username,
-        ).delete()
+        )
+        fulfillments.delete()
+        BADGE_REQUIREMENT_REGRESSED.send(sender=None, username=username, fulfillments=fulfillments)
 
     def is_fullfiled(self, username: str) -> bool:
         return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
 
     def fulfill(self, username: str):
         progress, _ = BadgeProgress.objects.get_or_create(template=self.template, username=username)
-        return Fulfillment.objects.create(progress=progress, requirement=self)
+        fulfillment = Fulfillment.objects.create(progress=progress, requirement=self)
+        BADGE_REQUIREMENT_FULFILLED.send(sender=None, username=username, fulfillment=fulfillment)
 
     def apply_rules(self, data: dict) -> bool:
         for rule in self.datarule_set.all():
@@ -291,17 +295,13 @@ class BadgePenalty(models.Model):
 
     class Meta:
         verbose_name_plural = "Badge penalties"
-    
+
     def apply_rules(self, data: dict) -> bool:
         return all(rule.apply(data) for rule in self.rules.all())
-    
+
     def reset_requirements(self, username: str):
         for requirement in self.requirements.all():
             requirement.reset(username)
-    
-    @property
-    def is_active(self):
-        return self.template.is_active
 
     @property
     def is_active(self):
@@ -346,10 +346,9 @@ class PenaltyDataRule(AbstractDataRule):
 
     class Meta:
         unique_together = ("penalty", "data_path", "operator", "value")
-        
     @property
     def is_active(self):
-        return self.requirement.template.is_active
+        return self.penalty.template.is_active
 
 
 class BadgeProgress(models.Model):
@@ -397,6 +396,9 @@ class BadgeProgress(models.Model):
 
     def reset(self):
         Fulfillment.objects.filter(progress=self).delete()
+
+    def completed(self):
+        return self.ratio == 1.00
 
 
 class Fulfillment(models.Model):
@@ -449,7 +451,7 @@ class CredlyBadge(UserCredential):
                 name=badge_template.name,
                 description=badge_template.description,
                 image_url=str(badge_template.icon),
-            )
+            ),
         )
         return badge_data
 

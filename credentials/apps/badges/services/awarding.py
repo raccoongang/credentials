@@ -2,14 +2,12 @@
 Awarding pipeline - badge progression.
 """
 
-import uuid
 from typing import List
 
 from openedx_events.learning.signals import BADGE_AWARDED
 
-from credentials.apps.badges.models import BadgeRequirement, CredlyBadgeTemplate, UserCredential
+from credentials.apps.badges.models import BadgeRequirement
 from credentials.apps.badges.signals import BADGE_PROGRESS_COMPLETE
-from credentials.apps.badges.utils import keypath
 
 
 def discover_requirements(event_type: str) -> List[BadgeRequirement]:
@@ -32,19 +30,7 @@ def process_requirements(event_type, username, payload_dict):
             - emit BADGE_PROGRESS_COMPLETE >> handle_badge_completion
     """
 
-    # TEMP: remove this stub after processing is implemented
-    if keypath(payload_dict, "course_passing_status.status") == CoursePassingStatusData.PASSING:
-        BADGE_PROGRESS_COMPLETE.send(
-            sender=None,
-            username=username,
-            badge_template_id=CredlyBadgeTemplate.objects.first().id,
-        )
-
-    # :TEMP
-
     requirements = discover_requirements(event_type=event_type)
-
-    # actual processing goes here:
 
     for requirement in requirements:
         if not requirement.is_active:
@@ -61,7 +47,5 @@ def notify_badge_awarded(user_credential):  # pylint: disable=unused-argument
     - badge template ID
     """
 
-    # user = get_user_by_username(username)
-
-    badge_data = UserCredential.objects.get(username=username, credential__uuid=badge_template_uuid).as_badge_data()
+    badge_data = user_credential.as_badge_data()
     BADGE_AWARDED.send_event(badge=badge_data)
