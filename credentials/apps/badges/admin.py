@@ -169,6 +169,9 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         "event_type",
     ]
     form = BadgeRequirementForm
+    
+    def has_add_permission(self, request):
+        return False
 
 
 class BadgePenaltyAdmin(admin.ModelAdmin):
@@ -192,6 +195,9 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
         "requirements",
     ]
     form = BadgePenaltyForm
+    
+    def has_add_permission(self, request):
+        return False
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "requirements":
@@ -199,7 +205,6 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
             if template_id:
                 kwargs["queryset"] = BadgeRequirement.objects.filter(template_id=template_id)
         return super().formfield_for_manytomany(db_field, request, **kwargs)
-
 
 
 class BadgeProgressAdmin(admin.ModelAdmin):
