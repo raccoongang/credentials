@@ -101,6 +101,13 @@ LEARNER_RECORD_MFE_RECORDS_PAGE_URL = "http://localhost:1990/"
 
 add_plugins(__name__, PROJECT_TYPE, SettingsType.DEVSTACK)
 
+BADGES_CONFIG['events'] = (
+    "org.openedx.learning.ccx.course.passing.status.updated.v1",
+    "org.openedx.learning.course.passing.status.updated.v1",
+)
+
+BADGES_ENABLED = True
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
