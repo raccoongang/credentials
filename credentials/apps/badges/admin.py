@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from .admin_forms import (
     BadgePenaltyForm,
     BadgeRequirementForm,
+    BadgeTemplateForm,
     CredlyOrganizationAdminForm,
     DataRuleForm,
     PenaltyDataRuleForm,
@@ -123,6 +124,7 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         BadgeRequirementInline,
         BadgePenaltyInline,
     ]
+    form = BadgeTemplateForm
 
     def has_add_permission(self, request):
         return False
