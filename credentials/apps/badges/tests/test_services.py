@@ -1,3 +1,4 @@
+from re import template
 import uuid
 
 from django.contrib.sites.models import Site
@@ -91,7 +92,7 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
                 event_type=self.CCX_COURSE_PASSING_EVENT,
                 description="Test ccx course passing revoke description",
             )
-        ])
+        )
         course_passing_penalties = discover_penalties(event_type=self.COURSE_PASSING_EVENT)
         ccx_course_passing_penalties = discover_penalties(event_type=self.CCX_COURSE_PASSING_EVENT)
         self.assertEqual(course_passing_penalties.count(), 1)
@@ -145,7 +146,7 @@ class TestProcessPenalties(TestCase):
             value="test_email",
         )
 
-        progress = BadgeProgress.objects.create(username="test_username")
+        progress = BadgeProgress.objects.create(username="test_username", template=self.badge_template)
         Fulfillment.objects.create(progress=progress, requirement=requirement1)
         Fulfillment.objects.create(progress=progress, requirement=requirement2)
 
@@ -154,9 +155,7 @@ class TestProcessPenalties(TestCase):
         self.assertEqual(Fulfillment.objects.filter(progress=progress, requirement=requirement1).count(), 1)
         self.assertEqual(Fulfillment.objects.filter(progress=progress, requirement=requirement1).count(), 1)
 
-        bp = BadgePenalty.objects.create(
-            template=self.badge_template, event_type=self.COURSE_PASSING_EVENT
-        )
+        bp = BadgePenalty.objects.create(template=self.badge_template, event_type=self.COURSE_PASSING_EVENT)
         bp.requirements.set(
             (requirement1, requirement2),
         )

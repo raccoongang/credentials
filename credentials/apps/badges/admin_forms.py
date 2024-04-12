@@ -77,13 +77,9 @@ class BadgePenaltyForm(BadgeTemplteValidationMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.instance and hasattr(self.instance, "template"):
-            self.fields["requirements"].queryset = BadgeRequirement.objects.filter(
-                template=self.instance.template
-            )  # what to do on add if template is not yet set?
             if self.instance.template.is_active:
-                for field_name in self.fields:
-                    if field_name in ("template", "requirements", "description"):
-                        self.fields[field_name].disabled = True
+                for field_name in ("event_type", "template", "requirements", "description"):
+                    self.fields[field_name].disabled = True
 
     def clean(self):
         cleaned_data = super().clean()

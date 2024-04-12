@@ -9,10 +9,14 @@ import logging
 from django.dispatch import receiver
 from openedx_events.tooling import OpenEdxPublicSignal, load_all_signals
 
-from ..services.processing import process_event
-from ..services.issuers import CredlyBadgeTemplateIssuer
-from ..utils import get_badging_event_types
-from .signals import BADGE_PROGRESS_COMPLETE, BADGE_PROGRESS_INCOMPLETE
+from credentials.apps.badges.services.processing import process_event
+from credentials.apps.badges.services.issuers import CredlyBadgeTemplateIssuer
+from credentials.apps.badges.signals import BADGE_REQUIREMENT_FULFILLED, BADGE_REQUIREMENT_REGRESSED
+from credentials.apps.badges.utils import get_badging_event_types
+from .signals import (
+    BADGE_PROGRESS_COMPLETE,
+    BADGE_PROGRESS_INCOMPLETE,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -63,3 +67,23 @@ def handle_badge_regression(sender, username, badge_template_id, **kwargs):  # p
     """
 
     CredlyBadgeTemplateIssuer().revoke(badge_template_id, username)
+
+
+@receiver(BADGE_REQUIREMENT_FULFILLED)
+def handle_requirement_fulfilled(sender, username, fulfillment, **kwargs):  # pylint: disable=unused-argument
+    if not fulfillment.progress.completed():
+        BADGE_PROGRESS_COMPLETE.send(
+            sender=None,
+            username=username,
+            badge_template_id=fulfillment.progress.template.id,
+        )
+
+
+@receiver(BADGE_REQUIREMENT_REGRESSED)
+def handle_requirement_regressed(sender, username, fulfillments, **kwargs):  # pylint: disable=unused-argument
+    for fulfillment in fulfillments:
+        BADGE_PROGRESS_INCOMPLETE.send(
+            sender=None,
+            username=username,
+            badge_template_id=fulfillment.progress.template.id,
+        )

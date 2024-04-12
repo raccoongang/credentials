@@ -39,17 +39,6 @@ def process_penalties(event_type, username, payload_dict):
             - emit BADGE_PROGRESS_INCOMPLETE >> handle_badge_incompletion
     """
 
-    # TEMP: remove this stub after processing is implemented
-
-    if keypath(payload_dict, "course_passing_status.status") == CoursePassingStatusData.FAILING:
-        BADGE_PROGRESS_INCOMPLETE.send(
-            sender=None,
-            username=username,
-            badge_template_id=CredlyBadgeTemplate.objects.first().id,
-        )
-
-    # :TEMP
-
     penalties = discover_penalties(event_type=event_type)
     for penalty in penalties:
         if not penalty.is_active:
@@ -66,7 +55,5 @@ def notify_badge_revoked(user_credential):  # pylint: disable=unused-argument
     - badge template ID
     """
 
-    # user = get_user_by_username(username)
-
-    badge_data = UserCredential.objects.get(username=username, credential__uuid=badge_template_uuid).as_badge_data()
+    badge_data = user_credential.as_badge_data()
     BADGE_REVOKED.send_event(badge=badge_data)
