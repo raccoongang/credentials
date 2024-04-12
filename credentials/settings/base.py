@@ -544,8 +544,8 @@ FAVICON_URL = "https://edx-cdn.org/v3/default/favicon.ico"
 LOGO_POWERED_BY_OPEN_EDX_URL = "https://edx-cdn.org/v3/prod/open-edx-tag.svg"
 
 
-def _should_sent_badge_events(settings):
-    return settings.get("BADGES_ENABLED", False)
+def _should_send_learning_badge_events(settings):
+    return settings.FEATURES['BADGES_ENABLED']
 
 # Event Bus Settings
 EVENT_BUS_PRODUCER = "edx_event_bus_redis.create_producer"
@@ -564,7 +564,7 @@ EVENT_BUS_PRODUCER_CONFIG = {
     # .. toggle_warning: The default may be changed in a later release.
     # .. toggle_use_cases: opt_in
     "org.openedx.learning.badge.awarded.v1": {
-        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": _should_sent_badge_events},
+        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": _should_send_learning_badge_events},
     },
     # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.badge.revoked.v1']
     #    ['learning-badges-lifecycle']['enabled']
@@ -574,7 +574,7 @@ EVENT_BUS_PRODUCER_CONFIG = {
     # .. toggle_warning: The default may be changed in a later release.
     # .. toggle_use_cases: opt_in
     "org.openedx.learning.badge.revoked.v1": {
-        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": _should_sent_badge_events},
+        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": _should_send_learning_badge_events},
     },
 }
 
