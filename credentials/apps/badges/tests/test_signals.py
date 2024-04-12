@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
 from credentials.apps.badges.models import CredlyBadge, CredlyBadgeTemplate, CredlyOrganization
-from credentials.apps.badges.services.issuers import CredlyBadgeTemplateIssuer
+from credentials.apps.badges.issuers import CredlyBadgeTemplateIssuer
 from credentials.apps.badges.signals.signals import BADGE_PROGRESS_COMPLETE
 
 

@@ -7,7 +7,7 @@ from django.test import TestCase
 from credentials.apps.credentials.constants import UserCredentialStatus
 
 from ..models import CredlyBadge, CredlyBadgeTemplate, CredlyOrganization
-from ..services.issuers import CredlyBadgeTemplateIssuer
+from ..issuers import CredlyBadgeTemplateIssuer
 
 
 class CredlyBadgeTemplateIssuer(TestCase):

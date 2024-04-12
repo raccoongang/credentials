@@ -10,12 +10,11 @@ from credentials.apps.badges.credly.api_client import CredlyAPIClient
 from credentials.apps.badges.credly.data import IssueBadgeData
 from credentials.apps.badges.credly.exceptions import CredlyAPIError
 from credentials.apps.badges.models import BadgeTemplate, CredlyBadge, CredlyBadgeTemplate, UserCredential
+from credentials.apps.badges.processing.progression import notify_badge_awarded
+from credentials.apps.badges.processing.regression import notify_badge_revoked
 from credentials.apps.core.api import get_user_by_username
 from credentials.apps.credentials.constants import UserCredentialStatus
 from credentials.apps.credentials.issuers import AbstractCredentialIssuer
-
-from .awarding import notify_badge_awarded
-from .revocation import notify_badge_revoked
 
 
 class BadgeTemplateIssuer(AbstractCredentialIssuer):

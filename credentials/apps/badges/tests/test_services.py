@@ -15,8 +15,8 @@ from ..models import (
     PenaltyDataRule,
 )
 
-from credentials.apps.badges.services.awarding import discover_requirements
-from credentials.apps.badges.services.revocation import discover_penalties, process_penalties
+from credentials.apps.badges.services.progression import discover_requirements
+from credentials.apps.badges.services.regression import discover_penalties, process_penalties
 
 
 class BadgeRequirementDiscoveryTestCase(TestCase):
