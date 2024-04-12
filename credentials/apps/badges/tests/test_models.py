@@ -1,17 +1,21 @@
 import uuid
 
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.test import TestCase
+from openedx_events.learning.data import BadgeData, UserData, UserPersonalData, BadgeTemplateData
 
-from ..models import (
+from credentials.apps.badges.models import (
     BadgeProgress,
     BadgeRequirement,
     BadgeTemplate,
+    CredlyBadge,
     CredlyBadgeTemplate,
     CredlyOrganization,
     DataRule,
     Fulfillment,
 )
+from credentials.apps.core.models import User
 
 
 class DataRulesTestCase(TestCase):
@@ -329,3 +333,42 @@ class BadgeTemplateRatioTestCase(TestCase):
     def test_ratio_no_requirements(self):
         BadgeRequirement.objects.filter(template=self.badge_template).delete()
         self.assertEqual(self.progress.ratio, 0.00)
+
+
+class CredlyBadgeAsBadgeDataTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='test_user', email='test@example.com', full_name='Test User', lms_user_id=1)
+        self.site = Site.objects.create(domain='test_domain', name='test_name')
+        self.credential = BadgeTemplate.objects.create(
+            uuid=uuid.uuid4(), origin='test_origin', name='test_template', description='test_description', icon='test_icon', site=self.site
+        )
+        self.badge = CredlyBadge.objects.create(
+            username="test_user",
+            credential_content_type=ContentType.objects.get_for_model(self.credential),
+            credential_id=self.credential.id,
+            state=CredlyBadge.STATES.pending,
+            uuid=uuid.uuid4(),
+        )
+
+    def test_as_badge_data(self):
+        expected_badge_data = BadgeData(
+            uuid=self.badge.uuid,
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.user.username,
+                    email=self.user.email,
+                    name=self.user.get_full_name(),
+                ),
+                id=self.user.lms_user_id,
+                is_active=self.user.is_active,
+            ),
+            template=BadgeTemplateData(
+                uuid=str(self.credential.uuid),
+                origin=self.credential.origin,
+                name=self.credential.name,
+                description=self.credential.description,
+                image_url=self.credential.icon,
+            ),
+        )
+        actual_badge_data = self.badge.as_badge_data()
+        self.assertEqual(actual_badge_data, expected_badge_data)
