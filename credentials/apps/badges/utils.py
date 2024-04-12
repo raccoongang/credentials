@@ -3,7 +3,7 @@ import inspect
 import attr
 from attrs import asdict
 from django.conf import settings
-from openedx_events.learning.data import UserData
+from openedx_events.learning.data import UserData, UserPersonalData
 from openedx_events.tooling import OpenEdxPublicSignal
 
 
@@ -76,26 +76,25 @@ def is_datapath_valid(datapath: str, event_type: str) -> bool:
                     return False
 
 
-def get_user_data(data) -> UserData:
+def get_user_data(data: dict) -> UserData:
     """
     Extracts UserData object from any dataclass that contains UserData as a field.
 
     Parameters:
-        - data: Input dataclass object that contains UserData.
+        - data: Input dict that contains UserData.
 
     Returns:
         UserData: UserData object contained within the input dataclass.
     """
-    if isinstance(data, UserData):
-        return data
 
-    for _, attr_value in inspect.getmembers(data):
-        if isinstance(attr_value, UserData):
-            return attr_value
-        elif attr.has(attr_value):
-            user_data = get_user_data(attr_value)
-            if user_data:
-                return user_data
+    if "user" in data.keys():
+        user = data["user"]
+        pii = UserPersonalData(**user["pii"])
+        return UserData(id=user["id"], is_active=user["is_active"], pii=pii)
+    
+    for key, value in data.items():
+        if isinstance(value, dict):
+            return get_user_data(value)
     return None
 
 

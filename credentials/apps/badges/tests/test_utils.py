@@ -4,7 +4,7 @@ from attr import asdict
 
 from openedx_events.learning.data import UserData, UserPersonalData, CourseData, CoursePassingStatusData
 
-from ..utils import keypath, get_user_data, is_datapath_valid
+from ..utils import extract_payload, keypath, get_user_data, is_datapath_valid
 
 
 class TestKeypath(unittest.TestCase):
@@ -76,12 +76,12 @@ class TestGetUserData(unittest.TestCase):
             id=2, is_active=False, pii=UserPersonalData(username="user2", email="user2@example.com", name="Jane Doe")
         )
 
-        self.passing_status_1 = CoursePassingStatusData(
+        self.passing_status_1 = asdict(CoursePassingStatusData(
             status=CoursePassingStatusData.PASSING, course=self.course_data_1, user=self.user_data_1
-        )
-        self.failing_status_1 = CoursePassingStatusData(
+        ))
+        self.failing_status_1 = asdict(CoursePassingStatusData(
             status=CoursePassingStatusData.FAILING, course=self.course_data_2, user=self.user_data_2
-        )
+        ))
 
     def test_get_user_data_from_course_enrollment(self):
         result_1 = get_user_data(self.passing_status_1)
