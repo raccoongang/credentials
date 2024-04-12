@@ -19,6 +19,7 @@ from openedx_events.learning.data import (
     UserPersonalData,
 )
 
+from credentials.apps.badges.credly.utils import get_credly_base_url
 from credentials.apps.badges.signals import (
     BADGE_REQUIREMENT_FULFILLED,
     BADGE_REQUIREMENT_REGRESSED,
@@ -130,10 +131,8 @@ class CredlyBadgeTemplate(BadgeTemplate):
         """
         Build external Credly dashboard URL.
         """
-        credly_host_base_url = "https://sandbox.credly.com"
-        return (
-            f"{credly_host_base_url}/mgmt/organizations/{self.organization.uuid}/badges/templates/{self.uuid}/details"
-        )
+        credly_host_base_url = get_credly_base_url(settings)
+        return f"{credly_host_base_url}mgmt/organizations/{self.organization.uuid}/badges/templates/{self.uuid}/details"
 
 
 class BadgeRequirement(models.Model):
@@ -449,6 +448,9 @@ class CredlyBadge(UserCredential):
     )
 
     def as_badge_data(self) -> BadgeData:
+        """
+        Represents itself as a BadgeData instance.
+        """
         user = get_user_by_username(self.username)
         badge_template = self.credential
 

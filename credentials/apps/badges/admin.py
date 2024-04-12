@@ -122,6 +122,39 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         "dashboard_link",
         "image",
     ]
+    fieldsets = (
+        (
+            "Generic",
+            {
+                "fields": (
+                    "site",
+                    "is_active",
+                )
+            },
+        ),
+        (
+            "Badge template",
+            {
+                "fields": (
+                    "uuid",
+                    "name",
+                    "description",
+                    "image",
+                    "origin",
+                )
+            },
+        ),
+        (
+            "Credly",
+            {
+                "fields": (
+                    "organization",
+                    "state",
+                    "dashboard_link",
+                ),
+            },
+        ),
+    )
     inlines = [
         BadgeRequirementInline,
         BadgePenaltyInline,
