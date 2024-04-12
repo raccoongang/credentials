@@ -41,8 +41,8 @@ def process_requirements(event_type, username, payload_dict):
             if not requirement.is_active or requirement.is_fulfilled(username):
                 continue
 
-        if requirement.apply_rules(payload_dict):
-            requirement.fulfill(username)
+            if requirement.apply_rules(payload_dict):
+                requirement.fulfill(username)
 
 
 def notify_badge_awarded(user_credential):  # pylint: disable=unused-argument
