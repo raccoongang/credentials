@@ -68,9 +68,6 @@ def identify_user(*, event_type, event_payload):
 
     user_data = get_user_data(event_payload)
 
-    # FIXME: didn't find!
-    user_data = event_payload["course_passing_status"].user
-
     if not user_data:
         message = f"User data cannot be found (got: {user_data}): {event_payload}. Does event {event_type} include user data at all?"
         raise BadgesProcessingError(message)
