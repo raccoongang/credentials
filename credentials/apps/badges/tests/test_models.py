@@ -185,11 +185,11 @@ class RequirementFulfillmentCheckTestCase(TestCase):
         self.fulfillment = Fulfillment.objects.create(progress=self.badge_progress, requirement=self.badge_requirement)
 
     def test_fulfillment_check_success(self):
-        is_fulfilled = self.badge_requirement.is_fullfiled("test1")
+        is_fulfilled = self.badge_requirement.is_fulfilled("test1")
         self.assertTrue(is_fulfilled)
 
     def test_fulfillment_check_wrong_username(self):
-        is_fulfilled = self.badge_requirement.is_fullfiled("asd")
+        is_fulfilled = self.badge_requirement.is_fulfilled("asd")
         self.assertFalse(is_fulfilled)
 
 
