@@ -7,7 +7,7 @@ from django.test import TestCase
 from credentials.apps.credentials.constants import UserCredentialStatus
 
 from ..models import CredlyBadge, CredlyBadgeTemplate, CredlyOrganization
-from ..services.issuers import CredlyBadgeTemplateIssuer
+from ..issuers import CredlyBadgeTemplateIssuer
 
 
 class CredlyBadgeTemplateIssuer(TestCase):
@@ -32,7 +32,7 @@ class CredlyBadgeTemplateIssuer(TestCase):
 
     def test_create_user_credential_with_status_awared(self):
         # Call create_user_credential with valid arguments
-        with mock.patch("credentials.apps.badges.services.issuers.notify_badge_awarded") as mock_notify_badge_awarded:
+        with mock.patch("credentials.apps.badges.issuers.notify_badge_awarded") as mock_notify_badge_awarded:
 
             with mock.patch.object(self.issuer, "issue_credly_badge") as mock_issue_credly_badge:
                 self.issuer().award(self.badge_template.id, "test_user")
@@ -59,7 +59,7 @@ class CredlyBadgeTemplateIssuer(TestCase):
             uuid=self.fake.uuid4(),
         )
 
-        with mock.patch("credentials.apps.badges.services.issuers.notify_badge_revoked") as mock_notify_badge_revoked:
+        with mock.patch("credentials.apps.badges.issuers.notify_badge_revoked") as mock_notify_badge_revoked:
             with mock.patch.object(self.issuer, "revoke_credly_badge") as mock_revoke_credly_badge:
                 self.issuer().revoke(self.badge_template.id, "test_user")
 

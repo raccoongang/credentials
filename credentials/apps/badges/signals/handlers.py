@@ -11,18 +11,12 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from openedx_events.tooling import OpenEdxPublicSignal, load_all_signals
 
+from credentials.apps.badges.issuers import CredlyBadgeTemplateIssuer
 from credentials.apps.badges.models import BadgeTemplate
-from credentials.apps.badges.services.processing import process_event
-from credentials.apps.badges.services.issuers import CredlyBadgeTemplateIssuer
-from credentials.apps.badges.signals import (
-    BADGE_REQUIREMENT_FULFILLED,
-    BADGE_REQUIREMENT_REGRESSED,
-)
+from credentials.apps.badges.processing import process_event
+from credentials.apps.badges.signals import BADGE_REQUIREMENT_FULFILLED, BADGE_REQUIREMENT_REGRESSED
+from credentials.apps.badges.signals.signals import BADGE_PROGRESS_COMPLETE, BADGE_PROGRESS_INCOMPLETE
 from credentials.apps.badges.utils import get_badging_event_types
-from .signals import (
-    BADGE_PROGRESS_COMPLETE,
-    BADGE_PROGRESS_INCOMPLETE,
-)
 
 
 logger = logging.getLogger(__name__)

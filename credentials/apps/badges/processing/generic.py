@@ -4,16 +4,11 @@ Main processing logic.
 
 import logging
 
-from credentials.apps.badges.exceptions import (
-    BadgesProcessingError,
-    StopEventProcessing,
-)
+from credentials.apps.badges.exceptions import BadgesProcessingError, StopEventProcessing
+from credentials.apps.badges.processing.progression import process_requirements
+from credentials.apps.badges.processing.regression import process_penalties
+from credentials.apps.badges.utils import extract_payload, get_user_data
 from credentials.apps.core.api import get_or_create_user_from_event_data
-
-from ..services.awarding import process_requirements
-from ..services.revocation import process_penalties
-from ..utils import extract_payload, get_user_data
-
 
 logger = logging.getLogger(__name__)
 

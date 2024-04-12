@@ -263,19 +263,19 @@ class BadgeTemplateUserCompletionTestCase(TestCase):
             description="Test description",
         )
 
-    def test_user_completion_success(self):
+    def test_is_completed_success(self):
         Fulfillment.objects.create(
             progress=BadgeProgress.objects.create(username="test_user", template=self.badge_template),
             requirement=self.requirement1,
         )
-        self.assertTrue(self.badge_template.user_completion("test_user"))
+        self.assertTrue(self.badge_template.is_completed("test_user"))
 
-    def test_user_completion_failure(self):
-        self.assertFalse(self.badge_template.user_completion("test_usfer"))
+    def test_is_completed_failure(self):
+        self.assertFalse(self.badge_template.is_completed("test_usfer"))
 
-    def test_user_completion_no_requirements(self):
+    def test_is_completed_no_requirements(self):
         BadgeRequirement.objects.filter(template=self.badge_template).delete()
-        self.assertEqual(self.badge_template.user_completion("test_user"), 0.0)
+        self.assertEqual(self.badge_template.is_completed("test_user"), 0.0)
 
 
 class BadgeTemplateRatioTestCase(TestCase):
