@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .credly.api_client import CredlyAPIClient
 from .credly.exceptions import CredlyAPIError
-from .models import BadgePenalty, BadgeRequirement, CredlyOrganization, DataRule, PenaltyDataRule
+from .models import BadgePenalty, BadgeRequirement, BadgeTemplate, CredlyOrganization, DataRule, PenaltyDataRule
 
 
 class BadgeTemplteValidationMixin:
@@ -129,3 +129,16 @@ class DataRuleForm(BadgeTemplteValidationMixin, forms.ModelForm):
             for field_name in self.fields:
                 if field_name in ("data_path", "operator", "value"):
                     self.fields[field_name].disabled = True
+
+
+class BadgeTemplateForm(forms.ModelForm):
+    class Meta:
+        model = BadgeTemplate
+        fields = "__all__"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        print(cleaned_data)
+        if cleaned_data.get("is_active") and not self.instance.badgerequirement_set.exists():
+            raise forms.ValidationError("Badge Template must have at least 1 Requirement set.")
+        return cleaned_data
