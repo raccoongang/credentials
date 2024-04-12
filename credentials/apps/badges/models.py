@@ -197,12 +197,12 @@ class BadgeRequirement(models.Model):
         fulfillments.delete()
         BADGE_REQUIREMENT_REGRESSED.send(sender=None, username=username, fulfillments=fulfillments)
 
-    def is_fullfiled(self, username: str) -> bool:
+    def is_fulfilled(self, username: str) -> bool:
         return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
 
     def fulfill(self, username: str):
         progress, _ = BadgeProgress.objects.get_or_create(template=self.template, username=username)
-        fulfillment = Fulfillment.objects.create(progress=progress, requirement=self)
+        fulfillment, _ = Fulfillment.objects.get_or_create(progress=progress, requirement=self)
         BADGE_REQUIREMENT_FULFILLED.send(sender=None, username=username, fulfillment=fulfillment)
 
     def apply_rules(self, data: dict) -> bool:
@@ -367,13 +367,28 @@ class BadgeProgress(models.Model):
         """
         Calculate badge template progress ratio.
         """
-        requirements_count = BadgeRequirement.objects.filter(template=self.template).count()
-        if requirements_count == 0:
-            return 0.00
+
+        requirements = BadgeRequirement.objects.filter(template=self.template)
+
+        group_ids = requirements.filter(
+            group__isnull=False
+        ).values_list('group', flat=True).distinct()
+
+        requirements_count = requirements.filter(
+            group__isnull=True
+        ).count() + group_ids.count()
 
         fulfilled_requirements_count = Fulfillment.objects.filter(
-            progress=self, requirement__template=self.template
+            progress=self,
+            requirement__template=self.template,
+            requirement__group__isnull=True
         ).count()
+
+        for group_id in group_ids:
+            group_requirements = requirements.filter(group=group_id)
+            group_fulfillment_count = Fulfillment.objects.filter(requirement__in=group_requirements).count()
+            fulfilled_requirements_count += 1 if group_fulfillment_count > 0 else 0
+
         if fulfilled_requirements_count == 0:
             return 0.00
         return round(fulfilled_requirements_count / requirements_count, 2)
