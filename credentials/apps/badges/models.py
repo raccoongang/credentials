@@ -197,7 +197,7 @@ class BadgeRequirement(models.Model):
         fulfillments.delete()
         BADGE_REQUIREMENT_REGRESSED.send(sender=None, username=username, fulfillments=fulfillments)
 
-    def is_fullfiled(self, username: str) -> bool:
+    def is_fulfilled(self, username: str) -> bool:
         return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
 
     def fulfill(self, username: str):
