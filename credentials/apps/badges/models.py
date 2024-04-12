@@ -103,8 +103,10 @@ class BadgeTemplate(AbstractCredential):
         return self.name
 
     def save(self, *args, **kwargs):
+        # do not allow activate not configured item:
         if self.is_active and self.badgerequirement_set.count() == 0:
             raise ValidationError("Badge template must have at least 1 Requirement set.")
+
         super().save()
         # auto-evaluate type:
         if not self.origin:
@@ -124,7 +126,7 @@ class BadgeTemplate(AbstractCredential):
             return 0.00
         return progress.ratio
 
-    def user_completion(self, username: str) -> bool:
+    def is_completed(self, username: str) -> bool:
         """
         Check if user completed badge template.
         """
