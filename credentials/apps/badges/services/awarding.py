@@ -35,6 +35,7 @@ def process_requirements(event_type, username, payload_dict):
     for requirement in requirements:
         if not requirement.is_active or requirement.is_fulfilled(username):
             continue
+
         if requirement.apply_rules(payload_dict):
             requirement.fulfill(username)
 
