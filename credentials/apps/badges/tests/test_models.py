@@ -318,6 +318,32 @@ class BadgeTemplateRatioTestCase(TestCase):
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
         )
+
+        self.group_requirement1 = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type="org.openedx.learning.course.passing.status.updated.v1",
+            description="Test description",
+            group='test-group1',
+        )
+        self.group_requirement2 = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type="org.openedx.learning.course.passing.status.updated.v1",
+            description="Test description",
+            group='test-group1',
+        )
+
+        self.group_requirement3 = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type="org.openedx.learning.course.passing.status.updated.v1",
+            description="Test description",
+            group='test-group2',
+        )
+        self.group_requirement4 = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type="org.openedx.learning.course.passing.status.updated.v1",
+            description="Test description",
+            group='test-group2',
+        )
         self.progress = BadgeProgress.objects.create(username="test_user", template=self.badge_template)
 
     def test_ratio_no_fulfillments(self):
@@ -328,7 +354,25 @@ class BadgeTemplateRatioTestCase(TestCase):
             progress=self.progress,
             requirement=self.requirement1,
         )
+        self.assertEqual(self.progress.ratio, 0.25)
+
+        Fulfillment.objects.create(
+            progress=self.progress,
+            requirement=self.requirement2,
+        )
         self.assertEqual(self.progress.ratio, 0.50)
+
+        Fulfillment.objects.create(
+            progress=self.progress,
+            requirement=self.group_requirement1,
+        )
+        self.assertEqual(self.progress.ratio, 0.75)
+
+        Fulfillment.objects.create(
+            progress=self.progress,
+            requirement=self.group_requirement3,
+        )
+        self.assertEqual(self.progress.ratio, 1.00)
 
     def test_ratio_no_requirements(self):
         BadgeRequirement.objects.filter(template=self.badge_template).delete()
