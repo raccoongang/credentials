@@ -108,7 +108,6 @@ class BadgeTemplate(AbstractCredential):
             self.origin = self.ORIGIN
             self.save(*args, **kwargs)
 
-
     @classmethod
     def by_uuid(cls, template_uuid):
         return cls.objects.filter(uuid=template_uuid, origin=cls.ORIGIN).first()
