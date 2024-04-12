@@ -6,9 +6,12 @@ See:
 
 import logging
 
+from django.core.exceptions import ValidationError
+from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from openedx_events.tooling import OpenEdxPublicSignal, load_all_signals
 
+from credentials.apps.badges.models import BadgeTemplate
 from credentials.apps.badges.services.processing import process_event
 from credentials.apps.badges.services.issuers import CredlyBadgeTemplateIssuer
 from credentials.apps.badges.signals import BADGE_REQUIREMENT_FULFILLED, BADGE_REQUIREMENT_REGRESSED
@@ -87,3 +90,9 @@ def handle_requirement_regressed(sender, username, fulfillments, **kwargs):  # p
             username=username,
             badge_template_id=fulfillment.progress.template.id,
         )
+
+
+@receiver(pre_delete, sender=BadgeTemplate)
+def prevent_deletion_if_active(sender, instance, **kwargs):
+    if instance.is_active:
+        raise ValidationError("Cannot delete active BadgeTemplate instance.")
