@@ -8,6 +8,7 @@ from edx_toggles.toggles import WaffleSwitch
 from edx_django_utils.plugins import get_plugin_apps, add_plugins
 
 from credentials.settings.utils import get_logger_config
+from credentials.apps.badges.toggles import is_badges_enabled
 from credentials.apps.plugins.constants import PROJECT_TYPE, SettingsType
 
 
@@ -543,10 +544,6 @@ LOGO_WHITE_URL_SVG = "https://edx-cdn.org/v3/default/logo-white.svg"
 FAVICON_URL = "https://edx-cdn.org/v3/default/favicon.ico"
 LOGO_POWERED_BY_OPEN_EDX_URL = "https://edx-cdn.org/v3/prod/open-edx-tag.svg"
 
-
-def _should_send_learning_badge_events(settings):
-    return settings.FEATURES['BADGES_ENABLED']
-
 # Event Bus Settings
 EVENT_BUS_PRODUCER = "edx_event_bus_redis.create_producer"
 EVENT_BUS_CONSUMER = "edx_event_bus_redis.RedisEventConsumer"
@@ -564,7 +561,7 @@ EVENT_BUS_PRODUCER_CONFIG = {
     # .. toggle_warning: The default may be changed in a later release.
     # .. toggle_use_cases: opt_in
     "org.openedx.learning.badge.awarded.v1": {
-        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": _should_send_learning_badge_events()},
+        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": is_badges_enabled()},
     },
     # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.badge.revoked.v1']
     #    ['learning-badges-lifecycle']['enabled']
@@ -574,7 +571,7 @@ EVENT_BUS_PRODUCER_CONFIG = {
     # .. toggle_warning: The default may be changed in a later release.
     # .. toggle_use_cases: opt_in
     "org.openedx.learning.badge.revoked.v1": {
-        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": _should_send_learning_badge_events()},
+        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": is_badges_enabled()},
     },
 }
 
