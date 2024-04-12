@@ -32,7 +32,7 @@ def process_event(sender, **kwargs):
 
     try:
         # user identification
-        username = identify_user(event_type=event_type, event_payload=extract_payload(kwargs))
+        username = identify_user(event_type=event_type, event_payload=extract_payload(kwargs, as_dict=True))
 
         # requirements processing
         process_requirements(event_type, username, extract_payload(kwargs, as_dict=True))
