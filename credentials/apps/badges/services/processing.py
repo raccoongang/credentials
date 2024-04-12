@@ -23,9 +23,9 @@ def process_event(sender, **kwargs):
     Badge templates configuration interpreter.
 
     Responsibilities:
-        - event's User identification (whose action);
-        - requirements processing;
-        - penalties processing;
+        - identifies a target User based on event's payload ("whose action");
+        - runs badges progressive pipeline (requirements processing);
+        - runs badges regressive pipeline (penalties processing);
     """
 
     event_type = sender.event_type
@@ -67,9 +67,6 @@ def identify_user(*, event_type, event_payload):
     """
 
     user_data = get_user_data(event_payload)
-
-    # FIXME: didn't find!
-    user_data = event_payload["course_passing_status"].user
 
     if not user_data:
         message = f"User data cannot be found (got: {user_data}): {event_payload}. Does event {event_type} include user data at all?"

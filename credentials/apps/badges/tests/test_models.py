@@ -81,29 +81,11 @@ class RequirementApplyRulesCheckTestCase(TestCase):
         self.data_rule = DataRule.objects.create
 
     def test_apply_rules_check_success(self):
-        data = {
-            'course_passing_status': {
-                'user': {
-                    'pii': {
-                        'username': 'test-username',
-                        'email': 'test@example.com'
-                    }
-                }
-            }
-        }
+        data = {"course_passing_status": {"user": {"pii": {"username": "test-username", "email": "test@example.com"}}}}
         self.assertTrue(self.badge_requirement.apply_rules(data))
 
     def test_apply_rules_check_failed(self):
-        data = {
-            'course_passing_status': {
-                'user': {
-                    'pii': {
-                        'username': 'test-username2',
-                        'email': 'test@example.com'
-                    }
-                }
-            }
-        }
+        data = {"course_passing_status": {"user": {"pii": {"username": "test-username2", "email": "test@example.com"}}}}
         self.assertFalse(self.badge_requirement.apply_rules(data))
 
 
@@ -323,26 +305,26 @@ class BadgeTemplateRatioTestCase(TestCase):
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
-            group='test-group1',
+            group="test-group1",
         )
         self.group_requirement2 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
-            group='test-group1',
+            group="test-group1",
         )
 
         self.group_requirement3 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
-            group='test-group2',
+            group="test-group2",
         )
         self.group_requirement4 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
-            group='test-group2',
+            group="test-group2",
         )
         self.progress = BadgeProgress.objects.create(username="test_user", template=self.badge_template)
 
@@ -381,10 +363,17 @@ class BadgeTemplateRatioTestCase(TestCase):
 
 class CredlyBadgeAsBadgeDataTestCase(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='test_user', email='test@example.com', full_name='Test User', lms_user_id=1)
-        self.site = Site.objects.create(domain='test_domain', name='test_name')
+        self.user = User.objects.create_user(
+            username="test_user", email="test@example.com", full_name="Test User", lms_user_id=1
+        )
+        self.site = Site.objects.create(domain="test_domain", name="test_name")
         self.credential = BadgeTemplate.objects.create(
-            uuid=uuid.uuid4(), origin='test_origin', name='test_template', description='test_description', icon='test_icon', site=self.site
+            uuid=uuid.uuid4(),
+            origin="test_origin",
+            name="test_template",
+            description="test_description",
+            icon="test_icon",
+            site=self.site,
         )
         self.badge = CredlyBadge.objects.create(
             username="test_user",

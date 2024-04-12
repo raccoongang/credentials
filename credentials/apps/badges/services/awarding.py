@@ -7,10 +7,12 @@ from typing import List
 from openedx_events.learning.signals import BADGE_AWARDED
 
 from credentials.apps.badges.models import BadgeRequirement
-from credentials.apps.badges.signals import BADGE_PROGRESS_COMPLETE
 
 
 def discover_requirements(event_type: str) -> List[BadgeRequirement]:
+    """
+    Picks all relevant requirements based on the event type.
+    """
     return BadgeRequirement.objects.filter(event_type=event_type)
 
 
@@ -34,15 +36,26 @@ def process_requirements(event_type, username, payload_dict):
     completed_templates = set()
 
     for requirement in requirements:
+
+        # ignore: if the badge template wasn't activated yet
+        if not requirement.is_active:
+            continue
+
+        # remember: the badge template is already "done"
         if requirement.template.user_completion(username):
             completed_templates.add(requirement.template_id)
-        
-        if requirement.template_id not in completed_templates:
-            if not requirement.is_active or requirement.is_fulfilled(username):
-                continue
 
-            if requirement.apply_rules(payload_dict):
-                requirement.fulfill(username)
+        # drop early: if the badge template is already "done"
+        if requirement.template_id in completed_templates:
+            continue
+
+        # drop early: if the requirement is already "done"
+        if requirement.is_fulfilled(username):
+            continue
+
+        # process: payload rules
+        if requirement.apply_rules(payload_dict):
+            requirement.fulfill(username)
 
 
 def notify_badge_awarded(user_credential):  # pylint: disable=unused-argument

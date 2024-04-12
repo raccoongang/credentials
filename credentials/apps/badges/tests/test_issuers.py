@@ -34,7 +34,7 @@ class CredlyBadgeTemplateIssuer(TestCase):
         # Call create_user_credential with valid arguments
         with mock.patch("credentials.apps.badges.services.issuers.notify_badge_awarded") as mock_notify_badge_awarded:
 
-            with mock.patch.object(self.issuer, 'issue_credly_badge') as mock_issue_credly_badge:
+            with mock.patch.object(self.issuer, "issue_credly_badge") as mock_issue_credly_badge:
                 self.issuer().award(self.badge_template.id, "test_user")
 
             mock_notify_badge_awarded.assert_called_once()
@@ -60,7 +60,7 @@ class CredlyBadgeTemplateIssuer(TestCase):
         )
 
         with mock.patch("credentials.apps.badges.services.issuers.notify_badge_revoked") as mock_notify_badge_revoked:
-            with mock.patch.object(self.issuer, 'revoke_credly_badge') as mock_revoke_credly_badge:
+            with mock.patch.object(self.issuer, "revoke_credly_badge") as mock_revoke_credly_badge:
                 self.issuer().revoke(self.badge_template.id, "test_user")
 
             mock_revoke_credly_badge.assert_called_once()

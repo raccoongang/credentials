@@ -329,6 +329,7 @@ class PenaltyDataRule(AbstractDataRule):
 
     class Meta:
         unique_together = ("penalty", "data_path", "operator", "value")
+
     @property
     def is_active(self):
         return self.penalty.template.is_active
@@ -369,18 +370,12 @@ class BadgeProgress(models.Model):
 
         requirements = BadgeRequirement.objects.filter(template=self.template)
 
-        group_ids = requirements.filter(
-            group__isnull=False
-        ).values_list('group', flat=True).distinct()
+        group_ids = requirements.filter(group__isnull=False).values_list("group", flat=True).distinct()
 
-        requirements_count = requirements.filter(
-            group__isnull=True
-        ).count() + group_ids.count()
+        requirements_count = requirements.filter(group__isnull=True).count() + group_ids.count()
 
         fulfilled_requirements_count = Fulfillment.objects.filter(
-            progress=self,
-            requirement__template=self.template,
-            requirement__group__isnull=True
+            progress=self, requirement__template=self.template, requirement__group__isnull=True
         ).count()
 
         for group_id in group_ids:
