@@ -31,12 +31,18 @@ def process_requirements(event_type, username, payload_dict):
     """
 
     requirements = discover_requirements(event_type=event_type)
+    completed_templates = set()
 
     for requirement in requirements:
-        if not requirement.is_active:
-            continue
-        if requirement.apply_rules(payload_dict):
-            requirement.fulfill(username)
+        if requirement.template.user_completion(username):
+            completed_templates.add(requirement.template_id)
+        
+        if requirement.template_id not in completed_templates:
+            if not requirement.is_active or requirement.is_fulfilled(username):
+                continue
+
+            if requirement.apply_rules(payload_dict):
+                requirement.fulfill(username)
 
 
 def notify_badge_awarded(user_credential):  # pylint: disable=unused-argument
