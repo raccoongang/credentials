@@ -23,9 +23,9 @@ def process_event(sender, **kwargs):
     Badge templates configuration interpreter.
 
     Responsibilities:
-        - event's User identification (whose action);
-        - requirements processing;
-        - penalties processing;
+        - identifies a target User based on event's payload ("whose action");
+        - runs badges progressive pipeline (requirements processing);
+        - runs badges regressive pipeline (penalties processing);
     """
 
     event_type = sender.event_type

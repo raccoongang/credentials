@@ -305,26 +305,26 @@ class BadgeTemplateRatioTestCase(TestCase):
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
-            group='test-group1',
+            group="test-group1",
         )
         self.group_requirement2 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
-            group='test-group1',
+            group="test-group1",
         )
 
         self.group_requirement3 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
-            group='test-group2',
+            group="test-group2",
         )
         self.group_requirement4 = BadgeRequirement.objects.create(
             template=self.badge_template,
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
-            group='test-group2',
+            group="test-group2",
         )
         self.progress = BadgeProgress.objects.create(username="test_user", template=self.badge_template)
 
