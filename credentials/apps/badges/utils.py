@@ -91,7 +91,7 @@ def get_user_data(data: dict) -> UserData:
         user = data["user"]
         pii = UserPersonalData(**user["pii"])
         return UserData(id=user["id"], is_active=user["is_active"], pii=pii)
-    
+
     for key, value in data.items():
         if isinstance(value, dict):
             return get_user_data(value)

@@ -36,7 +36,7 @@ def process_requirements(event_type, username, payload_dict):
     for requirement in requirements:
         if requirement.template.user_completion(username):
             completed_templates.add(requirement.template_id)
-        
+
         if requirement.template_id not in completed_templates:
             if not requirement.is_active or requirement.is_fulfilled(username):
                 continue
