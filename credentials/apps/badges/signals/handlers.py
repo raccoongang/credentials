@@ -6,16 +6,17 @@ See:
 
 import logging
 
-from django.core.exceptions import ValidationError
-from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from openedx_events.tooling import OpenEdxPublicSignal, load_all_signals
 
 from credentials.apps.badges.issuers import CredlyBadgeTemplateIssuer
-from credentials.apps.badges.models import BadgeTemplate
-from credentials.apps.badges.processing import process_event
-from credentials.apps.badges.signals import BADGE_REQUIREMENT_FULFILLED, BADGE_REQUIREMENT_REGRESSED
-from credentials.apps.badges.signals.signals import BADGE_PROGRESS_COMPLETE, BADGE_PROGRESS_INCOMPLETE
+from credentials.apps.badges.processing.generic import process_event
+from credentials.apps.badges.signals import (
+    BADGE_PROGRESS_COMPLETE,
+    BADGE_PROGRESS_INCOMPLETE,
+    BADGE_REQUIREMENT_FULFILLED,
+    BADGE_REQUIREMENT_REGRESSED,
+)
 from credentials.apps.badges.utils import get_badging_event_types
 
 
@@ -94,10 +95,21 @@ def handle_badge_regression(sender, username, badge_template_id, **kwargs):  # p
     CredlyBadgeTemplateIssuer().revoke(badge_template_id, username)
 
 
-@receiver(pre_delete, sender=BadgeTemplate)
-def prevent_deletion_if_active(sender, instance, **kwargs):
-    """
-    Forbids already activated badge templates deletion.
-    """
-    if instance.is_active:
-        raise ValidationError("Cannot delete active BadgeTemplate instance.")
+@receiver(BADGE_REQUIREMENT_FULFILLED)
+def handle_requirement_fulfilled(sender, username, fulfillment, **kwargs):  # pylint: disable=unused-argument
+    if not fulfillment.progress.completed():
+        BADGE_PROGRESS_COMPLETE.send(
+            sender=None,
+            username=username,
+            badge_template_id=fulfillment.progress.template.id,
+        )
+
+
+@receiver(BADGE_REQUIREMENT_REGRESSED)
+def handle_requirement_regressed(sender, username, fulfillments, **kwargs):  # pylint: disable=unused-argument
+    for fulfillment in fulfillments:
+        BADGE_PROGRESS_INCOMPLETE.send(
+            sender=None,
+            username=username,
+            badge_template_id=fulfillment.progress.template.id,
+        )
