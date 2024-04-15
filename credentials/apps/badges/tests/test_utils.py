@@ -1,10 +1,13 @@
 import unittest
-from datetime import datetime
+
 from attr import asdict
+from datetime import datetime
+from unittest.mock import patch
 
 from openedx_events.learning.data import UserData, UserPersonalData, CourseData, CoursePassingStatusData
 
-from ..utils import extract_payload, keypath, get_user_data, is_datapath_valid
+from credentials.apps.badges.checks import badges_checks
+from credentials.apps.badges.utils import extract_payload, keypath, get_user_data, is_datapath_valid
 
 
 class TestKeypath(unittest.TestCase):
@@ -123,3 +126,22 @@ class TestExtractPayload(unittest.TestCase):
         public_signal_kwargs = {"public_signal_kwargs": {}, "as_dict": False}
         result = extract_payload(**public_signal_kwargs)
         self.assertIsNone(result)
+
+
+class TestBadgesChecks(unittest.TestCase):
+    @patch("credentials.apps.badges.checks.get_badging_event_types")
+    def test_badges_checks_empty_events(self, mock_get_badging_event_types):
+        mock_get_badging_event_types.return_value = []
+        errors = badges_checks()
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].msg, "BADGES_CONFIG['events'] must include at least one event.")
+        self.assertEqual(errors[0].hint, "Add at least one event to BADGES_CONFIG['events'] setting.")
+        self.assertEqual(errors[0].id, "badges.E001")
+
+    @patch("credentials.apps.badges.checks.get_badging_event_types")
+    def test_badges_checks_non_empty_events(self, mock_get_badging_event_types):
+        mock_get_badging_event_types.return_value = ["event1", "event2"]
+        errors = badges_checks()
+        self.assertEqual(len(errors), 0)
+
+
