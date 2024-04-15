@@ -12,7 +12,6 @@ from openedx_events.learning.data import (
     UserData,
     UserPersonalData,
 )
-from openedx_events.learning.signals import BADGE_REVOKED
 
 from credentials.apps.badges.models import BadgePenalty, CredlyBadgeTemplate, UserCredential
 from credentials.apps.badges.signals.signals import BADGE_PROGRESS_INCOMPLETE
@@ -51,15 +50,3 @@ def process_penalties(event_type, username, payload_dict):
             continue
         if penalty.apply_rules(payload_dict):
             penalty.reset_requirements(username)
-
-
-def notify_badge_revoked(user_credential):  # pylint: disable=unused-argument
-    """
-    Emit public event about badge template regression.
-
-    - username
-    - badge template ID
-    """
-
-    badge_data = user_credential.as_badge_data()
-    BADGE_REVOKED.send_event(badge=badge_data)

@@ -47,24 +47,12 @@ def handle_badging_event(sender, signal, **kwargs):
 
 
 @receiver(BADGE_REQUIREMENT_FULFILLED)
-def handle_requirement_fulfilled(sender, username, fulfillment, **kwargs):  # pylint: disable=unused-argument
-    """
-    Fires once a single requirement was marked as "done".
-    """
-    if not fulfillment.progress.completed():
-        BADGE_PROGRESS_COMPLETE.send(
-            sender=None,
-            username=username,
-            badge_template_id=fulfillment.progress.template.id,
-        )
-
-
 @receiver(BADGE_REQUIREMENT_REGRESSED)
 def handle_requirement_regressed(sender, username, **kwargs):  # pylint: disable=unused-argument
     """
-    Fires once a single requirement for a badge template was marked as "done".
+    Revises user's progress status each time relevant requirement's progress was updated (+/-).
     """
-    BadgeProgress.for_user(username, sender.template.id).check()
+    BadgeProgress.for_user(username=username, template_id=sender.template.id).check()
 
 
 @receiver(BADGE_PROGRESS_COMPLETE)

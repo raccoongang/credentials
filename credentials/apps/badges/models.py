@@ -9,7 +9,12 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from credentials.apps.badges.signals.signals import notify_progress_complete, notify_progress_incomplete
+from credentials.apps.badges.signals.signals import (
+    notify_progress_complete,
+    notify_progress_incomplete,
+    notify_requirement_fulfilled,
+    notify_requirement_regressed,
+)
 from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
@@ -98,7 +103,7 @@ class BadgeTemplate(AbstractCredential):
         """
         Determines a completion progress for user.
         """
-        progress = BadgeProgress.objects.filter(username=username, template=self).first()
+        progress = BadgeProgress.for_user(username=username, template_id=self.id)
         if progress is None:
             return 0.00
         return progress.ratio
@@ -175,34 +180,52 @@ class BadgeRequirement(models.Model):
     def __str__(self):
         return f"BadgeRequirement:{self.id}:{self.template.uuid}"
 
+    def fulfill(self, username: str):
+        """
+        Marks itself as "done" for the user.
+
+        - notifies about the progression if any;
+
+        Returns: (bool) if progression happened
+        """
+        template_id = self.template.id
+        progress = BadgeProgress.for_user(username=username, template_id=template_id)
+        fulfillment, created = Fulfillment.objects.get_or_create(progress=progress, requirement=self)
+        if created:
+            notify_requirement_fulfilled(
+                sender=self,
+                username=username,
+                badge_template_id=template_id,
+                fulfillment_id=fulfillment.id,
+            )
+        return created
+
     def reset(self, username: str):
         """
-        Removes user progress for the requirement if any.
+        Marks itself as "undone" for the user.
+
+        - removes user progress for the requirement if any;
+        - notifies about the regression if any;
 
         Returns: (bool) if any progress existed.
         """
-        fulfillments = Fulfillment.objects.filter(
+        template_id = self.template.id
+        fulfillment = Fulfillment.objects.filter(
             requirement=self,
             progress__username=username,
-        )
-        deleted, __ = fulfillments.delete()
+        ).first()
+        deleted, __ = fulfillment.delete()
         if deleted:
-            self.notify_regression(username)
+            notify_requirement_regressed(
+                sender=self,
+                username=username,
+                badge_template_id=template_id,
+                fulfillment_id=fulfillment.id,
+            )
         return bool(deleted)
-
-    def notify_regression(self, username):
-        """
-        Notify about user progress regression.
-        """
-        BADGE_REQUIREMENT_REGRESSED.send(sender=self, username=username)
 
     def is_fulfilled(self, username: str) -> bool:
         return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
-
-    def fulfill(self, username: str):
-        progress, _ = BadgeProgress.objects.get_or_create(template=self.template, username=username)
-        fulfillment, _ = Fulfillment.objects.get_or_create(progress=progress, requirement=self)
-        BADGE_REQUIREMENT_FULFILLED.send(sender=None, username=username, fulfillment=fulfillment)
 
     def apply_rules(self, data: dict) -> bool:
         """
@@ -251,7 +274,7 @@ class AbstractDataRule(models.Model):
 
     def apply(self, data: dict) -> bool:
         """
-        Evaluates itself on the  to a specified value from the input data.
+        Evaluates itself on the input data (event payload).
 
         This method retrieves a value specified by a data path within a given dictionary,
         converts that value to a string, and then applies a comparison operation against
@@ -415,11 +438,12 @@ class BadgeProgress(models.Model):
         return f"BadgeProgress:{self.username}"
 
     @classmethod
-    def for_user(cls, username, template_id):
+    def for_user(cls, *username, template_id):
         """
         Service shortcut.
         """
-        return cls.objects.get_or_create(username=username, template_id=template_id)
+        progress, __ = cls.objects.get_or_create(username=username, template_id=template_id)
+        return progress
 
     @property
     def ratio(self) -> float:

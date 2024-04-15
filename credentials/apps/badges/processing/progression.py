@@ -5,8 +5,6 @@ Awarding pipeline - badge progression.
 import logging
 from typing import List
 
-from openedx_events.learning.signals import BADGE_AWARDED
-
 from credentials.apps.badges.models import BadgeRequirement
 
 
@@ -51,15 +49,3 @@ def process_requirements(event_type, username, payload_dict):
         # process: payload rules
         if requirement.apply_rules(payload_dict):
             requirement.fulfill(username)
-
-
-def notify_badge_awarded(user_credential):  # pylint: disable=unused-argument
-    """
-    Emit public event about badge template completion.
-
-    - username
-    - badge template ID
-    """
-
-    badge_data = user_credential.as_badge_data()
-    BADGE_AWARDED.send_event(badge=badge_data)
