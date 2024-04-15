@@ -8,15 +8,13 @@ from django.core.management import call_command
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .admin_forms import (
+from credentials.apps.badges.admin_forms import (
     BadgePenaltyForm,
-    BadgeRequirementForm,
     CredlyOrganizationAdminForm,
-    DataRuleForm,
-    PenaltyDataRuleForm,
+    BadgeTemplateForm,
 )
 
-from .models import (
+from credentials.apps.badges.models import (
     BadgePenalty,
     BadgeProgress,
     BadgeRequirement,
@@ -27,14 +25,13 @@ from .models import (
     Fulfillment,
     PenaltyDataRule,
 )
-from .toggles import is_badges_enabled
+from credentials.apps.badges.toggles import is_badges_enabled
 
 
 class BadgeRequirementInline(admin.TabularInline):
     model = BadgeRequirement
     show_change_link = True
     extra = 0
-    form = BadgeRequirementForm
 
 
 class BadgePenaltyInline(admin.TabularInline):
@@ -45,7 +42,7 @@ class BadgePenaltyInline(admin.TabularInline):
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "requirements":
-            template_id = request.resolver_match.kwargs.get('object_id')
+            template_id = request.resolver_match.kwargs.get("object_id")
             if template_id:
                 kwargs["queryset"] = BadgeRequirement.objects.filter(template_id=template_id)
         return super().formfield_for_manytomany(db_field, request, **kwargs)
@@ -59,7 +56,6 @@ class FulfillmentInline(admin.TabularInline):
 class DataRuleInline(admin.TabularInline):
     model = DataRule
     extra = 0
-    form = DataRuleForm
 
 
 class CredlyOrganizationAdmin(admin.ModelAdmin):
@@ -130,6 +126,7 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         BadgeRequirementInline,
         BadgePenaltyInline,
     ]
+    form = BadgeTemplateForm
 
     def has_add_permission(self, request):
         return False
@@ -149,7 +146,6 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
 class DataRulePenaltyInline(admin.TabularInline):
     model = PenaltyDataRule
     extra = 0
-    form = PenaltyDataRuleForm
 
 
 class BadgeRequirementAdmin(admin.ModelAdmin):
@@ -174,8 +170,7 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         "template",
         "event_type",
     ]
-    form = BadgeRequirementForm
-    
+
     def has_add_permission(self, request):
         return False
 
@@ -202,13 +197,13 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
         "requirements",
     ]
     form = BadgePenaltyForm
-    
+
     def has_add_permission(self, request):
         return False
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "requirements":
-            template_id = request.resolver_match.kwargs.get('object_id')
+            template_id = request.resolver_match.kwargs.get("object_id")
             if template_id:
                 kwargs["queryset"] = BadgeRequirement.objects.filter(template_id=template_id)
         return super().formfield_for_manytomany(db_field, request, **kwargs)

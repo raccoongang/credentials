@@ -1,22 +1,20 @@
-from re import template
 import uuid
 
 from django.contrib.sites.models import Site
 from django.test import TestCase
 
-from ..models import (
-    BadgeRequirement,
+from credentials.apps.badges.models import (
     BadgePenalty,
     BadgeProgress,
+    BadgeRequirement,
     BadgeTemplate,
     CredlyOrganization,
     DataRule,
     Fulfillment,
     PenaltyDataRule,
 )
-
-from credentials.apps.badges.services.awarding import discover_requirements
-from credentials.apps.badges.services.revocation import discover_penalties, process_penalties
+from credentials.apps.badges.processing.progression import discover_requirements
+from credentials.apps.badges.processing.regression import discover_penalties, process_penalties
 
 
 class BadgeRequirementDiscoveryTestCase(TestCase):

@@ -103,8 +103,10 @@ class BadgeTemplate(AbstractCredential):
         return self.name
 
     def save(self, *args, **kwargs):
+        # do not allow activate not configured item:
         if self.is_active and self.badgerequirement_set.count() == 0:
             raise ValidationError("Badge template must have at least 1 Requirement set.")
+
         super().save()
         # auto-evaluate type:
         if not self.origin:
@@ -124,7 +126,7 @@ class BadgeTemplate(AbstractCredential):
             return 0.00
         return progress.ratio
 
-    def user_completion(self, username: str) -> bool:
+    def is_completed(self, username: str) -> bool:
         """
         Check if user completed badge template.
         """
@@ -189,12 +191,6 @@ class BadgeRequirement(models.Model):
     def __str__(self):
         return f"BadgeRequirement:{self.id}:{self.template.uuid}"
 
-    def save(self, *args, **kwargs):
-        if self.is_active:
-            raise ValidationError("Configuration updates are blocked on active badge templates")
-
-        super().save(*args, **kwargs)
-
     def reset(self, username: str):
         fulfillments = Fulfillment.objects.filter(
             requirement=self,
@@ -203,12 +199,12 @@ class BadgeRequirement(models.Model):
         fulfillments.delete()
         BADGE_REQUIREMENT_REGRESSED.send(sender=None, username=username, fulfillments=fulfillments)
 
-    def is_fullfiled(self, username: str) -> bool:
+    def is_fulfilled(self, username: str) -> bool:
         return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
 
     def fulfill(self, username: str):
         progress, _ = BadgeProgress.objects.get_or_create(template=self.template, username=username)
-        fulfillment = Fulfillment.objects.create(progress=progress, requirement=self)
+        fulfillment, _ = Fulfillment.objects.get_or_create(progress=progress, requirement=self)
         BADGE_REQUIREMENT_FULFILLED.send(sender=None, username=username, fulfillment=fulfillment)
 
     def apply_rules(self, data: dict) -> bool:
@@ -248,9 +244,6 @@ class DataRule(AbstractDataRule):
         if not is_datapath_valid(self.data_path, self.requirement.event_type):
             raise ValidationError("Invalid data path for event type")
 
-        if self.is_active:
-            raise ValidationError("Configuration updates are blocked on active badge templates")
-
         super().save(*args, **kwargs)
 
     @property
@@ -285,12 +278,6 @@ class BadgePenalty(models.Model):
 
     class Meta:
         verbose_name_plural = "Badge penalties"
-
-    def save(self, *args, **kwargs):
-        if self.is_active:
-            raise ValidationError("Configuration updates are blocked on active badge templates")
-
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"BadgePenalty:{self.id}:{self.template.uuid}"
@@ -330,10 +317,6 @@ class PenaltyDataRule(AbstractDataRule):
         if not is_datapath_valid(self.data_path, self.penalty.event_type):
             raise ValidationError("Invalid data path for event type")
 
-        # Check if the related BadgeTemplate is active
-        if self.is_active:
-            raise ValidationError("Configuration updates are blocked on active badge templates")
-
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -348,6 +331,7 @@ class PenaltyDataRule(AbstractDataRule):
 
     class Meta:
         unique_together = ("penalty", "data_path", "operator", "value")
+
     @property
     def is_active(self):
         return self.penalty.template.is_active
@@ -385,13 +369,22 @@ class BadgeProgress(models.Model):
         """
         Calculate badge template progress ratio.
         """
-        requirements_count = BadgeRequirement.objects.filter(template=self.template).count()
-        if requirements_count == 0:
-            return 0.00
+
+        requirements = BadgeRequirement.objects.filter(template=self.template)
+
+        group_ids = requirements.filter(group__isnull=False).values_list("group", flat=True).distinct()
+
+        requirements_count = requirements.filter(group__isnull=True).count() + group_ids.count()
 
         fulfilled_requirements_count = Fulfillment.objects.filter(
-            progress=self, requirement__template=self.template
+            progress=self, requirement__template=self.template, requirement__group__isnull=True
         ).count()
+
+        for group_id in group_ids:
+            group_requirements = requirements.filter(group=group_id)
+            group_fulfillment_count = Fulfillment.objects.filter(requirement__in=group_requirements).count()
+            fulfilled_requirements_count += 1 if group_fulfillment_count > 0 else 0
+
         if fulfilled_requirements_count == 0:
             return 0.00
         return round(fulfilled_requirements_count / requirements_count, 2)
@@ -437,14 +430,14 @@ class CredlyBadge(UserCredential):
         badge_template = self.credential
 
         badge_data = BadgeData(
-            uuid=str(uuid.uuid4()),
+            uuid=self.uuid,
             user=UserData(
                 pii=UserPersonalData(
                     username=self.username,
                     email=user.email,
-                    name=user.name,
+                    name=user.get_full_name(),
                 ),
-                id=user.lms_id,
+                id=user.lms_user_id,
                 is_active=user.is_active,
             ),
             template=BadgeTemplateData(

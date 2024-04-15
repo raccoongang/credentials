@@ -19,6 +19,7 @@ def is_badges_enabled():
     """
     Check main feature flag.
     """
+
     return ENABLE_BADGES.is_enabled()
 
 
