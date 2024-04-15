@@ -93,23 +93,3 @@ def handle_badge_regression(sender, username, badge_template_id, **kwargs):  # p
     """
 
     CredlyBadgeTemplateIssuer().revoke(badge_template_id, username)
-
-
-@receiver(BADGE_REQUIREMENT_FULFILLED)
-def handle_requirement_fulfilled(sender, username, fulfillment, **kwargs):  # pylint: disable=unused-argument
-    if not fulfillment.progress.completed():
-        BADGE_PROGRESS_COMPLETE.send(
-            sender=None,
-            username=username,
-            badge_template_id=fulfillment.progress.template.id,
-        )
-
-
-@receiver(BADGE_REQUIREMENT_REGRESSED)
-def handle_requirement_regressed(sender, username, fulfillments, **kwargs):  # pylint: disable=unused-argument
-    for fulfillment in fulfillments:
-        BADGE_PROGRESS_INCOMPLETE.send(
-            sender=None,
-            username=username,
-            badge_template_id=fulfillment.progress.template.id,
-        )

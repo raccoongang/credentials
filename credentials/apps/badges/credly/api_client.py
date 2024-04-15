@@ -9,33 +9,12 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from requests.exceptions import HTTPError
 
-from ..models import CredlyBadgeTemplate, CredlyOrganization
-from .exceptions import CredlyAPIError, CredlyError
+from credentials.apps.badges.credly.exceptions import CredlyAPIError, CredlyError
+from credentials.apps.badges.credly.utils import get_credly_api_base_url
+from credentials.apps.badges.models import CredlyBadgeTemplate, CredlyOrganization
 
 
 logger = logging.getLogger(__name__)
-
-
-def get_credly_api_base_url(settings):
-    """
-    Determines the base URL for the Credly API based on application settings.
-
-    Parameters:
-    - settings: A configuration object containing the application's settings,
-                including those specific to Credly API integration.
-
-    Returns:
-    - str:  The base URL for the Credly API. This will be the URL for the sandbox
-            environment if `USE_SANDBOX` is set to a truthy value in the configuration;
-            otherwise, it will be the production environment's URL.
-    """
-
-    credly_config = settings.BADGES_CONFIG["credly"]
-
-    if credly_config.get("USE_SANDBOX"):
-        return credly_config["CREDLY_SANDBOX_API_BASE_URL"]
-
-    return credly_config["CREDLY_API_BASE_URL"]
 
 
 class CredlyAPIClient:

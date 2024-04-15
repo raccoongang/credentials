@@ -600,7 +600,9 @@ BADGES_CONFIG = {
         "org.openedx.learning.ccx.course.passing.status.updated.v1",
     ],
     "credly": {
+        "CREDLY_BASE_URL": "https://credly.com/",
         "CREDLY_API_BASE_URL": "https://api.credly.com/v1/",
+        "CREDLY_SANDBOX_BASE_URL": "https://sandbox.credly.com/",
         "CREDLY_SANDBOX_API_BASE_URL": "https://sandbox-api.credly.com/v1/",
         "USE_SANDBOX": False,
     },

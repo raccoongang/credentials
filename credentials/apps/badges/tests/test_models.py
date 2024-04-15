@@ -196,7 +196,7 @@ class BadgeRequirementGroupTestCase(TestCase):
         )
 
     def test_requirement_group(self):
-        group = self.badge_template.badgerequirement_set.filter(group="group1")
+        group = self.badge_template.requirements.filter(group="group1")
         self.assertEqual(group.count(), 2)
         self.assertIsNone(self.badge_requirement3.group)
 

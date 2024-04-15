@@ -84,6 +84,6 @@ class BadgeTemplateForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         print(cleaned_data)
-        if cleaned_data.get("is_active") and not self.instance.badgerequirement_set.exists():
+        if cleaned_data.get("is_active") and not self.instance.requirements.exists():
             raise forms.ValidationError("Badge Template must have at least 1 Requirement set.")
         return cleaned_data
