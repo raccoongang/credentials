@@ -74,16 +74,3 @@ class BadgePenaltyForm(forms.ModelForm):
         ):
             raise forms.ValidationError("All requirements must belong to the same template.")
         return cleaned_data
-
-
-class BadgeTemplateForm(forms.ModelForm):
-    class Meta:
-        model = BadgeTemplate
-        fields = "__all__"
-
-    def clean(self):
-        cleaned_data = super().clean()
-        print(cleaned_data)
-        if cleaned_data.get("is_active") and not self.instance.requirements.exists():
-            raise forms.ValidationError("Badge Template must have at least 1 Requirement set.")
-        return cleaned_data
