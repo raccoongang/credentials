@@ -11,7 +11,6 @@ from django.utils.translation import gettext_lazy as _
 from credentials.apps.badges.admin_forms import (
     BadgePenaltyForm,
     CredlyOrganizationAdminForm,
-    BadgeTemplateForm,
 )
 
 from credentials.apps.badges.models import (
@@ -159,7 +158,6 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         BadgeRequirementInline,
         BadgePenaltyInline,
     ]
-    form = BadgeTemplateForm
 
     def has_add_permission(self, request):
         return False
@@ -194,6 +192,20 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         return "-"
 
     image.short_description = _("icon")
+
+    def save_related(self, request, form, formsets, change):
+        """
+        Save inline forms before checking for existence of requirements.
+        """
+        for formset in formsets:
+            self.save_formset(request, form, formset, change)
+
+        obj = form.instance
+        if obj.is_active and not obj.requirements.exists():
+            messages.set_level(request, messages.ERROR)
+            messages.error(request, "Badge Template must have at least 1 Requirement set.")
+            return
+        super().save_related(request, form, formsets, change)
 
 
 class DataRulePenaltyInline(admin.TabularInline):
