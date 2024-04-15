@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from credentials.apps.badges.signals.signals import notify_progress_complete, notify_progress_incomplete
 from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
@@ -140,7 +141,7 @@ class BadgeRequirement(models.Model):
     Describes what must happen for badge template to progress.
 
     - what unique event is expected to happen;
-    - what exact conditions such event must carry in its payload;
+    - what exact conditions the expected event must carry in its payload;
 
     NOTE:   all attached to a badge template requirements must be fulfilled by default;
             to achieve "OR" processing logic for 2 attached requirements just group them (put identical group ID).
@@ -161,9 +162,7 @@ class BadgeRequirement(models.Model):
             'Public signal type. Available events are configured in "BADGES_CONFIG" setting. The crucial aspect for event to carry UserData in its payload.'
         ),
     )
-
     description = models.TextField(null=True, blank=True, help_text=_("Provide more details if needed."))
-
     group = models.CharField(
         max_length=255,
         null=True,
@@ -177,12 +176,25 @@ class BadgeRequirement(models.Model):
         return f"BadgeRequirement:{self.id}:{self.template.uuid}"
 
     def reset(self, username: str):
+        """
+        Removes user progress for the requirement if any.
+
+        Returns: (bool) if any progress existed.
+        """
         fulfillments = Fulfillment.objects.filter(
             requirement=self,
             progress__username=username,
         )
-        fulfillments.delete()
-        BADGE_REQUIREMENT_REGRESSED.send(sender=None, username=username, fulfillments=fulfillments)
+        deleted, __ = fulfillments.delete()
+        if deleted:
+            self.notify_regression(username)
+        return bool(deleted)
+
+    def notify_regression(self, username):
+        """
+        Notify about user progress regression.
+        """
+        BADGE_REQUIREMENT_REGRESSED.send(sender=self, username=username)
 
     def is_fulfilled(self, username: str) -> bool:
         return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
@@ -193,14 +205,10 @@ class BadgeRequirement(models.Model):
         BADGE_REQUIREMENT_FULFILLED.send(sender=None, username=username, fulfillment=fulfillment)
 
     def apply_rules(self, data: dict) -> bool:
-        for rule in self.datarule_set.all():
-            comparison_func = getattr(operator, rule.operator, None)
-            if comparison_func:
-                data_value = str(keypath(data, rule.data_path))
-                result = comparison_func(data_value, rule.value)
-                if not result:
-                    return False
-        return True
+        """
+        Evaluates payload rules.
+        """
+        return all(rule.apply(data) for rule in self.rules.all())
 
     @property
     def is_active(self):
@@ -241,6 +249,36 @@ class AbstractDataRule(models.Model):
     class Meta:
         abstract = True
 
+    def apply(self, data: dict) -> bool:
+        """
+        Evaluates itself on the  to a specified value from the input data.
+
+        This method retrieves a value specified by a data path within a given dictionary,
+        converts that value to a string, and then applies a comparison operation against
+        a predefined value. The comparison operation is determined by the `self.operator`
+        attribute, which should match the name of an operator function in the `operator`
+        module.
+
+        Parameters:
+        - data (dict):  A dictionary containing data against which the comparison operation
+                        will be applied. The specific value to be compared is determined by
+                        the `self.data_path` attribute, which specifies the path to the value
+                        within the dictionary.
+
+        Returns:
+        - bool: True if the rule "worked".
+
+        Example:
+        Assuming `self.operator` is set to "eq", `self.data_path` is set to "user.age",
+        and `self.value` is "30", then calling `apply({"user": {"age": 30}})` will return True
+        because the age matches the specified value.
+        """
+        comparison_func = getattr(operator, self.operator, None)
+        if comparison_func:
+            data_value = str(keypath(data, self.data_path))
+            return comparison_func(data_value, self.value)
+        return False
+
 
 class DataRule(AbstractDataRule):
     """
@@ -252,6 +290,7 @@ class DataRule(AbstractDataRule):
         BadgeRequirement,
         on_delete=models.CASCADE,
         help_text=_("Parent requirement for this data rule."),
+        related_name="rules",
     )
 
     class Meta:
@@ -297,15 +336,15 @@ class BadgePenalty(models.Model):
     description = models.TextField(null=True, blank=True, help_text=_("Provide more details if needed."))
 
     class Meta:
-        verbose_name_plural = "Badge penalties"
+        verbose_name_plural = _("Badge penalties")
 
     def __str__(self):
         return f"BadgePenalty:{self.id}:{self.template.uuid}"
 
-    class Meta:
-        verbose_name_plural = "Badge penalties"
-
     def apply_rules(self, data: dict) -> bool:
+        """
+        Evaluates payload rules.
+        """
         return all(rule.apply(data) for rule in self.rules.all())
 
     def reset_requirements(self, username: str):
@@ -333,24 +372,14 @@ class PenaltyDataRule(AbstractDataRule):
     class Meta:
         unique_together = ("penalty", "data_path", "operator", "value")
 
+    def __str__(self):
+        return f"{self.penalty.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
+
     def save(self, *args, **kwargs):
         if not is_datapath_valid(self.data_path, self.penalty.event_type):
             raise ValidationError("Invalid data path for event type")
 
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.penalty.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
-
-    def apply(self, data: dict) -> bool:
-        comparison_func = getattr(operator, self.operator, None)
-        if comparison_func:
-            data_value = str(keypath(data, self.data_path))
-            return comparison_func(data_value, self.value)
-        return False
-
-    class Meta:
-        unique_together = ("penalty", "data_path", "operator", "value")
 
     @property
     def is_active(self):
@@ -362,6 +391,7 @@ class BadgeProgress(models.Model):
     Tracks a single badge template progress for user.
 
     - allows multiple requirements status tracking;
+    - user-centric;
     """
 
     credential = models.OneToOneField(
@@ -384,10 +414,17 @@ class BadgeProgress(models.Model):
     def __str__(self):
         return f"BadgeProgress:{self.username}"
 
+    @classmethod
+    def for_user(cls, username, template_id):
+        """
+        Service shortcut.
+        """
+        return cls.objects.get_or_create(username=username, template_id=template_id)
+
     @property
     def ratio(self) -> float:
         """
-        Calculate badge template progress ratio.
+        Calculates badge template progress ratio.
         """
 
         requirements = BadgeRequirement.objects.filter(template=self.template)
@@ -410,6 +447,16 @@ class BadgeProgress(models.Model):
         if fulfilled_requirements_count == 0:
             return 0.00
         return round(fulfilled_requirements_count / requirements_count, 2)
+
+    def check(self):
+        """
+        Performs self-check and notifies about the current status.
+        """
+        if self.completed():
+            notify_progress_complete(self, self.username, self.template.id)
+
+        if not self.completed():
+            notify_progress_incomplete(self, self.username, self.template.id)
 
     def reset(self):
         Fulfillment.objects.filter(progress=self).delete()

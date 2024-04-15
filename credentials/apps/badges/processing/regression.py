@@ -2,21 +2,24 @@
 Revocation pipeline - badge regression.
 """
 
-import uuid
+import logging
 from typing import List
 
 from openedx_events.learning.data import (
     BadgeData,
     BadgeTemplateData,
+    CoursePassingStatusData,
     UserData,
     UserPersonalData,
 )
-from openedx_events.learning.data import CoursePassingStatusData
 from openedx_events.learning.signals import BADGE_REVOKED
 
+from credentials.apps.badges.models import BadgePenalty, CredlyBadgeTemplate, UserCredential
 from credentials.apps.badges.signals.signals import BADGE_PROGRESS_INCOMPLETE
 from credentials.apps.badges.utils import keypath
-from credentials.apps.badges.models import BadgePenalty, CredlyBadgeTemplate, UserCredential
+
+
+logger = logging.getLogger(__name__)
 
 
 def discover_penalties(event_type: str) -> List[BadgePenalty]:
@@ -40,6 +43,9 @@ def process_penalties(event_type, username, payload_dict):
     """
 
     penalties = discover_penalties(event_type=event_type)
+
+    logger.debug("BADGES: found %s penalties to process.", len(penalties))
+
     for penalty in penalties:
         if not penalty.is_active:
             continue

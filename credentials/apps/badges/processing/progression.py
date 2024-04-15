@@ -2,11 +2,15 @@
 Awarding pipeline - badge progression.
 """
 
+import logging
 from typing import List
 
 from openedx_events.learning.signals import BADGE_AWARDED
 
 from credentials.apps.badges.models import BadgeRequirement
+
+
+logger = logging.getLogger(__name__)
 
 
 def discover_requirements(event_type: str) -> List[BadgeRequirement]:
@@ -23,6 +27,8 @@ def process_requirements(event_type, username, payload_dict):
 
     requirements = discover_requirements(event_type=event_type)
     completed_templates = set()
+
+    logger.debug("BADGES: found %s requirements to process.", len(requirements))
 
     for requirement in requirements:
 

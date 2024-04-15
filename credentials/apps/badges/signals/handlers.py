@@ -10,6 +10,7 @@ from django.dispatch import receiver
 from openedx_events.tooling import OpenEdxPublicSignal, load_all_signals
 
 from credentials.apps.badges.issuers import CredlyBadgeTemplateIssuer
+from credentials.apps.badges.models import BadgeProgress
 from credentials.apps.badges.processing.generic import process_event
 from credentials.apps.badges.signals import (
     BADGE_PROGRESS_COMPLETE,
@@ -59,16 +60,11 @@ def handle_requirement_fulfilled(sender, username, fulfillment, **kwargs):  # py
 
 
 @receiver(BADGE_REQUIREMENT_REGRESSED)
-def handle_requirement_regressed(sender, username, fulfillments, **kwargs):  # pylint: disable=unused-argument
+def handle_requirement_regressed(sender, username, **kwargs):  # pylint: disable=unused-argument
     """
     Fires once a single requirement for a badge template was marked as "done".
     """
-    for fulfillment in fulfillments:
-        BADGE_PROGRESS_INCOMPLETE.send(
-            sender=None,
-            username=username,
-            badge_template_id=fulfillment.progress.template.id,
-        )
+    BadgeProgress.for_user(username, sender.template.id).check()
 
 
 @receiver(BADGE_PROGRESS_COMPLETE)
