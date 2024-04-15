@@ -472,7 +472,7 @@ class BadgeProgress(models.Model):
             return 0.00
         return round(fulfilled_requirements_count / requirements_count, 2)
 
-    def check(self):
+    def validate(self):
         """
         Performs self-check and notifies about the current status.
         """

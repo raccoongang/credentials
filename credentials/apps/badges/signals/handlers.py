@@ -52,7 +52,7 @@ def handle_requirement_regressed(sender, username, **kwargs):  # pylint: disable
     """
     Revises user's progress status each time relevant requirement's progress was updated (+/-).
     """
-    BadgeProgress.for_user(username=username, template_id=sender.template.id).check()
+    BadgeProgress.for_user(username=username, template_id=sender.template.id).validate()
 
 
 @receiver(BADGE_PROGRESS_COMPLETE)
