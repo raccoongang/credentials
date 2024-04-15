@@ -168,6 +168,26 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         url = obj.management_url
         return format_html("<a href='{url}'>{url}</a>", url=url)
 
+    def delete_model(self, request, obj):
+        """
+        Prevent deletion of active badge templates.
+        """
+        if obj.is_active:
+            messages.set_level(request, messages.ERROR)
+            messages.error(request, "Active badge template cannot be deleted.")
+            return
+        super().delete_model(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        """
+        Prevent deletion of active badge templates.
+        """
+        if queryset.filter(is_active=True).exists():
+            messages.set_level(request, messages.ERROR)
+            messages.error(request, "Active badge templates cannot be deleted.")
+            return
+        super().delete_queryset(request, queryset)
+
     def image(self, obj):
         if obj.icon:
             return format_html('<img src="{}" width="50" height="auto" />', obj.icon)
