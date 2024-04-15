@@ -438,7 +438,7 @@ class BadgeProgress(models.Model):
         return f"BadgeProgress:{self.username}"
 
     @classmethod
-    def for_user(cls, *username, template_id):
+    def for_user(cls, *, username, template_id):
         """
         Service shortcut.
         """
