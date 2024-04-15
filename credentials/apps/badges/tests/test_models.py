@@ -81,29 +81,11 @@ class RequirementApplyRulesCheckTestCase(TestCase):
         self.data_rule = DataRule.objects.create
 
     def test_apply_rules_check_success(self):
-        data = {
-            'course_passing_status': {
-                'user': {
-                    'pii': {
-                        'username': 'test-username',
-                        'email': 'test@example.com'
-                    }
-                }
-            }
-        }
+        data = {"course_passing_status": {"user": {"pii": {"username": "test-username", "email": "test@example.com"}}}}
         self.assertTrue(self.badge_requirement.apply_rules(data))
 
     def test_apply_rules_check_failed(self):
-        data = {
-            'course_passing_status': {
-                'user': {
-                    'pii': {
-                        'username': 'test-username2',
-                        'email': 'test@example.com'
-                    }
-                }
-            }
-        }
+        data = {"course_passing_status": {"user": {"pii": {"username": "test-username2", "email": "test@example.com"}}}}
         self.assertFalse(self.badge_requirement.apply_rules(data))
 
 
@@ -185,11 +167,11 @@ class RequirementFulfillmentCheckTestCase(TestCase):
         self.fulfillment = Fulfillment.objects.create(progress=self.badge_progress, requirement=self.badge_requirement)
 
     def test_fulfillment_check_success(self):
-        is_fulfilled = self.badge_requirement.is_fullfiled("test1")
+        is_fulfilled = self.badge_requirement.is_fulfilled("test1")
         self.assertTrue(is_fulfilled)
 
     def test_fulfillment_check_wrong_username(self):
-        is_fulfilled = self.badge_requirement.is_fullfiled("asd")
+        is_fulfilled = self.badge_requirement.is_fulfilled("asd")
         self.assertFalse(is_fulfilled)
 
 
@@ -281,19 +263,19 @@ class BadgeTemplateUserCompletionTestCase(TestCase):
             description="Test description",
         )
 
-    def test_user_completion_success(self):
+    def test_is_completed_success(self):
         Fulfillment.objects.create(
             progress=BadgeProgress.objects.create(username="test_user", template=self.badge_template),
             requirement=self.requirement1,
         )
-        self.assertTrue(self.badge_template.user_completion("test_user"))
+        self.assertTrue(self.badge_template.is_completed("test_user"))
 
-    def test_user_completion_failure(self):
-        self.assertFalse(self.badge_template.user_completion("test_usfer"))
+    def test_is_completed_failure(self):
+        self.assertFalse(self.badge_template.is_completed("test_usfer"))
 
-    def test_user_completion_no_requirements(self):
+    def test_is_completed_no_requirements(self):
         BadgeRequirement.objects.filter(template=self.badge_template).delete()
-        self.assertEqual(self.badge_template.user_completion("test_user"), 0.0)
+        self.assertEqual(self.badge_template.is_completed("test_user"), 0.0)
 
 
 class BadgeTemplateRatioTestCase(TestCase):
@@ -318,6 +300,32 @@ class BadgeTemplateRatioTestCase(TestCase):
             event_type="org.openedx.learning.course.passing.status.updated.v1",
             description="Test description",
         )
+
+        self.group_requirement1 = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type="org.openedx.learning.course.passing.status.updated.v1",
+            description="Test description",
+            group="test-group1",
+        )
+        self.group_requirement2 = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type="org.openedx.learning.course.passing.status.updated.v1",
+            description="Test description",
+            group="test-group1",
+        )
+
+        self.group_requirement3 = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type="org.openedx.learning.course.passing.status.updated.v1",
+            description="Test description",
+            group="test-group2",
+        )
+        self.group_requirement4 = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type="org.openedx.learning.course.passing.status.updated.v1",
+            description="Test description",
+            group="test-group2",
+        )
         self.progress = BadgeProgress.objects.create(username="test_user", template=self.badge_template)
 
     def test_ratio_no_fulfillments(self):
@@ -328,7 +336,25 @@ class BadgeTemplateRatioTestCase(TestCase):
             progress=self.progress,
             requirement=self.requirement1,
         )
+        self.assertEqual(self.progress.ratio, 0.25)
+
+        Fulfillment.objects.create(
+            progress=self.progress,
+            requirement=self.requirement2,
+        )
         self.assertEqual(self.progress.ratio, 0.50)
+
+        Fulfillment.objects.create(
+            progress=self.progress,
+            requirement=self.group_requirement1,
+        )
+        self.assertEqual(self.progress.ratio, 0.75)
+
+        Fulfillment.objects.create(
+            progress=self.progress,
+            requirement=self.group_requirement3,
+        )
+        self.assertEqual(self.progress.ratio, 1.00)
 
     def test_ratio_no_requirements(self):
         BadgeRequirement.objects.filter(template=self.badge_template).delete()
@@ -337,10 +363,17 @@ class BadgeTemplateRatioTestCase(TestCase):
 
 class CredlyBadgeAsBadgeDataTestCase(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='test_user', email='test@example.com', full_name='Test User', lms_user_id=1)
-        self.site = Site.objects.create(domain='test_domain', name='test_name')
+        self.user = User.objects.create_user(
+            username="test_user", email="test@example.com", full_name="Test User", lms_user_id=1
+        )
+        self.site = Site.objects.create(domain="test_domain", name="test_name")
         self.credential = BadgeTemplate.objects.create(
-            uuid=uuid.uuid4(), origin='test_origin', name='test_template', description='test_description', icon='test_icon', site=self.site
+            uuid=uuid.uuid4(),
+            origin="test_origin",
+            name="test_template",
+            description="test_description",
+            icon="test_icon",
+            site=self.site,
         )
         self.badge = CredlyBadge.objects.create(
             username="test_user",

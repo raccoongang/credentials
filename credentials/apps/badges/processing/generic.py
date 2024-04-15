@@ -4,16 +4,11 @@ Main processing logic.
 
 import logging
 
-from credentials.apps.badges.exceptions import (
-    BadgesProcessingError,
-    StopEventProcessing,
-)
+from credentials.apps.badges.exceptions import BadgesProcessingError, StopEventProcessing
+from credentials.apps.badges.processing.progression import process_requirements
+from credentials.apps.badges.processing.regression import process_penalties
+from credentials.apps.badges.utils import extract_payload, get_user_data
 from credentials.apps.core.api import get_or_create_user_from_event_data
-
-from ..services.awarding import process_requirements
-from ..services.revocation import process_penalties
-from ..utils import extract_payload, get_user_data
-
 
 logger = logging.getLogger(__name__)
 
@@ -23,9 +18,9 @@ def process_event(sender, **kwargs):
     Badge templates configuration interpreter.
 
     Responsibilities:
-        - event's User identification (whose action);
-        - requirements processing;
-        - penalties processing;
+        - identifies a target User based on event's payload ("whose action");
+        - runs badges progressive pipeline (requirements processing);
+        - runs badges regressive pipeline (penalties processing);
     """
 
     event_type = sender.event_type
@@ -67,9 +62,6 @@ def identify_user(*, event_type, event_payload):
     """
 
     user_data = get_user_data(event_payload)
-
-    # FIXME: didn't find!
-    user_data = event_payload["course_passing_status"].user
 
     if not user_data:
         message = f"User data cannot be found (got: {user_data}): {event_payload}. Does event {event_type} include user data at all?"

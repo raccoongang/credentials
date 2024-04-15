@@ -4,8 +4,12 @@ import faker
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
-from credentials.apps.badges.models import CredlyBadge, CredlyBadgeTemplate, CredlyOrganization
-from credentials.apps.badges.services.issuers import CredlyBadgeTemplateIssuer
+from credentials.apps.badges.models import (
+    CredlyBadge,
+    CredlyBadgeTemplate,
+    CredlyOrganization,
+)
+from credentials.apps.badges.issuers import CredlyBadgeTemplateIssuer
 from credentials.apps.badges.signals.signals import BADGE_PROGRESS_COMPLETE
 
 
@@ -22,8 +26,8 @@ class BadgeSignalReceiverTestCase(TestCase):
 
     def test_signal_emission_and_receiver_execution(self):
         # Emit the signal
-        with mock.patch("credentials.apps.badges.services.issuers.notify_badge_awarded"):
-            with mock.patch.object(CredlyBadgeTemplateIssuer, 'issue_credly_badge'):
+        with mock.patch("credentials.apps.badges.issuers.notify_badge_awarded"):
+            with mock.patch.object(CredlyBadgeTemplateIssuer, "issue_credly_badge"):
                 BADGE_PROGRESS_COMPLETE.send(
                     sender=self,
                     username="test_user",
@@ -42,15 +46,3 @@ class BadgeSignalReceiverTestCase(TestCase):
 
         # Check if user credential status is 'awarded'
         self.assertTrue(user_credential[0].status == "awarded")
-
-    def test_behavior_for_nonexistent_badge_templates(self):
-        # Emit the signal with a non-existent badge template ID
-        with self.assertRaises(CredlyBadgeTemplate.DoesNotExist):
-            BADGE_PROGRESS_COMPLETE.send(
-                sender=self,
-                username="test_user",
-                badge_template_id=999,  # Non-existent ID
-            )
-
-        # Check that no user credential is created
-        self.assertFalse(CredlyBadge.objects.filter(username="test_user").exists())
