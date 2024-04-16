@@ -156,16 +156,16 @@ class CredlyBadgeTemplateIssuer(BadgeTemplateIssuer):
         Returns: (CredlyBadge) user credential
         """
 
-        user_credential = super().award(username=username, credential_id=credential_id)
+        credly_badge = super().award(username=username, credential_id=credential_id)
 
         # do not issue new badges if the badge was issued already
-        if not user_credential.issued:
-            self.issue_credly_badge(user_credential)
+        if not credly_badge.propagated:
+            self.issue_credly_badge(user_credential=credly_badge)
 
-        return user_credential
+        return credly_badge
 
     def revoke(self, credential_id, username):
         user_credential = super().revoke(credential_id, username)
-        if user_credential.issued:
+        if user_credential.propagated:
             self.revoke_credly_badge(credential_id, user_credential)
         return user_credential

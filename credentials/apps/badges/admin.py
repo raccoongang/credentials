@@ -300,7 +300,6 @@ class BadgeProgressAdmin(admin.ModelAdmin):
         "username",
         "template",
         "complete",
-        "issued",
     ]
     list_display_links = (
         "id",
@@ -311,11 +310,8 @@ class BadgeProgressAdmin(admin.ModelAdmin):
         "username",
         "template",
         "complete",
-        "issued",
+        "ratio",
     )
-    exclude = [
-        "user_credential",
-    ]
 
     @admin.display(boolean=True)
     def complete(self, obj):
@@ -326,12 +322,11 @@ class BadgeProgressAdmin(admin.ModelAdmin):
         """
         return obj.completed
 
-    @admin.display(boolean=True)
-    def issued(self, obj):
+    def ratio(self, obj):
         """
-        Identifies if user credential exists (regardless its current status).
+        Displays progress value.
         """
-        return bool(obj.user_credential)
+        return obj.ratio
 
 
 class CredlyBadgeAdmin(admin.ModelAdmin):

@@ -101,8 +101,6 @@ class BadgeTemplate(AbstractCredential):
         Determines a completion progress for user.
         """
         progress = BadgeProgress.for_user(username=username, template_id=self.id)
-        if progress is None:
-            return 0.00
         return progress.ratio
 
     def is_completed(self, username: str) -> bool:
@@ -417,12 +415,6 @@ class BadgeProgress(models.Model):
     - user-centric;
     """
 
-    user_credential = models.OneToOneField(
-        UserCredential,
-        models.SET_NULL,
-        blank=True,
-        null=True,
-    )
     username = models.CharField(max_length=255)  # index
     template = models.ForeignKey(
         BadgeTemplate,
@@ -449,6 +441,8 @@ class BadgeProgress(models.Model):
     def ratio(self) -> float:
         """
         Calculates badge template progress ratio.
+
+        FIXME: simplify
         """
 
         requirements = BadgeRequirement.objects.filter(template=self.template)
@@ -573,7 +567,7 @@ class CredlyBadge(UserCredential):
         return badge_data
 
     @property
-    def issued(self):
+    def propagated(self):
         """
         Checks if this user credential already has issued (external) Credly badge.
         """
