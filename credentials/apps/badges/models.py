@@ -417,7 +417,7 @@ class BadgeProgress(models.Model):
     - user-centric;
     """
 
-    credential = models.OneToOneField(
+    user_credential = models.OneToOneField(
         UserCredential,
         models.SET_NULL,
         blank=True,

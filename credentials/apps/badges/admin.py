@@ -304,7 +304,7 @@ class BadgeProgressAdmin(admin.ModelAdmin):
         "issued",
     )
     exclude = [
-        "credential",
+        "user_credential",
     ]
 
     @admin.display(boolean=True)
@@ -321,7 +321,7 @@ class BadgeProgressAdmin(admin.ModelAdmin):
         """
         Identifies if user credential exists (regardless its current status).
         """
-        return bool(obj.credential)
+        return bool(obj.user_credential)
 
 
 class CredlyBadgeAdmin(admin.ModelAdmin):
@@ -330,18 +330,26 @@ class CredlyBadgeAdmin(admin.ModelAdmin):
     """
 
     list_display = (
-        "username",
-        "state",
         "uuid",
+        "username",
+        "credential",
+        "status",
+        "state",
+        "external_uuid",
     )
-    list_filter = ("state",)
+    list_filter = ("status", "state",)
     search_fields = (
         "username",
-        "uuid",
+        "external_uuid",
     )
     readonly_fields = (
+        "credential_id",
+        "credential_content_type",
+        "username",
+        "download_url",
         "state",
         "uuid",
+        "external_uuid",
     )
 
 
