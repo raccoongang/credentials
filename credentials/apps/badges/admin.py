@@ -32,6 +32,11 @@ class BadgeRequirementInline(admin.TabularInline):
     show_change_link = True
     extra = 0
 
+    # FIXME: disable until "Release VI"
+    exclude = [
+        "group",
+    ]
+
 
 class BadgePenaltyInline(admin.TabularInline):
     model = BadgePenalty
@@ -159,7 +164,8 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
     )
     inlines = [
         BadgeRequirementInline,
-        BadgePenaltyInline,
+        # FIXME: disable until "Release V"
+        # BadgePenaltyInline,
     ]
 
     def has_add_permission(self, request):
@@ -237,6 +243,10 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
     list_filter = [
         "template",
         "event_type",
+    ]
+    # FIXME: disable until "Release VI"
+    exclude = [
+        "group",
     ]
 
     def has_add_permission(self, request):
@@ -337,7 +347,10 @@ class CredlyBadgeAdmin(admin.ModelAdmin):
         "state",
         "external_uuid",
     )
-    list_filter = ("status", "state",)
+    list_filter = (
+        "status",
+        "state",
+    )
     search_fields = (
         "username",
         "external_uuid",
@@ -359,5 +372,6 @@ if is_badges_enabled():
     admin.site.register(CredlyBadgeTemplate, CredlyBadgeTemplateAdmin)
     admin.site.register(CredlyBadge, CredlyBadgeAdmin)
     admin.site.register(BadgeRequirement, BadgeRequirementAdmin)
-    admin.site.register(BadgePenalty, BadgePenaltyAdmin)
+    # FIXME: disable until "Release V"
+    # admin.site.register(BadgePenalty, BadgePenaltyAdmin)
     admin.site.register(BadgeProgress, BadgeProgressAdmin)
