@@ -16,6 +16,7 @@ def discover_requirements(event_type: str) -> List[BadgeRequirement]:
     Picks all relevant requirements based on the event type.
     """
 
+    # TODO: get only active templates
     return BadgeRequirement.objects.filter(event_type=event_type)
 
 
@@ -31,6 +32,7 @@ def process_requirements(event_type, username, payload_dict):
 
     for requirement in requirements:
 
+        # TODO: remove the check if only active templates were collected
         # ignore: if the badge template wasn't activated yet
         if not requirement.is_active:
             continue
