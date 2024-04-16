@@ -21,7 +21,7 @@ BADGE_PROGRESS_INCOMPLETE = Signal()
 
 def notify_requirement_fulfilled(*, sender, username, badge_template_id, **kwargs):
     """
-    Notifies about user's progression on the badge template.
+    Notifies about user's partial progression on the badge template.
     """
 
     BADGE_REQUIREMENT_FULFILLED.send(
@@ -39,8 +39,9 @@ def notify_requirement_regressed(*, sender, username, badge_template_id):
 
 def notify_progress_complete(sender, username, badge_template_id):
     """
-    FIXME:
+    Notifies about user's completion on the badge template.
     """
+
     BADGE_PROGRESS_COMPLETE.send(
         sender=sender,
         username=username,
@@ -61,7 +62,7 @@ def notify_progress_incomplete(sender, username, badge_template_id):
 
 def notify_badge_awarded(user_credential):  # pylint: disable=unused-argument
     """
-    Emit public event about badge template completion.
+    Emits a public signal about the badge template completion for user.
 
     - username
     - badge template ID

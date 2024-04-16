@@ -64,7 +64,9 @@ def handle_badge_completion(sender, username, badge_template_id, **kwargs):  # p
     - badge template ID
     """
 
-    CredlyBadgeTemplateIssuer().award(badge_template_id, username)
+    logger.debug("BADGES: progress is complete for %s on the %s", username, badge_template_id)
+
+    CredlyBadgeTemplateIssuer().award(username=username, credential_id=badge_template_id)
 
 
 @receiver(BADGE_PROGRESS_INCOMPLETE)

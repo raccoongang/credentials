@@ -521,6 +521,7 @@ class CredlyBadge(UserCredential):
         """
         Represents itself as a BadgeData instance.
         """
+
         user = get_user_by_username(self.username)
         badge_template = self.credential
 

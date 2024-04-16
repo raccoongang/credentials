@@ -69,7 +69,16 @@ class BadgeTemplateIssuer(AbstractCredentialIssuer):
 
         return user_credential
 
-    def award(self, credential_id, username):
+    def award(self, *, username, credential_id):
+        """
+        Awards a badge.
+
+        Creates user credential record for the given badge template, for a given user.
+        Notifies about the awarded badge (public signal).
+
+        Returns: UserCredential
+        """
+
         credential = self.get_credential(credential_id)
         user_credential = self.issue_credential(credential, username)
 
@@ -131,10 +140,23 @@ class CredlyBadgeTemplateIssuer(BadgeTemplateIssuer):
         user_credential.state = response.get("data").get("state")
         user_credential.save()
 
-    def award(self, credential_id, username):
-        user_credential = super().award(credential_id, username)
+    def award(self, *, username, credential_id):
+        """
+        Awards a Credly badge.
+
+        - Creates user credential record for the given badge template, for a given user;
+        - Notifies about the awarded badge (public signal);
+        - Issues external Credly badge (Credly API);
+
+        Returns: (CredlyBadge) user credential
+        """
+
+        user_credential = super().award(username=username, credential_id=credential_id)
+
+        # do not issue new badges if the badge was issued already
         if not user_credential.is_issued:
             self.issue_credly_badge(credential_id, user_credential)
+
         return user_credential
 
     def revoke(self, credential_id, username):
