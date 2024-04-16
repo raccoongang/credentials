@@ -2,19 +2,15 @@
 Badges DB models.
 """
 
+import logging
 import operator
 import uuid
 
+from attrs import asdict
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from credentials.apps.badges.signals.signals import (
-    notify_progress_complete,
-    notify_progress_incomplete,
-    notify_requirement_fulfilled,
-    notify_requirement_regressed,
-)
 from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
@@ -26,13 +22,18 @@ from openedx_events.learning.data import (
 )
 
 from credentials.apps.badges.credly.utils import get_credly_base_url
-from credentials.apps.badges.signals import (
-    BADGE_REQUIREMENT_FULFILLED,
-    BADGE_REQUIREMENT_REGRESSED,
+from credentials.apps.badges.signals.signals import (
+    notify_progress_complete,
+    notify_progress_incomplete,
+    notify_requirement_fulfilled,
+    notify_requirement_regressed,
 )
 from credentials.apps.badges.utils import is_datapath_valid, keypath
 from credentials.apps.core.api import get_user_by_username
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
+
+
+logger = logging.getLogger(__name__)
 
 
 class CredlyOrganization(TimeStampedModel):
@@ -100,8 +101,6 @@ class BadgeTemplate(AbstractCredential):
         Determines a completion progress for user.
         """
         progress = BadgeProgress.for_user(username=username, template_id=self.id)
-        if progress is None:
-            return 0.00
         return progress.ratio
 
     def is_completed(self, username: str) -> bool:
@@ -180,13 +179,15 @@ class BadgeRequirement(models.Model):
         """
         Marks itself as "done" for the user.
 
-        - notifies about the progression if any;
+        Side effects:
+            - notifies about a progression if any;
 
         Returns: (bool) if progression happened
         """
         template_id = self.template.id
         progress = BadgeProgress.for_user(username=username, template_id=template_id)
         fulfillment, created = Fulfillment.objects.get_or_create(progress=progress, requirement=self)
+
         if created:
             notify_requirement_fulfilled(
                 sender=self,
@@ -221,12 +222,13 @@ class BadgeRequirement(models.Model):
         return bool(deleted)
 
     def is_fulfilled(self, username: str) -> bool:
-        return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
+        return self.fulfillments.filter(progress__username=username, progress__template=self.template).exists()
 
     def apply_rules(self, data: dict) -> bool:
         """
         Evaluates payload rules.
         """
+
         return all(rule.apply(data) for rule in self.rules.all())
 
     @property
@@ -413,12 +415,6 @@ class BadgeProgress(models.Model):
     - user-centric;
     """
 
-    credential = models.OneToOneField(
-        UserCredential,
-        models.SET_NULL,
-        blank=True,
-        null=True,
-    )
     username = models.CharField(max_length=255)  # index
     template = models.ForeignKey(
         BadgeTemplate,
@@ -445,6 +441,8 @@ class BadgeProgress(models.Model):
     def ratio(self) -> float:
         """
         Calculates badge template progress ratio.
+
+        FIXME: simplify
         """
 
         requirements = BadgeRequirement.objects.filter(template=self.template)
@@ -468,21 +466,23 @@ class BadgeProgress(models.Model):
             return 0.00
         return round(fulfilled_requirements_count / requirements_count, 2)
 
+    @property
+    def completed(self):
+        return self.ratio == 1.00
+
     def validate(self):
         """
         Performs self-check and notifies about the current status.
         """
-        if self.completed():
+
+        if self.completed:
             notify_progress_complete(self, self.username, self.template.id)
 
-        if not self.completed():
+        if not self.completed:
             notify_progress_incomplete(self, self.username, self.template.id)
 
     def reset(self):
         Fulfillment.objects.filter(progress=self).delete()
-
-    def completed(self):
-        return self.ratio == 1.00
 
 
 class Fulfillment(models.Model):
@@ -496,6 +496,7 @@ class Fulfillment(models.Model):
         models.SET_NULL,
         blank=True,
         null=True,
+        related_name="fulfillments",
     )
 
 
@@ -506,7 +507,21 @@ class CredlyBadge(UserCredential):
     - tracks distributed (external Credly service) state for Credly badge.
     """
 
-    STATES = Choices("created", "no_response", "error", "pending", "accepted", "rejected", "revoked")
+    STATES = Choices(
+        "created",
+        "no_response",
+        "error",
+        "pending",
+        "accepted",
+        "rejected",
+        "revoked",
+        "expired",
+    )
+    ISSUING_STATES = {
+        STATES.pending,
+        STATES.accepted,
+        STATES.rejected,
+    }
 
     state = StatusField(
         choices_name="STATES",
@@ -514,15 +529,23 @@ class CredlyBadge(UserCredential):
         default=STATES.created,
     )
 
+    external_uuid = models.UUIDField(
+        blank=True,
+        null=True,
+        unique=True,
+        help_text=_("Credly service badge identifier"),
+    )
+
     def as_badge_data(self) -> BadgeData:
         """
         Represents itself as a BadgeData instance.
         """
+
         user = get_user_by_username(self.username)
         badge_template = self.credential
 
         badge_data = BadgeData(
-            uuid=self.uuid,
+            uuid=str(self.uuid),
             user=UserData(
                 pii=UserPersonalData(
                     username=self.username,
@@ -540,8 +563,12 @@ class CredlyBadge(UserCredential):
                 image_url=str(badge_template.icon),
             ),
         )
+
         return badge_data
 
     @property
-    def is_issued(self):
-        return self.uuid and (self.state in ["pending", "accepted", "rejected"])
+    def propagated(self):
+        """
+        Checks if this user credential already has issued (external) Credly badge.
+        """
+        return self.external_uuid and (self.state in self.ISSUING_STATES)

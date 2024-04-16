@@ -2,8 +2,12 @@
 Badges internal signals.
 """
 
+import logging
 from django.dispatch import Signal
 from openedx_events.learning.signals import BADGE_AWARDED, BADGE_REVOKED
+
+
+logger = logging.getLogger(__name__)
 
 
 # a single requirements for a badge template was finished
@@ -21,8 +25,9 @@ BADGE_PROGRESS_INCOMPLETE = Signal()
 
 def notify_requirement_fulfilled(*, sender, username, badge_template_id, **kwargs):
     """
-    FIXME:
+    Notifies about user's partial progression on the badge template.
     """
+
     BADGE_REQUIREMENT_FULFILLED.send(
         sender=sender,
         username=username,
@@ -38,8 +43,9 @@ def notify_requirement_regressed(*, sender, username, badge_template_id):
 
 def notify_progress_complete(sender, username, badge_template_id):
     """
-    FIXME:
+    Notifies about user's completion on the badge template.
     """
+
     BADGE_PROGRESS_COMPLETE.send(
         sender=sender,
         username=username,
@@ -60,7 +66,7 @@ def notify_progress_incomplete(sender, username, badge_template_id):
 
 def notify_badge_awarded(user_credential):  # pylint: disable=unused-argument
     """
-    Emit public event about badge template completion.
+    Emits a public signal about the badge template completion for user.
 
     - username
     - badge template ID

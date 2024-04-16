@@ -32,6 +32,11 @@ class BadgeRequirementInline(admin.TabularInline):
     show_change_link = True
     extra = 0
 
+    # FIXME: disable until "Release VI"
+    exclude = [
+        "group",
+    ]
+
 
 class BadgePenaltyInline(admin.TabularInline):
     model = BadgePenalty
@@ -50,6 +55,9 @@ class BadgePenaltyInline(admin.TabularInline):
 class FulfillmentInline(admin.TabularInline):
     model = Fulfillment
     extra = 0
+    readonly_fields = [
+        "requirement",
+    ]
 
 
 class DataRuleInline(admin.TabularInline):
@@ -156,7 +164,8 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
     )
     inlines = [
         BadgeRequirementInline,
-        BadgePenaltyInline,
+        # FIXME: disable until "Release V"
+        # BadgePenaltyInline,
     ]
 
     def has_add_permission(self, request):
@@ -235,6 +244,10 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         "template",
         "event_type",
     ]
+    # FIXME: disable until "Release VI"
+    exclude = [
+        "group",
+    ]
 
     def has_add_permission(self, request):
         return False
@@ -284,21 +297,36 @@ class BadgeProgressAdmin(admin.ModelAdmin):
     ]
     list_display = [
         "id",
-        "template",
         "username",
+        "template",
         "complete",
     ]
     list_display_links = (
         "id",
+        "username",
         "template",
+    )
+    readonly_fields = (
+        "username",
+        "template",
+        "complete",
+        "ratio",
     )
 
     @admin.display(boolean=True)
     def complete(self, obj):
         """
-        TODO: switch dedicated `is_complete` bool field
+        Identifies if all requirements are already fulfilled.
+
+        NOTE: (performance) dynamic evaluation.
         """
-        return bool(getattr(obj, "credential", False))
+        return obj.completed
+
+    def ratio(self, obj):
+        """
+        Displays progress value.
+        """
+        return obj.ratio
 
 
 class CredlyBadgeAdmin(admin.ModelAdmin):
@@ -307,18 +335,29 @@ class CredlyBadgeAdmin(admin.ModelAdmin):
     """
 
     list_display = (
-        "username",
-        "state",
         "uuid",
+        "username",
+        "credential",
+        "status",
+        "state",
+        "external_uuid",
     )
-    list_filter = ("state",)
+    list_filter = (
+        "status",
+        "state",
+    )
     search_fields = (
         "username",
-        "uuid",
+        "external_uuid",
     )
     readonly_fields = (
+        "credential_id",
+        "credential_content_type",
+        "username",
+        "download_url",
         "state",
         "uuid",
+        "external_uuid",
     )
 
 
@@ -328,5 +367,6 @@ if is_badges_enabled():
     admin.site.register(CredlyBadgeTemplate, CredlyBadgeTemplateAdmin)
     admin.site.register(CredlyBadge, CredlyBadgeAdmin)
     admin.site.register(BadgeRequirement, BadgeRequirementAdmin)
-    admin.site.register(BadgePenalty, BadgePenaltyAdmin)
+    # FIXME: disable until "Release V"
+    # admin.site.register(BadgePenalty, BadgePenaltyAdmin)
     admin.site.register(BadgeProgress, BadgeProgressAdmin)
