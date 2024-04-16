@@ -545,7 +545,7 @@ class CredlyBadge(UserCredential):
         badge_template = self.credential
 
         badge_data = BadgeData(
-            uuid=self.uuid,
+            uuid=str(self.uuid),
             user=UserData(
                 pii=UserPersonalData(
                     username=self.username,
