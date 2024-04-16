@@ -143,5 +143,3 @@ class TestBadgesChecks(unittest.TestCase):
         mock_get_badging_event_types.return_value = ["event1", "event2"]
         errors = badges_checks()
         self.assertEqual(len(errors), 0)
-
-

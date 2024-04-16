@@ -26,10 +26,7 @@ from openedx_events.learning.data import (
 )
 
 from credentials.apps.badges.credly.utils import get_credly_base_url
-from credentials.apps.badges.signals import (
-    BADGE_REQUIREMENT_FULFILLED,
-    BADGE_REQUIREMENT_REGRESSED,
-)
+
 from credentials.apps.badges.utils import is_datapath_valid, keypath
 from credentials.apps.core.api import get_user_by_username
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
@@ -180,13 +177,15 @@ class BadgeRequirement(models.Model):
         """
         Marks itself as "done" for the user.
 
-        - notifies about the progression if any;
+        Side effects:
+            - notifies about a progression if any;
 
         Returns: (bool) if progression happened
         """
         template_id = self.template.id
         progress = BadgeProgress.for_user(username=username, template_id=template_id)
         fulfillment, created = Fulfillment.objects.get_or_create(progress=progress, requirement=self)
+
         if created:
             notify_requirement_fulfilled(
                 sender=self,
@@ -469,21 +468,23 @@ class BadgeProgress(models.Model):
             return 0.00
         return round(fulfilled_requirements_count / requirements_count, 2)
 
+    @property
+    def completed(self):
+        return self.ratio == 1.00
+
     def validate(self):
         """
         Performs self-check and notifies about the current status.
         """
-        if self.completed():
+
+        if self.completed:
             notify_progress_complete(self, self.username, self.template.id)
 
-        if not self.completed():
+        if not self.completed:
             notify_progress_incomplete(self, self.username, self.template.id)
 
     def reset(self):
         Fulfillment.objects.filter(progress=self).delete()
-
-    def completed(self):
-        return self.ratio == 1.00
 
 
 class Fulfillment(models.Model):

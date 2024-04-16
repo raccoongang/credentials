@@ -21,8 +21,9 @@ BADGE_PROGRESS_INCOMPLETE = Signal()
 
 def notify_requirement_fulfilled(*, sender, username, badge_template_id, **kwargs):
     """
-    FIXME:
+    Notifies about user's progression on the badge template.
     """
+
     BADGE_REQUIREMENT_FULFILLED.send(
         sender=sender,
         username=username,
