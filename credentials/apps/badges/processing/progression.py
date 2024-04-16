@@ -43,10 +43,12 @@ def process_requirements(event_type, username, payload_dict):
 
         # drop early: if the badge template is already "done"
         if requirement.template_id in completed_templates:
+            # TODO: move this check to `discover_requirements` query
             continue
 
         # drop early: if the requirement is already "done"
         if requirement.is_fulfilled(username):
+            # TODO: move this check to `discover_requirements` query
             continue
 
         # process: payload rules

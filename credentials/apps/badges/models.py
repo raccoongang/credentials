@@ -221,12 +221,13 @@ class BadgeRequirement(models.Model):
         return bool(deleted)
 
     def is_fulfilled(self, username: str) -> bool:
-        return self.fulfillment_set.filter(progress__username=username, progress__template=self.template).exists()
+        return self.fulfillments.filter(progress__username=username, progress__template=self.template).exists()
 
     def apply_rules(self, data: dict) -> bool:
         """
         Evaluates payload rules.
         """
+
         return all(rule.apply(data) for rule in self.rules.all())
 
     @property
@@ -496,6 +497,7 @@ class Fulfillment(models.Model):
         models.SET_NULL,
         blank=True,
         null=True,
+        related_name="fulfillments",
     )
 
 
