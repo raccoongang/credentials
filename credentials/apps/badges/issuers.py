@@ -7,7 +7,7 @@ from django.db import transaction
 from django.utils.translation import gettext as _
 
 from credentials.apps.badges.credly.api_client import CredlyAPIClient
-from credentials.apps.badges.credly.data import IssueBadgeData
+from credentials.apps.badges.credly.data import CredlyBadgeData
 from credentials.apps.badges.credly.exceptions import CredlyAPIError
 from credentials.apps.badges.models import BadgeTemplate, CredlyBadge, CredlyBadgeTemplate, UserCredential
 from credentials.apps.badges.signals.signals import notify_badge_awarded, notify_badge_revoked
@@ -101,26 +101,31 @@ class CredlyBadgeTemplateIssuer(BadgeTemplateIssuer):
     issued_credential_type = CredlyBadgeTemplate
     issued_user_credential_type = CredlyBadge
 
-    def issue_credly_badge(self, credential_id, user_credential):
-        user = get_user_by_username(user_credential.username)
+    def issue_credly_badge(self, *, user_credential):
+        """
+        Requests Credly service for external badge issuing based on internal user credential (CredlyBadge).
+        """
 
-        credential = self.get_credential(credential_id)
-        credly_api = CredlyAPIClient(credential.organization.uuid)
-        issue_badge_data = IssueBadgeData(
+        user = get_user_by_username(user_credential.username)
+        badge_template = user_credential.credential
+
+        credly_badge_data = CredlyBadgeData(
             recipient_email=user.email,
             issued_to_first_name=(user.first_name or user.username),
             issued_to_last_name=(user.last_name or user.username),
-            badge_template_id=str(credential.uuid),
-            issued_at=credential.created.strftime("%Y-%m-%d %H:%M:%S %z"),
+            badge_template_id=str(badge_template.uuid),
+            issued_at=badge_template.created.strftime("%Y-%m-%d %H:%M:%S %z"),
         )
+
         try:
-            response = credly_api.issue_badge(issue_badge_data)
+            credly_api = CredlyAPIClient(badge_template.organization.uuid)
+            response = credly_api.issue_badge(credly_badge_data)
         except CredlyAPIError:
             user_credential.state = "error"
             user_credential.save()
             raise
 
-        user_credential.uuid = response.get("data").get("id")
+        user_credential.external_uuid = response.get("data").get("id")
         user_credential.state = response.get("data").get("state")
         user_credential.save()
 
@@ -154,13 +159,13 @@ class CredlyBadgeTemplateIssuer(BadgeTemplateIssuer):
         user_credential = super().award(username=username, credential_id=credential_id)
 
         # do not issue new badges if the badge was issued already
-        if not user_credential.is_issued:
-            self.issue_credly_badge(credential_id, user_credential)
+        if not user_credential.issued:
+            self.issue_credly_badge(user_credential)
 
         return user_credential
 
     def revoke(self, credential_id, username):
         user_credential = super().revoke(credential_id, username)
-        if user_credential.is_issued:
+        if user_credential.issued:
             self.revoke_credly_badge(credential_id, user_credential)
         return user_credential

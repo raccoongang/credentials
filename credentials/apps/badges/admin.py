@@ -50,6 +50,9 @@ class BadgePenaltyInline(admin.TabularInline):
 class FulfillmentInline(admin.TabularInline):
     model = Fulfillment
     extra = 0
+    readonly_fields = [
+        "requirement",
+    ]
 
 
 class DataRuleInline(admin.TabularInline):
@@ -284,21 +287,41 @@ class BadgeProgressAdmin(admin.ModelAdmin):
     ]
     list_display = [
         "id",
-        "template",
         "username",
+        "template",
         "complete",
+        "issued",
     ]
     list_display_links = (
         "id",
+        "username",
         "template",
     )
+    readonly_fields = (
+        "username",
+        "template",
+        "complete",
+        "issued",
+    )
+    exclude = [
+        "credential",
+    ]
 
     @admin.display(boolean=True)
     def complete(self, obj):
         """
-        TODO: switch dedicated `is_complete` bool field
+        Identifies if all requirements are already fulfilled.
+
+        NOTE: (performance) dynamic evaluation.
         """
-        return bool(getattr(obj, "credential", False))
+        return obj.completed
+
+    @admin.display(boolean=True)
+    def issued(self, obj):
+        """
+        Identifies if user credential exists (regardless its current status).
+        """
+        return bool(obj.credential)
 
 
 class CredlyBadgeAdmin(admin.ModelAdmin):

@@ -2,19 +2,15 @@
 Badges DB models.
 """
 
+import logging
 import operator
 import uuid
 
+from attrs import asdict
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from credentials.apps.badges.signals.signals import (
-    notify_progress_complete,
-    notify_progress_incomplete,
-    notify_requirement_fulfilled,
-    notify_requirement_regressed,
-)
 from django_extensions.db.models import TimeStampedModel
 from model_utils import Choices
 from model_utils.fields import StatusField
@@ -26,10 +22,18 @@ from openedx_events.learning.data import (
 )
 
 from credentials.apps.badges.credly.utils import get_credly_base_url
-
+from credentials.apps.badges.signals.signals import (
+    notify_progress_complete,
+    notify_progress_incomplete,
+    notify_requirement_fulfilled,
+    notify_requirement_regressed,
+)
 from credentials.apps.badges.utils import is_datapath_valid, keypath
 from credentials.apps.core.api import get_user_by_username
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
+
+
+logger = logging.getLogger(__name__)
 
 
 class CredlyOrganization(TimeStampedModel):
@@ -509,12 +513,33 @@ class CredlyBadge(UserCredential):
     - tracks distributed (external Credly service) state for Credly badge.
     """
 
-    STATES = Choices("created", "no_response", "error", "pending", "accepted", "rejected", "revoked")
+    STATES = Choices(
+        "created",
+        "no_response",
+        "error",
+        "pending",
+        "accepted",
+        "rejected",
+        "revoked",
+        "expired",
+    )
+    ISSUING_STATES = {
+        STATES.pending,
+        STATES.accepted,
+        STATES.rejected,
+    }
 
     state = StatusField(
         choices_name="STATES",
         help_text=_("Credly badge issuing state"),
         default=STATES.created,
+    )
+
+    external_uuid = models.UUIDField(
+        blank=True,
+        null=True,
+        unique=True,
+        help_text=_("Credly service badge identifier"),
     )
 
     def as_badge_data(self) -> BadgeData:
@@ -544,8 +569,12 @@ class CredlyBadge(UserCredential):
                 image_url=str(badge_template.icon),
             ),
         )
+
         return badge_data
 
     @property
-    def is_issued(self):
-        return self.uuid and (self.state in ["pending", "accepted", "rejected"])
+    def issued(self):
+        """
+        Checks if this user credential already has issued (external) Credly badge.
+        """
+        return self.external_uuid and (self.state in self.ISSUING_STATES)

@@ -2,8 +2,12 @@
 Badges internal signals.
 """
 
+import logging
 from django.dispatch import Signal
 from openedx_events.learning.signals import BADGE_AWARDED, BADGE_REVOKED
+
+
+logger = logging.getLogger(__name__)
 
 
 # a single requirements for a badge template was finished
