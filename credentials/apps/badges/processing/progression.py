@@ -1,5 +1,5 @@
 """
-Awarding pipeline - badge progression.
+Badge progression processing.
 """
 
 import logging
@@ -15,6 +15,7 @@ def discover_requirements(event_type: str) -> List[BadgeRequirement]:
     """
     Picks all relevant requirements based on the event type.
     """
+
     return BadgeRequirement.objects.filter(event_type=event_type)
 
 
