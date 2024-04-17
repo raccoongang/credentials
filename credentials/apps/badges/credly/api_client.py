@@ -120,7 +120,7 @@ class CredlyAPIClient:
         """
         Fetches the badge templates from the Credly API.
         """
-        return self.perform_request("get", "badge_templates/")
+        return self.perform_request("get", f"badge_templates/?filter=state::{CredlyBadgeTemplate.STATES.active}")
 
     def fetch_event_information(self, event_id):
         """
@@ -154,8 +154,7 @@ class CredlyAPIClient:
         Pull active badge templates for a given Credly Organization.
 
         Args:
-            organization_id (str): UUID of the organization.
-            organization_id (str): UUID of the organization.
+            site_id (int): ID of the site.
 
         Returns:
             int | None: processed items.
