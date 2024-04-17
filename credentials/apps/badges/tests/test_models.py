@@ -404,6 +404,4 @@ class CredlyBadgeAsBadgeDataTestCase(TestCase):
             ),
         )
         actual_badge_data = self.badge.as_badge_data()
-        print(expected_badge_data)
-        print(actual_badge_data)
         self.assertEqual(actual_badge_data, expected_badge_data)
