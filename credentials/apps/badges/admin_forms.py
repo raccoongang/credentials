@@ -4,10 +4,12 @@ Badges admin forms.
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from model_utils import Choices
 
 from credentials.apps.badges.credly.api_client import CredlyAPIClient
 from credentials.apps.badges.credly.exceptions import CredlyAPIError
-from credentials.apps.badges.models import BadgePenalty, CredlyOrganization, BadgeTemplate
+from credentials.apps.badges.models import BadgePenalty, CredlyOrganization, DataRule
+from credentials.apps.badges.utils import get_event_type_keypaths
 
 
 class CredlyOrganizationAdminForm(forms.ModelForm):
@@ -74,3 +76,14 @@ class BadgePenaltyForm(forms.ModelForm):
         ):
             raise forms.ValidationError("All requirements must belong to the same template.")
         return cleaned_data
+
+
+class DataRuleForm(forms.ModelForm):
+    class Meta:
+        model = DataRule
+        fields = "__all__"
+
+    CHOICES = Choices(*get_event_type_keypaths("org.openedx.learning.course.passing.status.updated.v1"))
+    data_path = forms.ChoiceField(
+        choices=CHOICES,
+    )

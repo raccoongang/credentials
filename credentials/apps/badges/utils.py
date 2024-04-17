@@ -76,7 +76,7 @@ def is_datapath_valid(datapath: str, event_type: str) -> bool:
                     return False
 
 
-def get_user_data(data: dict) -> UserData:
+def get_user_data(data: attr.s) -> UserData:
     """
     Extracts UserData object from any dataclass that contains UserData as a field.
 
@@ -90,9 +90,6 @@ def get_user_data(data: dict) -> UserData:
     if isinstance(data, UserData):
         return data
 
-    if isinstance(data, dict):
-        data = list(data.values())[0]
-
     for _, attr_value in inspect.getmembers(data):
         if isinstance(attr_value, UserData):
             return attr_value
@@ -103,17 +100,47 @@ def get_user_data(data: dict) -> UserData:
     return None
 
 
-def extract_payload(public_signal_kwargs: dict, as_dict=False) -> dict:
+def extract_payload(public_signal_kwargs: dict) -> attr.s:
     """
     Extracts the event payload from the event data.
 
     Parameters:
-        - payload: The event data.
-        - as_dict: Transform returned dict to primitives.
+        - public_signal_kwargs: The event data.
 
     Returns:
-        dict: The event "cleaned" payload.
+        attr.s: The extracted event payload.
     """
-    for key, value in public_signal_kwargs.items():
+    for value in public_signal_kwargs.values():
         if attr.has(value):
-            return {key: asdict(value)} if as_dict else {key: value}
+            return value
+
+
+def get_event_type_keypaths(event_type: str) -> list:
+    """
+    Extracts all possible keypaths for a given event type.
+
+    Parameters:
+        - event_type: The event type to extract keypaths for.
+
+    Returns:
+        list: A list of all possible keypaths for the given event type.
+    """
+    signal = OpenEdxPublicSignal.get_signal_by_type(event_type)
+    data = extract_payload(signal.init_data)
+
+    def get_data_keypaths(data):
+        keypaths = []
+        for field in attr.fields(data):
+            if attr.has(field.type):
+                keypaths += [f"{field.name}.{keypath}" for keypath in get_data_keypaths(field.type)]
+            else:
+                keypaths.append(field.name)
+        return keypaths
+
+    keypaths = []
+    for field in attr.fields(data):
+        if attr.has(field.type):
+            keypaths += [f"{field.name}.{keypath}" for keypath in get_data_keypaths(field.type)]
+        else:
+            keypaths.append(field.name)
+    return keypaths

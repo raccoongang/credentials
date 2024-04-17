@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from credentials.apps.badges.admin_forms import (
     BadgePenaltyForm,
     CredlyOrganizationAdminForm,
+    DataRuleForm,
 )
 
 from credentials.apps.badges.models import (
@@ -63,6 +64,7 @@ class FulfillmentInline(admin.TabularInline):
 class DataRuleInline(admin.TabularInline):
     model = DataRule
     extra = 0
+    form = DataRuleForm
 
 
 class CredlyOrganizationAdmin(admin.ModelAdmin):
