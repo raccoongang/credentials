@@ -34,7 +34,8 @@ def process_event(sender, **kwargs):
         process_requirements(event_type, username, extract_payload(kwargs, as_dict=True))
 
         # penalties processing
-        process_penalties(event_type, username, extract_payload(kwargs, as_dict=True))
+        # FIXME: disable until "Release V"
+        # process_penalties(event_type, username, extract_payload(kwargs, as_dict=True))
 
     except StopEventProcessing:
         # controlled processing dropping

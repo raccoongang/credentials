@@ -7,6 +7,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
 from credentials.apps.badges.admin_forms import (
     BadgePenaltyForm,
@@ -32,6 +33,11 @@ class BadgeRequirementInline(admin.TabularInline):
     show_change_link = True
     extra = 0
 
+    # FIXME: disable until "Release VI"
+    exclude = [
+        "group",
+    ]
+
 
 class BadgePenaltyInline(admin.TabularInline):
     model = BadgePenalty
@@ -50,6 +56,9 @@ class BadgePenaltyInline(admin.TabularInline):
 class FulfillmentInline(admin.TabularInline):
     model = Fulfillment
     extra = 0
+    readonly_fields = [
+        "requirement",
+    ]
 
 
 class DataRuleInline(admin.TabularInline):
@@ -128,7 +137,14 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
                 "fields": (
                     "site",
                     "is_active",
-                )
+                ),
+                "description": _(
+                    """
+                    WARNING: avoid configuration updates on activated badges.
+                    Active badge templates are continuously processed and learners may already have partial progress on them.
+                    Any changes in badge template requirements (including data rules) will affect learners' experience!
+                    """
+                ),
             },
         ),
         (
@@ -156,7 +172,8 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
     )
     inlines = [
         BadgeRequirementInline,
-        BadgePenaltyInline,
+        # FIXME: disable until "Release V"
+        # BadgePenaltyInline,
     ]
 
     def has_add_permission(self, request):
@@ -187,9 +204,12 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         super().delete_queryset(request, queryset)
 
     def image(self, obj):
+        """
+        Badge template preview image.
+        """
         if obj.icon:
             return format_html('<img src="{}" width="50" height="auto" />', obj.icon)
-        return "-"
+        return None
 
     image.short_description = _("icon")
 
@@ -224,20 +244,43 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
 
     list_display = [
         "id",
-        "template",
+        "__str__",
         "event_type",
+        "template_link",
     ]
     list_display_links = (
         "id",
-        "template",
+        "__str__",
     )
     list_filter = [
         "template",
         "event_type",
     ]
+    readonly_fields = [
+        "template",
+        "event_type",
+        "template_link",
+    ]
+
+    fields = [
+        "template_link",
+        "event_type",
+        "description",
+        # FIXME: disable until "Release VI"
+        # "group",
+    ]
 
     def has_add_permission(self, request):
         return False
+
+    def template_link(self, instance):
+        """
+        Interactive link to parent (badge template).
+        """
+        url = reverse("admin:badges_credlybadgetemplate_change", args=[instance.template.pk])
+        return format_html('<a href="{}">{}</a>', url, instance.template)
+
+    template_link.short_description = _("badge template")
 
 
 class BadgePenaltyAdmin(admin.ModelAdmin):
@@ -249,13 +292,19 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
         DataRulePenaltyInline,
     ]
 
-    list_display = [
-        "id",
-        "template",
-    ]
     list_display_links = (
         "id",
         "template",
+    )
+    list_display = [
+        "id",
+        "__str__",
+        "event_type",
+        "template_link",
+    ]
+    list_display_links = (
+        "id",
+        "__str__",
     )
     list_filter = [
         "template",
@@ -273,6 +322,15 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
                 kwargs["queryset"] = BadgeRequirement.objects.filter(template_id=template_id)
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
+    def template_link(self, instance):
+        """
+        Interactive link to parent (badge template).
+        """
+        url = reverse("admin:badges_credlybadgetemplate_change", args=[instance.template.pk])
+        return format_html('<a href="{}">{}</a>', url, instance.template)
+
+    template_link.short_description = _("badge template")
+
 
 class BadgeProgressAdmin(admin.ModelAdmin):
     """
@@ -284,21 +342,39 @@ class BadgeProgressAdmin(admin.ModelAdmin):
     ]
     list_display = [
         "id",
-        "template",
         "username",
+        "template",
         "complete",
     ]
     list_display_links = (
         "id",
+        "username",
         "template",
+    )
+    readonly_fields = (
+        "username",
+        "template",
+        "complete",
+        "ratio",
     )
 
     @admin.display(boolean=True)
     def complete(self, obj):
         """
-        TODO: switch dedicated `is_complete` bool field
+        Identifies if all requirements are already fulfilled.
+
+        NOTE: (performance) dynamic evaluation.
         """
-        return bool(getattr(obj, "credential", False))
+        return obj.completed
+
+    def ratio(self, obj):
+        """
+        Displays progress value.
+        """
+        return obj.ratio
+
+    def has_add_permission(self, request):
+        return False
 
 
 class CredlyBadgeAdmin(admin.ModelAdmin):
@@ -307,19 +383,33 @@ class CredlyBadgeAdmin(admin.ModelAdmin):
     """
 
     list_display = (
-        "username",
-        "state",
         "uuid",
+        "username",
+        "credential",
+        "status",
+        "state",
+        "external_uuid",
     )
-    list_filter = ("state",)
+    list_filter = (
+        "status",
+        "state",
+    )
     search_fields = (
         "username",
-        "uuid",
+        "external_uuid",
     )
     readonly_fields = (
+        "credential_id",
+        "credential_content_type",
+        "username",
+        "download_url",
         "state",
         "uuid",
+        "external_uuid",
     )
+
+    def has_add_permission(self, request):
+        return False
 
 
 # register admin configurations with respect to the feature flag
@@ -328,5 +418,6 @@ if is_badges_enabled():
     admin.site.register(CredlyBadgeTemplate, CredlyBadgeTemplateAdmin)
     admin.site.register(CredlyBadge, CredlyBadgeAdmin)
     admin.site.register(BadgeRequirement, BadgeRequirementAdmin)
-    admin.site.register(BadgePenalty, BadgePenaltyAdmin)
+    # FIXME: disable until "Release V"
+    # admin.site.register(BadgePenalty, BadgePenaltyAdmin)
     admin.site.register(BadgeProgress, BadgeProgressAdmin)

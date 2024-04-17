@@ -4,7 +4,7 @@ import attr
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class IssueBadgeData:
+class CredlyBadgeData:
     """
     Represents the data required to issue a badge.
 
