@@ -104,26 +104,20 @@ class TestExtractPayload(unittest.TestCase):
             end=datetime(2024, 6, 1),
         )
 
-    def test_extract_payload_as_dict_false(self):
-        public_signal_kwargs = {
-            "public_signal_kwargs": {"course": self.course_data},
-            "as_dict": False,
-        }
-        expected_result = {"course": self.course_data}
-        result = extract_payload(**public_signal_kwargs)
-        self.assertEqual(result, expected_result)
-
-    def test_extract_payload_as_dict_true(self):
-        public_signal_kwargs = {
-            "public_signal_kwargs": {"course": self.course_data},
-            "as_dict": True,
-        }
-        expected_result = {"course": asdict(self.course_data)}
-        result = extract_payload(**public_signal_kwargs)
-        self.assertEqual(result, expected_result)
+    def test_extract_payload(self):
+        user_data = UserData(
+            id=1, is_active=True, pii=UserPersonalData(username="user1", email="user1@example.com ", name="John Doe")
+        )
+        course_passing_status = CoursePassingStatusData(
+            status=CoursePassingStatusData.PASSING, course=self.course_data, user=user_data
+        )
+        public_signal_kwargs = {"course_passing_status": course_passing_status}
+        result = extract_payload(public_signal_kwargs)
+        self.assertIsNotNone(result)
+        self.assertEqual(asdict(result), asdict(course_passing_status))
 
     def test_extract_payload_empty_payload(self):
-        public_signal_kwargs = {"public_signal_kwargs": {}, "as_dict": False}
+        public_signal_kwargs = {"public_signal_kwargs": {}}
         result = extract_payload(**public_signal_kwargs)
         self.assertIsNone(result)
 
