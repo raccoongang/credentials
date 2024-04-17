@@ -14,6 +14,20 @@ def get_badging_event_types():
     return settings.BADGES_CONFIG.get("events", [])
 
 
+def credly_check():
+    credly_settings = settings.BADGES_CONFIG.get("credly", None)
+    if credly_settings is None:
+        return False
+    keys = (
+        "CREDLY_BASE_URL",
+        "CREDLY_API_BASE_URL",
+        "CREDLY_SANDBOX_BASE_URL",
+        "CREDLY_SANDBOX_API_BASE_URL",
+        "USE_SANDBOX",
+    )
+    return all([key in credly_settings.keys() for key in keys])
+
+
 def keypath(payload, keys_path):
     """
     Retrieve the value from a nested dictionary using a dot-separated key path.
