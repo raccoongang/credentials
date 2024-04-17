@@ -217,7 +217,6 @@ class BadgeRequirement(models.Model):
                 sender=self,
                 username=username,
                 badge_template_id=template_id,
-                fulfillment_id=fulfillment.id,
             )
         return bool(deleted)
 

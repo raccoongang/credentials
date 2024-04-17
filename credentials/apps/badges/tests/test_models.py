@@ -385,7 +385,7 @@ class CredlyBadgeAsBadgeDataTestCase(TestCase):
 
     def test_as_badge_data(self):
         expected_badge_data = BadgeData(
-            uuid=self.badge.uuid,
+            uuid=str(self.badge.uuid),
             user=UserData(
                 pii=UserPersonalData(
                     username=self.user.username,
@@ -400,7 +400,7 @@ class CredlyBadgeAsBadgeDataTestCase(TestCase):
                 origin=self.credential.origin,
                 name=self.credential.name,
                 description=self.credential.description,
-                image_url=self.credential.icon,
+                image_url=str(self.credential.icon),
             ),
         )
         actual_badge_data = self.badge.as_badge_data()

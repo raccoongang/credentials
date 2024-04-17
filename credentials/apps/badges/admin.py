@@ -5,6 +5,7 @@ Admin section configuration.
 from django.contrib import admin, messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
+from django.urls import resolve
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
@@ -12,6 +13,8 @@ from django.urls import reverse
 from credentials.apps.badges.admin_forms import (
     BadgePenaltyForm,
     CredlyOrganizationAdminForm,
+    DataRuleForm,
+    DataRuleFormSet,
 )
 
 from credentials.apps.badges.models import (
@@ -64,6 +67,8 @@ class FulfillmentInline(admin.TabularInline):
 class DataRuleInline(admin.TabularInline):
     model = DataRule
     extra = 0
+    form = DataRuleForm
+    formset = DataRuleFormSet
 
 
 class CredlyOrganizationAdmin(admin.ModelAdmin):

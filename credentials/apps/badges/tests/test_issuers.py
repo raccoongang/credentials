@@ -35,7 +35,7 @@ class CredlyBadgeTemplateIssuer(TestCase):
         with mock.patch("credentials.apps.badges.issuers.notify_badge_awarded") as mock_notify_badge_awarded:
 
             with mock.patch.object(self.issuer, "issue_credly_badge") as mock_issue_credly_badge:
-                self.issuer().award(self.badge_template.id, "test_user")
+                self.issuer().award(credential_id=self.badge_template.id, username="test_user")
 
             mock_notify_badge_awarded.assert_called_once()
             mock_issue_credly_badge.assert_called_once()
@@ -57,6 +57,7 @@ class CredlyBadgeTemplateIssuer(TestCase):
             credential_id=self.badge_template.id,
             state=CredlyBadge.STATES.pending,
             uuid=self.fake.uuid4(),
+            external_uuid=self.fake.uuid4(),
         )
 
         with mock.patch("credentials.apps.badges.issuers.notify_badge_revoked") as mock_notify_badge_revoked:
