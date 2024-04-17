@@ -2,6 +2,8 @@
 Badges admin forms.
 """
 
+import inspect
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
@@ -78,12 +80,24 @@ class BadgePenaltyForm(forms.ModelForm):
         return cleaned_data
 
 
+class DataRuleFormSet(forms.BaseInlineFormSet):
+    def get_form_kwargs(self, index):
+        kwargs = super().get_form_kwargs(index)
+        kwargs["parent_instance"] = self.instance
+        return kwargs
+
+
 class DataRuleForm(forms.ModelForm):
     class Meta:
         model = DataRule
         fields = "__all__"
 
-    CHOICES = Choices(*get_event_type_keypaths("org.openedx.learning.course.passing.status.updated.v1"))
-    data_path = forms.ChoiceField(
-        choices=CHOICES,
-    )
+    data_path = forms.ChoiceField()
+
+    def __init__(self, *args, parent_instance=None, **kwargs):
+        self.parent_instance = parent_instance
+        super().__init__(*args, **kwargs)
+
+        if self.parent_instance:
+            event_type = self.parent_instance.event_type
+            self.fields["data_path"].choices = Choices(*get_event_type_keypaths(event_type=event_type))
