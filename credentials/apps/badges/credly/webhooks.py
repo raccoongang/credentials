@@ -105,6 +105,12 @@ class CredlyWebhook(APIView):
             },
         )
 
+        if badge_template.get("state") != CredlyBadgeTemplate.STATES.active:
+            CredlyBadgeTemplate.objects.filter(
+                uuid=badge_template.get("id"),
+                organization=organization,
+            ).update(is_active=False)
+
     @staticmethod
     def handle_badge_template_deleted_event(request, data):
         """
