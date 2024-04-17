@@ -194,7 +194,7 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         """
         if obj.is_active:
             messages.set_level(request, messages.ERROR)
-            messages.error(request, "Active badge template cannot be deleted.")
+            messages.error(request, _("Active badge template cannot be deleted."))
             return
         super().delete_model(request, obj)
 
@@ -204,7 +204,7 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         """
         if queryset.filter(is_active=True).exists():
             messages.set_level(request, messages.ERROR)
-            messages.error(request, "Active badge templates cannot be deleted.")
+            messages.error(request, _("Active badge templates cannot be deleted."))
             return
         super().delete_queryset(request, queryset)
 
@@ -228,7 +228,7 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         obj = form.instance
         if obj.is_active and not obj.requirements.exists():
             messages.set_level(request, messages.ERROR)
-            messages.error(request, "Badge Template must have at least 1 Requirement set.")
+            messages.error(request, _("Badge Template must have at least 1 Requirement set."))
             return
         super().save_related(request, form, formsets, change)
 

@@ -76,7 +76,7 @@ class BadgePenaltyForm(forms.ModelForm):
         if requirements and not all(
             [requirement.template.id == cleaned_data.get("template").id for requirement in requirements]
         ):
-            raise forms.ValidationError("All requirements must belong to the same template.")
+            raise forms.ValidationError(_("All requirements must belong to the same template."))
         return cleaned_data
 
 
