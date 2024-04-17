@@ -3,6 +3,16 @@ Quick Start
 
     Learners *earn* badges based on Open edX platform activity.
 
+
+0. Credly service prerequisites
+-------------------------------
+
+Since current Badges version is deeply integrated with the Credly service, Credly account is a prerequisite.
+
+- a **Credly Organization** is expected to be created;
+- 1 or more **badge templates** are expected to be created and activated in the Organization;
+- Credly Organization **authorization token** is issued;
+
 1. Enable feature
 -----------------
 
@@ -11,66 +21,117 @@ So, it must be enabled to be accessible.
 
 .. code-block::
 
+    # LMS service:
+    FEATURES["BADGES_ENABLED"] = True
+
     # Credentials service:
-    ENABLE_BADGES = true
+    BADGES_ENABLED = True
 
-2. Validate configuration
--------------------------
+2. Configure Credly integration
+-------------------------------
 
-Learners' activity is expressed through `system events`_.
-Credentials Badges has an explicit `configuration`_ for:
+Enter the Credentials service admin interface and configure the integration with the Credly service:
 
-- **consumed (incoming) events** - these events are a basis for **badging rules**;
-- **produced (outgoing) events** - these events inform other services about **badging progress**;
+- create a Credly Organization (`<credentials>/admin/badges/credlyorganization/`);
+- set the UUID for the Organization;
+- set the authorization token;
 
-Possibly, one will want to extend incoming event types.
+Check: the system pulls the Organization data and updates its name.
 
-3. Create your badge templates
+
+3. Synchronize badge templates
 ------------------------------
 
-A Badge has its `life-cycle`_ which starts from a template `creation`_.
-Newly created badge templates are inactive, since they are not configured.
+From the "Credly Organizations" list, select the Organization(s) you want to use and select ``Sync organization badge templates`` action.
 
-.. note::
-    Badges `distribution backends`_ may extend standard badges management capabilities.
+The system pulls the list of badge templates from the Credly Organization. Navigate to the "Credly badge templates" list and check newly created templates.
 
 4. Setup badge requirements
 ---------------------------
 
-The most important part of a badge template configuration is `requirements specification`_. In short, at least one requirement must be associated with a template.
+    Requirements describe **what** and **how** must happen on the system to earn a badge.
 
-    Requirements describe what must be done before one can get a badge.
+The crucial part of the badge template configuration is requirements specification.
+At least one requirement must be associated with a badge template.
 
-Badge template requirements control how badge completion is fulfilled (see currently `available use cases`_)
+Enter the first badge template details page and configure its requirement(s):
 
-Additionally, requirement can be configured with `revocation effect`_.
+- find "Badge Requirements" section;
+- add new item and select an event type (what is expected to happen);
+- optionally, put a description;
+- save and navigate to the Requirement details (``Change`` link);
+
+- optionally, specify a data rule(s) in the "Data Rules" section (how exactly it is expected to happen);
+- add new item and describe the rule;
+- select a key path - target payload parameter;
+- select an operator - how to compare the value;
+- enter a value - expected parameter's value;
+
+.. note::
+
+    A configuration for the badge template that must be issued on a **specific course completion** looks as following:
+
+    - Requirement:
+        - event type: ``org.openedx.learning.course.passing.status.updated.v1``
+        - description: ``On the Demo course completion.``
+    - Data rule 1:
+        - key path: ``course.course_key``
+        - operator: ``equals``
+        - value: ``course-v1:edX+DemoX+Demo_Course``
+    - Data rule 2:
+        - key path: ``status``
+        - operator: ``equals``
+        - value: ``passing``
+
+It is possible to put more than one requirement in a badge template.
 
 5. Activate configured badge templates
 --------------------------------------
 
-Once badge requirements are configured, to make badge available for users one have to "enable" it - put in active state.
+Once badge requirements are configured, it should be "enabled" to start "working" - so, check ``is active`` checkbox.
 
-Active badges start being taking into account by the `Badge Processor`_.
+Active badges start being taking into account immediately.
 
-6. Badge templates maintenance
-------------------------------
+.. warning::
 
-Badge processing can be "paused" by putting its template to `inactive` state. Inactive state allows badge template editing.
+    Configuration updates for an active badge template is discouraged since it may cause learners' inconsistent experience.
 
-7. Badge template withdrawal
+6. See users Badge Progress
+---------------------------
+
+Current badge progress can be seen in the "Badge progress records" section.
+
+Since badge template can have more than one requirement, there can be partially completed badges.
+
+7. See awarded user credentials
+-------------------------------
+
+Already earned badges are listed in the "Credly badges" list page.
+
+    The Credly Badge is an extended version of a user credential record.
+
+Once badge progress is complete (all requirements were *fulfilled*), the system:
+
+- creates internal user credential (CredlyBadge);
+- notifies about the badge awarding (public signal);
+- requests Credly service to issue the badge (API request).
+
+8. See issued Credly badges
+---------------------------
+
+Earned internal badges (user credentials) propagate to the Credly service.
+
+On a successful Credly badge issuing the CredlyBadge user credential is updated with its requisites:
+
+- external UUID;
+- external state;
+
+The Credly badge is visible in the Credly service.
+
+
+9. Badge template withdrawal
 ----------------------------
 
-Badge template can be retired by putting it in `archived` state. Such badge templates are not processed anymore.
+Badge template can be deactivated by putting it in the inactive state (``is active`` checkbox).
 
----
-
-
-.. _system events: details.html#events-event-bus
-.. _configuration: configuration.html#feature-configuration
-.. _life-cycle: configuration.html#badges-management
-.. _creation: configuration.html#creation
-.. _requirements specification: configuration.html#requirements-setup
-.. _available use cases: configuration.html#use-cases
-.. _revocation effect: configuration.html#revocation-setup
-.. _Badge Processor: processing.html#badge-processor
-.. _distribution backends: distribution.html
+Inactive badge templates are ignored during the processing.
