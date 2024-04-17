@@ -7,6 +7,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
 from credentials.apps.badges.admin_forms import (
     BadgePenaltyForm,
@@ -136,7 +137,14 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
                 "fields": (
                     "site",
                     "is_active",
-                )
+                ),
+                "description": _(
+                    """
+                    WARNING: avoid configuration updates on activated badges.
+                    Active badge templates are continuously processed and learners may already have partial progress on them.
+                    Any changes in badge template requirements (including data rules) will affect learners' experience!
+                    """
+                ),
             },
         ),
         (
@@ -196,9 +204,12 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
         super().delete_queryset(request, queryset)
 
     def image(self, obj):
+        """
+        Badge template preview image.
+        """
         if obj.icon:
             return format_html('<img src="{}" width="50" height="auto" />', obj.icon)
-        return "-"
+        return None
 
     image.short_description = _("icon")
 
@@ -233,24 +244,43 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
 
     list_display = [
         "id",
-        "template",
+        "__str__",
         "event_type",
+        "template_link",
     ]
     list_display_links = (
         "id",
-        "template",
+        "__str__",
     )
     list_filter = [
         "template",
         "event_type",
     ]
-    # FIXME: disable until "Release VI"
-    exclude = [
-        "group",
+    readonly_fields = [
+        "template",
+        "event_type",
+        "template_link",
+    ]
+
+    fields = [
+        "template_link",
+        "event_type",
+        "description",
+        # FIXME: disable until "Release VI"
+        # "group",
     ]
 
     def has_add_permission(self, request):
         return False
+
+    def template_link(self, instance):
+        """
+        Interactive link to parent (badge template).
+        """
+        url = reverse("admin:badges_credlybadgetemplate_change", args=[instance.template.pk])
+        return format_html('<a href="{}">{}</a>', url, instance.template)
+
+    template_link.short_description = _("badge template")
 
 
 class BadgePenaltyAdmin(admin.ModelAdmin):
@@ -262,13 +292,19 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
         DataRulePenaltyInline,
     ]
 
-    list_display = [
-        "id",
-        "template",
-    ]
     list_display_links = (
         "id",
         "template",
+    )
+    list_display = [
+        "id",
+        "__str__",
+        "event_type",
+        "template_link",
+    ]
+    list_display_links = (
+        "id",
+        "__str__",
     )
     list_filter = [
         "template",
@@ -285,6 +321,15 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
             if template_id:
                 kwargs["queryset"] = BadgeRequirement.objects.filter(template_id=template_id)
         return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+    def template_link(self, instance):
+        """
+        Interactive link to parent (badge template).
+        """
+        url = reverse("admin:badges_credlybadgetemplate_change", args=[instance.template.pk])
+        return format_html('<a href="{}">{}</a>', url, instance.template)
+
+    template_link.short_description = _("badge template")
 
 
 class BadgeProgressAdmin(admin.ModelAdmin):
@@ -328,6 +373,9 @@ class BadgeProgressAdmin(admin.ModelAdmin):
         """
         return obj.ratio
 
+    def has_add_permission(self, request):
+        return False
+
 
 class CredlyBadgeAdmin(admin.ModelAdmin):
     """
@@ -359,6 +407,9 @@ class CredlyBadgeAdmin(admin.ModelAdmin):
         "uuid",
         "external_uuid",
     )
+
+    def has_add_permission(self, request):
+        return False
 
 
 # register admin configurations with respect to the feature flag
