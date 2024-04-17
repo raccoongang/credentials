@@ -136,7 +136,14 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
                 "fields": (
                     "site",
                     "is_active",
-                )
+                ),
+                "description": _(
+                    """
+                    WARNING: avoid configuration updates on activated badges.
+                    Active badge templates are continuously processed and learners may already have partial progress on them.
+                    Any changes in badge template requirements (including data rules) will affect learners' experience!
+                    """
+                ),
             },
         ),
         (
