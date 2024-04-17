@@ -53,29 +53,6 @@ def keypath(payload, keys_path):
     return traverse(current, keys)
 
 
-def is_datapath_valid(datapath: str, event_type: str) -> bool:
-    path = datapath.split(".")
-    event_types = get_badging_event_types()
-    if event_type not in event_types:
-        return False
-    try:
-        obj = OpenEdxPublicSignal.get_signal_by_type(event_type).init_data[path[0]]
-    except KeyError:
-        return False
-    else:
-        for key in path[1:]:
-            try:
-                field_type = [field for field in attr.fields(obj) if field.name == key][0].type
-            except IndexError:
-                return False
-            else:
-                obj = field_type
-                if not attr.has(obj):
-                    if key == path[-1]:
-                        return True
-                    return False
-
-
 def get_user_data(data: attr.s) -> UserData:
     """
     Extracts UserData object from any dataclass that contains UserData as a field.
