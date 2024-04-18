@@ -30,6 +30,8 @@ So, it must be enabled to be accessible.
 2. Configure Credly integration
 -------------------------------
 
+    Multiple Credly Organizations can be configured.
+
 Enter the Credentials service admin interface and configure the integration with the Credly service:
 
 - create a Credly Organization (`<credentials>/admin/badges/credlyorganization/`);
@@ -88,13 +90,15 @@ It is possible to put more than one requirement in a badge template.
 5. Activate configured badge templates
 --------------------------------------
 
-Once badge requirements are configured, it should be "enabled" to start "working" - so, check ``is active`` checkbox.
+    To active a badge template check the ``is active`` checkbox on its edit page.
 
-Active badges start being taking into account immediately.
+Once badge requirements are configured, it should be "enabled" to start "working".
+
+Active badge templates start being taking into account immediately.
 
 .. warning::
 
-    Configuration updates for an active badge template is discouraged since it may cause learners' inconsistent experience.
+    Configuration updates for active badge template are discouraged since it may cause learners' inconsistent experience.
 
 6. See users Badge Progress
 ---------------------------
