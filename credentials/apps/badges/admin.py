@@ -5,8 +5,8 @@ Admin section configuration.
 from django.contrib import admin, messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
-from django.urls import resolve
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 
@@ -35,11 +35,23 @@ class BadgeRequirementInline(admin.TabularInline):
     model = BadgeRequirement
     show_change_link = True
     extra = 0
+    fields = ("event_type", "rules", "description")
+    readonly_fields = ("rules",)
 
     # FIXME: disable until "Release VI"
     exclude = [
         "group",
     ]
+
+    def rules(self, obj):
+        """
+        Display all data rules for the requirement.
+        """
+        return mark_safe(
+            "".join(
+                [f"<li>{rule.data_path} {rule.OPERATORS[rule.operator]} {rule.value}</li>" for rule in obj.rules.all()]
+            )
+        )
 
 
 class BadgePenaltyInline(admin.TabularInline):
