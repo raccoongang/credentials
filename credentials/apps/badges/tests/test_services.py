@@ -24,7 +24,7 @@ class BadgeRequirementDiscoveryTestCase(TestCase):
         )
         self.site = Site.objects.create(domain="test_domain", name="test_name")
         self.badge_template = BadgeTemplate.objects.create(
-            uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site
+            uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site, is_active=True
         )
         self.COURSE_PASSING_EVENT = "org.openedx.learning.course.passing.status.updated.v1"
         self.CCX_COURSE_PASSING_EVENT = "org.openedx.learning.ccx.course.passing.status.updated.v1"
@@ -61,7 +61,7 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
         )
         self.site = Site.objects.create(domain="test_domain", name="test_name")
         self.badge_template = BadgeTemplate.objects.create(
-            uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site
+            uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site, is_active=True
         )
         self.COURSE_PASSING_EVENT = "org.openedx.learning.course.passing.status.updated.v1"
         self.CCX_COURSE_PASSING_EVENT = "org.openedx.learning.ccx.course.passing.status.updated.v1"
