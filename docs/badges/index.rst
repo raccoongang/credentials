@@ -15,6 +15,7 @@ Current Badges version is highly integrated with the `Credly (by Pearson)`_ serv
     :maxdepth: 1
 
     quickstart
+    settings
     .. configuration
     .. processing
     .. collecting
