@@ -544,7 +544,7 @@ FAVICON_URL = "https://edx-cdn.org/v3/default/favicon.ico"
 LOGO_POWERED_BY_OPEN_EDX_URL = "https://edx-cdn.org/v3/prod/open-edx-tag.svg"
 
 # Badges settings
-BADGES_ENABLED = False
+BADGES_ENABLED = True
 
 # Event Bus Settings
 EVENT_BUS_PRODUCER = "edx_event_bus_redis.create_producer"
