@@ -116,3 +116,45 @@ The Badges feature introduced 2 own event types:
             "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": True },
         },
     }
+
+Consuming workers
+~~~~~~~~~~~~~~~~~
+
+    Consumers implementation depends on the used event bus.
+
+Event bus options:
+
+- Redis Streams
+- Kafka
+- ...
+
+The Credentials and the Platform services **produce** (push) their public signals as messages to the stream.
+
+To **consume** (pull) those messages a consumer process is required.
+
+Redis Streams
+#############
+
+When the Redis Streams event bus is used, the ``<preffix>-learning-badges-lifecycle`` stream is used for messages transport.
+
+For producing and consuming a single package (broker) is used - event-bus-redis_.
+
+"Event Bus Redis" is implemented as a Django application and provides a Django management command for consuming messages
+(see all details in the package's README).
+
+.. code-block:: bash
+
+    # Credentials service consumer example:
+    /edx/app/credentials/credentials/manage.py consume_events -t learning-badges-lifecycle -g credentials_dev --extra={"consumer_name":"credentials_dev.consumer1"}
+
+    # LMS service consumer example:
+    /edx/app/edxapp/edx-platform/manage.py lms consume_events -t learning-badges-lifecycle -g lms_dev --extra={"consumer_name":"lms_dev.consumer1"}
+
+.. note::
+
+    **Credentials event bus consumer** is crucial for the Badges feature, since it is responsible for all incoming events processing.
+
+    **LMS event bus consumer** is only required if LMS wants to receive information about badges processing results (awarding/revocation).
+
+
+.. _event-bus-redis: https://github.com/openedx/event-bus-redis
