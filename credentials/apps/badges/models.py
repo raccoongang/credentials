@@ -28,7 +28,7 @@ from credentials.apps.badges.signals.signals import (
     notify_requirement_fulfilled,
     notify_requirement_regressed,
 )
-from credentials.apps.badges.utils import is_datapath_valid, keypath
+from credentials.apps.badges.utils import keypath
 from credentials.apps.core.api import get_user_by_username
 from credentials.apps.credentials.models import AbstractCredential, UserCredential
 
@@ -319,12 +319,6 @@ class DataRule(AbstractDataRule):
     def __str__(self):
         return f"{self.requirement.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
 
-    def save(self, *args, **kwargs):
-        if not is_datapath_valid(self.data_path, self.requirement.event_type):
-            raise ValidationError("Invalid data path for event type")
-
-        super().save(*args, **kwargs)
-
     @property
     def is_active(self):
         return self.requirement.template.is_active
@@ -394,12 +388,6 @@ class PenaltyDataRule(AbstractDataRule):
 
     def __str__(self):
         return f"{self.penalty.template.uuid}:{self.data_path}:{self.operator}:{self.value}"
-
-    def save(self, *args, **kwargs):
-        if not is_datapath_valid(self.data_path, self.penalty.event_type):
-            raise ValidationError("Invalid data path for event type")
-
-        super().save(*args, **kwargs)
 
     @property
     def is_active(self):
