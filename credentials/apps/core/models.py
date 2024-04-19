@@ -38,11 +38,9 @@ class SiteConfiguration(models.Model):
         default="openedx",
     )
     partner_from_address = models.EmailField(
-        verbose_name=_("Email address for partners"),
-        help_text=_(
-            'An address to use for the "From" field of any automated emails sent out to partners. '
-            "If not defined, no-reply@sitedomain will be used."
-        ),
+        verbose_name="Email address for partners",
+        help_text='An address to use for the "From" field of any automated emails sent out to partners. '
+        + "If not defined, no-reply@sitedomain will be used.",
         blank=True,
         null=True,
     )
@@ -81,7 +79,7 @@ class SiteConfiguration(models.Model):
     )
     verified_certificate_url = models.URLField(
         verbose_name=_("Verified Certificate URL"),
-        help_text=_("This field is deprecated, and will be removed."),
+        help_text="This field is deprecated, and will be removed.",
         blank=True,
         null=True,
     )

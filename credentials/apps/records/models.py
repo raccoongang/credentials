@@ -29,7 +29,7 @@ class UserGrade(TimeStampedModel):
     course_run = models.ForeignKey(CourseRun, on_delete=models.PROTECT)
     letter_grade = models.CharField(max_length=255, blank=True)
     percent_grade = models.DecimalField(max_digits=5, decimal_places=4, null=False)
-    verified = models.BooleanField(verbose_name=_("Verified Learner ID"), default=True)
+    verified = models.BooleanField(verbose_name="Verified Learner ID", default=True)
     lms_last_updated_at = models.DateTimeField(null=True)
 
     class Meta:
@@ -47,7 +47,7 @@ class ProgramCertRecord(TimeStampedModel):
         ProgramCertificate,
         null=True,
         default=None,
-        help_text=_("Note: certificate is deprecated, and is kept around because it is used in an old data migration."),
+        help_text="Note: certificate is deprecated, and is kept around because it is used in an old data migration.",
         on_delete=models.CASCADE,
     )
     program = models.ForeignKey(Program, on_delete=models.PROTECT)
@@ -58,7 +58,7 @@ class ProgramCertRecord(TimeStampedModel):
         return f"ProgramCertificateRecord: {self.uuid}"
 
     class Meta:
-        verbose_name = _("Shared program record")
+        verbose_name = "Shared program record"
         unique_together = ("program", "user")
 
 

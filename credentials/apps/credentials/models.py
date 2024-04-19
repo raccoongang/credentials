@@ -134,7 +134,7 @@ class AbstractCertificate(AbstractCredential):
         max_length=255,
         null=True,
         blank=True,
-        help_text=_("Custom certificate title to override default display_name for a course/program."),
+        help_text="Custom certificate title to override default display_name for a course/program.",
     )
 
     class Meta:
@@ -228,7 +228,7 @@ class CourseCertificate(AbstractCertificate):
 
     class Meta:
         unique_together = (("course_id", "certificate_type", "site"),)
-        verbose_name = _("Course certificate configuration")
+        verbose_name = "Course certificate configuration"
 
     @cached_property
     def course_key(self):
@@ -262,21 +262,19 @@ class ProgramCertificate(AbstractCertificate):
     )
     include_hours_of_effort = models.BooleanField(
         default=False,
-        help_text=_(
-            "Display the estimated total number of hours needed to complete all courses in the program. This "
-            "feature will only be displayed in the certificate if the attribute 'Total hours of effort' has "
-            "been set for the program in Discovery."
-        ),
+        help_text="Display the estimated total number of hours needed to complete all courses in the program. This "
+        "feature will only be displayed in the certificate if the attribute 'Total hours of effort' has "
+        "been set for the program in Discovery.",
     )
     language = models.CharField(
-        max_length=8, null=True, help_text=_("Locale in which certificates for this program will be rendered")
+        max_length=8, null=True, help_text="Locale in which certificates for this program will be rendered"
     )
 
     def __str__(self):
         return f"ProgramCertificate: {self.program_uuid}"
 
     class Meta:
-        verbose_name = _("Program certificate configuration")
+        verbose_name = "Program certificate configuration"
         unique_together = (("site", "program_uuid"),)
 
     @cached_property
@@ -285,9 +283,7 @@ class ProgramCertificate(AbstractCertificate):
         program_details = get_program_details_by_uuid(uuid=self.program_uuid, site=self.site)
 
         if not program_details:
-            msg = _(
-                f"No matching program with UUID [{self.program_uuid}] in credentials catalog for program certificate"
-            )
+            msg = f"No matching program with UUID [{self.program_uuid}] in credentials catalog for program certificate"
             raise NoMatchingProgramException(msg)
 
         if self.use_org_name:
@@ -347,13 +343,13 @@ class ProgramCompletionEmailConfiguration(TimeStampedModel):
     identifier = models.CharField(
         max_length=50,
         unique=True,
-        help_text=_(
+        help_text=(
             """Should be either "default" to affect all programs, the program type slug, or the UUID of the program. """
             """Values are unique."""
         ),
     )
     html_template = models.TextField(
-        help_text=_("For HTML emails." "Allows tags include (a, b, blockquote, div, em, i, li, ol, span, strong, ul)")
+        help_text=("For HTML emails." "Allows tags include (a, b, blockquote, div, em, i, li, ol, span, strong, ul)")
     )
     plaintext_template = models.TextField(help_text="For plaintext emails. No formatting tags. Text will send as is.")
     enabled = models.BooleanField(default=False)
@@ -397,8 +393,8 @@ class UserCredentialDateOverride(TimeStampedModel):
         UserCredential,
         on_delete=models.CASCADE,
         related_name="date_override",
-        help_text=_("The id of the UserCredential that this date overrides"),
+        help_text="The id of the UserCredential that this date overrides",
     )
     date = models.DateTimeField(
-        help_text=_("The date to override a course certificate with. This is set in the LMS Django Admin."),
+        help_text="The date to override a course certificate with. This is set in the LMS Django Admin.",
     )
