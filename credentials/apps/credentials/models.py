@@ -1,7 +1,6 @@
 """
 Models for the credentials service.
 """
-
 import logging
 import uuid
 
