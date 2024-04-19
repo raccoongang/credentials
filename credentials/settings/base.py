@@ -8,7 +8,6 @@ from edx_toggles.toggles import WaffleSwitch
 from edx_django_utils.plugins import get_plugin_apps, add_plugins
 
 from credentials.settings.utils import get_logger_config
-from credentials.apps.badges.toggles import is_badges_enabled
 from credentials.apps.plugins.constants import PROJECT_TYPE, SettingsType
 
 
@@ -544,6 +543,9 @@ LOGO_WHITE_URL_SVG = "https://edx-cdn.org/v3/default/logo-white.svg"
 FAVICON_URL = "https://edx-cdn.org/v3/default/favicon.ico"
 LOGO_POWERED_BY_OPEN_EDX_URL = "https://edx-cdn.org/v3/prod/open-edx-tag.svg"
 
+# Badges settings
+BADGES_ENABLED = False
+
 # Event Bus Settings
 EVENT_BUS_PRODUCER = "edx_event_bus_redis.create_producer"
 EVENT_BUS_CONSUMER = "edx_event_bus_redis.RedisEventConsumer"
@@ -561,7 +563,7 @@ EVENT_BUS_PRODUCER_CONFIG = {
     # .. toggle_warning: The default may be changed in a later release.
     # .. toggle_use_cases: opt_in
     "org.openedx.learning.badge.awarded.v1": {
-        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": is_badges_enabled()},
+        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": BADGES_ENABLED},
     },
     # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.badge.revoked.v1']
     #    ['learning-badges-lifecycle']['enabled']
@@ -571,7 +573,7 @@ EVENT_BUS_PRODUCER_CONFIG = {
     # .. toggle_warning: The default may be changed in a later release.
     # .. toggle_use_cases: opt_in
     "org.openedx.learning.badge.revoked.v1": {
-        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": is_badges_enabled()},
+        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": BADGES_ENABLED},
     },
 }
 
@@ -601,7 +603,9 @@ BADGES_CONFIG = {
         "org.openedx.learning.ccx.course.passing.status.updated.v1",
     ],
     "credly": {
+        "CREDLY_BASE_URL": "https://credly.com/",
         "CREDLY_API_BASE_URL": "https://api.credly.com/v1/",
+        "CREDLY_SANDBOX_BASE_URL": "https://sandbox.credly.com/",
         "CREDLY_SANDBOX_API_BASE_URL": "https://sandbox-api.credly.com/v1/",
         "USE_SANDBOX": False,
     },
