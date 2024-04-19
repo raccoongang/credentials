@@ -47,9 +47,13 @@ class BadgeRequirementInline(admin.TabularInline):
         """
         Display all data rules for the requirement.
         """
-        return mark_safe(
-            "".join(
-                [f"<li>{rule.data_path} {rule.OPERATORS[rule.operator]} {rule.value}</li>" for rule in obj.rules.all()]
+        return format_html(
+            "<ul>{}</ul>",
+            mark_safe(
+                "".join(
+                    f"<li>{rule.data_path} {rule.OPERATORS[rule.operator]} {rule.value}</li>"
+                    for rule in obj.rules.all()
+                )
             )
         )
 
