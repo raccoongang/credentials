@@ -1,256 +1,136 @@
 Configuration
 =============
 
-Badges feature configuration includes:
+The Badges feature is configured via the Credentials admin interface.
 
-- feature settings
-- badge templates management
-- requirements setup
-- backends configuration (optional)
-
-
-Feature settings
-----------------
-
-Badges are under a feature flag (disabled by default):
-
-.. code-block:: sh
-
-    # credentials settings:
-    ENABLE_BADGES = SettingToggle('BADGES_ENABLED', default=False)
-
-Also the feature has its configuration which may look like this:
-
-.. code-block:: sh
-
-    # credentials settings:
-    BADGES_CONFIG = {
-        "event_types": [
-            "org.openedx.learning.course.grade.passed.v1",
-            "org.openedx.learning.course.grade.failed.v1",
-        ],
-    }
-
-Configuration describes:
-
-- ``event_types`` - explicitly listed types of *incoming* event bus events (public signals).
-
-Incoming Events configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Here term ``event`` is used in the context: ``event bus public signal``.
-
-1. Listed incoming event types become available for requirements configuration.
-2. Listed incoming event types are taken into account during events processing - signal handler is auto-connected to listen to those event types.
-
-.. code-block:: sh
-
-    BADGES_CONFIG["event_types"] = [
-        "org.openedx.learning.course.grade.passed.v1",
-        "org.openedx.learning.course.grade.failed.v1",
-    ]
-
-
-Outgoing Events configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The Badges feature extends the set of event types which are registered for external emission.
-
-.. code-block:: sh
-
-    EVENT_BUS_PRODUCER_CONFIG = {
-        ...
-
-        "org.openedx.learning.badge.awarded.v1": {
-            "badges": {"event_key_field": "badge.uuid", "enabled": True },
-        },
-        "org.openedx.learning.badge.revoked.v1": {
-            "badges": {"event_key_field": "badge.uuid", "enabled": True },
-        },
-    }
-
-Credentials service `EVENT_BUS_PRODUCER_CONFIG` is extended with two additional public signals:
-
-- information about the fact someone earned a new badge;
-- information about the fact someone's badge was revoked;
-
-In example above badge events will be sent to ``badges`` event-bus topic.
-
-Badge Processor
-~~~~~~~~~~~~~~~~
-
-TBD
-
-Badge Collector
-~~~~~~~~~~~~~~~~
-
-TBD
-
-
-Badge templates management
---------------------------
-
-Badge templates management includes the following life-cycle stages or maintenance activities:
-
-- badge template creation
-- badge template configuration
-- badge template activation (deactivation)
-- badge template editing
-
-.. note::
-    System allows badge templates management via:
-
-    - Credentials admin interface
-
-    .. image:: ../_static/images/badges/badges-admin.png
+.. image:: ../_static/images/badges/badges-admin.png
         :alt: Badges administration
 
+Credly Organizations
+--------------------
 
-Creation
-~~~~~~~~
+    Multiple Credly Organizations can be configured.
 
-    Badge template is an another credential type.
+**All communication between Open edX Credentials and Credly service happens on behalf of a Credly Organization.**
 
-Before being used a badge template must be created.
-Each `badge template`_ has at least its basic properties:
+Enter "Credly Organizations" list page (`<credentials>/admin/badges/credlyorganization/`) and create a new item:
 
-- generic credential properties:
-    - ``site``
-    - ``is active`` (inactive templates are excluded from processing)
+- to set the UUID use your Credly Organization identifier;
+- to set the authorization token issue one in the Credly Organization's dashboard;
 
-- specific properties:
-    - ``uuid`` (unique identifier, auto-generated)
-    - ``name`` (verbose label)
-    - ``description`` (a hint about earning conditions)
-    - ``icon`` (visualization)
-    - ``origin`` (indicates where the template originates from, defaults to ``openedx``)
+Check: the system pulls the Organization's details and updates its name.
 
-.. note::
+In case of errors check used credentials for the Organization.
 
-    **BadgeTemplate** data model extends `AbstractCredential`. It represents *native* badge templates (plugins can implement their extended badge templates. See: CredlyBadgeTemplate_ as an example).
+Badge templates
+---------------
 
-    .. code-block:: python
+    **Badge template** is another **credential** type. Credly badge template is a kind of a badge template.
 
-        BadgeTemplate(AbstractCredential):
-            """
-            Describes badge credential type.
-            """
+*Credly badge templates* (badge templates for brevity) are created in the Credly Organization's dashboard and then, if published, they are retrieved by the Credentials via API.
 
-            - uuid
-            - name: <template-name>
-            - description: <template-description>
-            - icon: <template-image_url>
-            - origin: default="openedx" (native type)
+Synchronization
+~~~~~~~~~~~~~~~
 
-From the Credentials' service admin interface (Django):
+To synchronize Credly badge templates for the Organization one should:
 
-- find "Badges" section
-- navigate Badge Templates item
-- add a new Badge template record
-- save the new Badge template
+- navigate "Credly badge templates" list page;
+- select the Organization;
+- use ``Sync organization badge templates`` action;
 
-.. image:: ../_static/images/badges/badges-admin-template-details.png
-        :alt: Badge template details
+.. image:: ../_static/images/badges/badges-admin-credly-templates-sync.png
+        :alt: Credly badge templates synchronization
 
-.. note::
-    It is expected that `distribution backends`_ will extend basic properties set if needed.
+On success, the system will update the list of Credly badge templates for the Organization:
 
-Configuration
-~~~~~~~~~~~~~
+- only badge templates with ``active`` state are pulled;
+- Credly badge template records are created inactive (disabled);
 
-To be activated a badge template must be configured.
-Configuration includes `requirements setup`_.
+.. image:: ../_static/images/badges/badges-admin-credly-templates-list.png
+        :alt: Credly badge templates list
 
-Activation
-~~~~~~~~~~
+For the usage a badge template must be configured and activated first.
 
-A badge template is created as inactive, so system won't use it before explicit activation.
-To activate badge template one should enable ``is active`` checkbox.
-
-Editing
-~~~~~~~
-
-Badge template can be modified. Unique identifier should not be changed.
-Active templates updates should avoided.
-
-
-Requirements setup
+Badge Requirements
 ------------------
 
-TBD
+    Requirements describe **what** and **how** must happen on the system to earn a badge.
 
-Each badge template must be configured with *requirements* before its activation.
+Badge Requirement(s) specification is a crucial part of badge template configuration.
+At least one badge requirement must be associated with a badge template.
 
-    **Requirement** is a rule which must be *fulfilled* by learners for associated badge to be earned.
+Badge Requirements are listed inline on a badge template detail page.
 
-    ``BadgeTemplate + Event = Requirement``
+.. image:: ../_static/images/badges/badges-admin-template-requirements.png
+        :alt: Credly badge template requirements
 
-A badge template must have at least 1 `requirement`_ associated with it, but badge template can have multiple requirements.
+A badge template can can have multiple requirements. All badge requirements must be *fulfilled* to earn a badge.
 
-Use cases
-~~~~~~~~~
+Event type
+~~~~~~~~~~
 
-Here is a list of possible use cases for requirements to cover (in examples):
+    Describes **what is expected to happen**.
+
+Available event type subset is pre-configured in the application settings.
 
 .. note::
-    Currently only 2, 3 use cases are available.
 
-1. Single generic event (e.g. "Profile data completion");
-2. **Single data-agnostic course event** (e.g "Arbitrary course completion");
-3. **Single data-specific course event** (e.g. "Specific course completion");
-4. Repetitive events (e.g. "5 arbitrary courses completions");
-5. Events combination (e.g. "5 specific courses completions")
-6. Frozen combination of events (e.g. "5 specific courses completions in defined order");
-7. Time-ranged event (e.g. "Arbitrary course completion during January 2024");
-8. Badge dependencies (e.g. "Badge A + Badge B = Badge C");
-9. Multiple times same badge earning (e.g. "3 arbitrary course completions make badge earned x3");
-10. Event combination alternatives... (e.g. "Logical `OR` rule sets: Course A OR Course B completion");
+    Technically, any public signal from the `openedx-events`_ library can be used for badge template requirements setup, if it includes user PII (UserData), so users can be identified.
 
-Requirement creation
-~~~~~~~~~~~~~~~~~~~~
+Description
+~~~~~~~~~~~
 
-Given already created badge template, one now should specify business rules for it.
+**Description** is an optional human-readable reminder that describes what the requirement is about.
 
-Requirement records are currently managed via Credentials admin interface:
+    Badge Requirement can be **deeper specified** via its Data Rules.
 
-- enter admin Badges section
-- add new Requirement record
-- associate Requirement with a **badge**
-- by default Requirement has `award` **effect** (also see `Revocation setup`_)
-- specify **event type** from the set of available event types
-- specify **event data** (for data-specific requirements)
-- **times** default=1 (default case for repetitive events)
-- **start** is None (not processed, time-ranged events)
-- **end** is None (not processed, time-ranged events)
-- **rule_set** is None (not processed, combination alternatives)
+Data Rules
+----------
 
-Revocation setup (reverse effect)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Describes **how it is expected to happen**
 
-During badge template configuration additional decision must be made: wether badges of the given type are `revocable` if required conditions are not the case anymore.
+Data Rules detail their parent Badge Requirement based on the expected event payload.
 
-    **Example: "Course X completion badge"**
+To edit/update a Data Rule:
 
-    - **Requirement:** the badge is granted when course grade becomes passing.
-    - **Question:** should badge be revoked if course grade becomes NOT passing (for any reason)?
+- navigate to the Badge Requirement detail page (use ``Change`` inline link);
+- find the "Data Rules" section and add a new item;
 
-If answer in the example is "yes", we have to setup additional requirement with `revoke` effect, based on corresponding event type. Requirements with `revoke` effect are processed in a special way.
+.. image:: ../_static/images/badges/badges-admin-requirement-rules.png
+        :alt: Badge requirement rules edit
 
-Backends configuration
-----------------------
+**Each data rule describes a single expected payload value:**
 
-Different backends may require their specific additional configuration.
-See `Distribution`_ section for details.
+All key paths are generated based on the event type specified for the parent Badge Requirement.
 
-.. _badge template: details.html#badge-template
-.. _requirement: details.html#requirement
-.. _processor: processing.html
-.. _processing: processing.html
-.. _collector: collecting.html
-.. _collecting: collecting.html
-.. _distribution backends: distribution.html
-.. _requirements setup: configuration.html#requirements-setup
-.. _Revocation setup: configuration.html#revocation-setup
-.. _Distribution: distribution.html
-.. _Badge Processor: processing.html#badge-processor
-.. _CredlyBadgeTemplate: distribution.html#badge-templates-management
+.. image:: ../_static/images/badges/badges-admin-data-rules.png
+        :alt: Badge requirement data rules
+
+1. **Key path** - payload path to the target attribute;
+2. **Operator** - how to compare expected and actual values;
+3. **Expected value** - an expected value for the target attribute;
+
+Please, see `configuration examples`_ for clarity.
+
+Activation
+----------
+
+Configured badge template can be activated:
+
+- navigate to the badge template detail page;
+- check ``Is active`` checkbox;
+
+    Activated badge template starts "working" immediately.
+
+.. image:: ../_static/images/badges/badges-admin-template-details.png
+        :alt: Badge template data structure
+
+Credly badge template record includes:
+
+1. Core credential attributes;
+2. Badge template credential attributes;
+3. Credly service attributes (state, dashboard link);
+4. Configured requirements;
+
+.. _openedx-events: https://github.com/openedx/openedx-events
+.. _`configuration examples`: examples.html
