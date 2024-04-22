@@ -5,6 +5,7 @@ Admin section configuration.
 from django.contrib import admin, messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
+from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -54,7 +55,7 @@ class BadgeRequirementInline(admin.TabularInline):
                     f"<li>{rule.data_path} {rule.OPERATORS[rule.operator]} {rule.value}</li>"
                     for rule in obj.rules.all()
                 )
-            )
+            ),
         )
 
 
@@ -234,19 +235,20 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
 
     image.short_description = _("icon")
 
-    def save_related(self, request, form, formsets, change):
-        """
-        Save inline forms before checking for existence of requirements.
-        """
-        for formset in formsets:
-            self.save_formset(request, form, formset, change)
+    def save_model(self, request, obj, form, change):  # pylint: disable=unused-argument
+        pass
 
-        obj = form.instance
-        if obj.is_active and not obj.requirements.exists():
+    def save_formset(self, request, form, formset, change):  # pylint: disable=unused-argument
+        """
+        Check if template is active and has requirements.
+        """
+        formset.save()
+
+        if form.instance.is_active and not form.instance.requirements.exists():
             messages.set_level(request, messages.ERROR)
-            messages.error(request, _("Badge Template must have at least 1 Requirement set."))
-            return
-        super().save_related(request, form, formsets, change)
+            messages.error(request, _("Active badge template must have at least one requirement."))
+            return HttpResponseRedirect(request.path)
+        form.instance.save()
 
 
 class DataRulePenaltyInline(admin.TabularInline):
