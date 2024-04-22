@@ -3,6 +3,7 @@ Badge progression processing.
 """
 
 import logging
+from attrs import asdict
 from typing import List
 
 from credentials.apps.badges.models import BadgeRequirement
@@ -20,7 +21,7 @@ def discover_requirements(event_type: str) -> List[BadgeRequirement]:
 
 
 
-def process_requirements(event_type, username, payload_dict):
+def process_requirements(event_type, username, payload):
     """
     Finds all relevant requirements, tests them one by one, marks as completed if needed.
     """
@@ -47,5 +48,5 @@ def process_requirements(event_type, username, payload_dict):
             continue
 
         # process: payload rules
-        if requirement.apply_rules(payload_dict):
+        if requirement.apply_rules(asdict(payload)):
             requirement.fulfill(username)

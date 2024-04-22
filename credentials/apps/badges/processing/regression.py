@@ -3,6 +3,7 @@ Badge regression processing.
 """
 
 import logging
+from attrs import asdict
 from typing import List
 
 from credentials.apps.badges.models import BadgePenalty
@@ -19,7 +20,7 @@ def discover_penalties(event_type: str) -> List[BadgePenalty]:
     return BadgePenalty.objects.filter(event_type=event_type, template__is_active=True)
 
 
-def process_penalties(event_type, username, payload_dict):
+def process_penalties(event_type, username, payload):
     """
     Finds all relevant penalties, tests them one by one, marks related requirement as not completed if needed.
     """
@@ -31,5 +32,5 @@ def process_penalties(event_type, username, payload_dict):
     for penalty in penalties:
 
         # process: payload rules
-        if penalty.apply_rules(payload_dict):
+        if penalty.apply_rules(asdict(payload)):
             penalty.reset_requirements(username)
