@@ -31,11 +31,11 @@ def process_event(sender, **kwargs):
         username = identify_user(event_type=event_type, event_payload=extract_payload(kwargs))
 
         # requirements processing
-        process_requirements(event_type, username, extract_payload(kwargs, as_dict=True))
+        process_requirements(event_type, username, extract_payload(kwargs))
 
         # penalties processing
         # FIXME: disable until "Release V"
-        # process_penalties(event_type, username, extract_payload(kwargs, as_dict=True))
+        # process_penalties(event_type, username, extract_payload(kwargs))
 
     except StopEventProcessing:
         # controlled processing dropping
