@@ -18,7 +18,7 @@ Current Badges version is highly integrated with the `Credly (by Pearson)`_ serv
     settings
     configuration
     examples
-    .. processing
+    processing
     .. collecting
     .. distribution
     .. details
