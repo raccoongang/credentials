@@ -13,8 +13,14 @@ from credentials.apps.badges.models import (
     Fulfillment,
     PenaltyDataRule,
 )
-from credentials.apps.badges.processing.progression import discover_requirements
-from credentials.apps.badges.processing.regression import discover_penalties, process_penalties
+from credentials.apps.badges.processing.progression import (
+    discover_requirements,
+    process_requirements,
+)
+from credentials.apps.badges.processing.regression import (
+    discover_penalties,
+    process_penalties,
+)
 
 
 class BadgeRequirementDiscoveryTestCase(TestCase):
@@ -24,10 +30,18 @@ class BadgeRequirementDiscoveryTestCase(TestCase):
         )
         self.site = Site.objects.create(domain="test_domain", name="test_name")
         self.badge_template = BadgeTemplate.objects.create(
-            uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site, is_active=True
+            uuid=uuid.uuid4(),
+            name="test_template",
+            state="draft",
+            site=self.site,
+            is_active=True,
         )
-        self.COURSE_PASSING_EVENT = "org.openedx.learning.course.passing.status.updated.v1"
-        self.CCX_COURSE_PASSING_EVENT = "org.openedx.learning.ccx.course.passing.status.updated.v1"
+        self.COURSE_PASSING_EVENT = (
+            "org.openedx.learning.course.passing.status.updated.v1"
+        )
+        self.CCX_COURSE_PASSING_EVENT = (
+            "org.openedx.learning.ccx.course.passing.status.updated.v1"
+        )
 
     def test_discovery_eventtype_related_requirements(self):
         BadgeRequirement.objects.create(
@@ -45,13 +59,26 @@ class BadgeRequirementDiscoveryTestCase(TestCase):
             event_type=self.CCX_COURSE_PASSING_EVENT,
             description="Test ccx course passing revoke description",
         )
-        course_passing_requirements = discover_requirements(event_type=self.COURSE_PASSING_EVENT)
-        ccx_course_passing_requirements = discover_requirements(event_type=self.CCX_COURSE_PASSING_EVENT)
+        course_passing_requirements = discover_requirements(
+            event_type=self.COURSE_PASSING_EVENT
+        )
+        ccx_course_passing_requirements = discover_requirements(
+            event_type=self.CCX_COURSE_PASSING_EVENT
+        )
         self.assertEqual(course_passing_requirements.count(), 1)
         self.assertEqual(ccx_course_passing_requirements.count(), 2)
-        self.assertEqual(course_passing_requirements[0].description, "Test course passing award description")
-        self.assertEqual(ccx_course_passing_requirements[0].description, "Test ccx course passing award description")
-        self.assertEqual(ccx_course_passing_requirements[1].description, "Test ccx course passing revoke description")
+        self.assertEqual(
+            course_passing_requirements[0].description,
+            "Test course passing award description",
+        )
+        self.assertEqual(
+            ccx_course_passing_requirements[0].description,
+            "Test ccx course passing award description",
+        )
+        self.assertEqual(
+            ccx_course_passing_requirements[1].description,
+            "Test ccx course passing revoke description",
+        )
 
 
 class BadgePenaltyDiscoveryTestCase(TestCase):
@@ -61,13 +88,23 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
         )
         self.site = Site.objects.create(domain="test_domain", name="test_name")
         self.badge_template = BadgeTemplate.objects.create(
-            uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site, is_active=True
+            uuid=uuid.uuid4(),
+            name="test_template",
+            state="draft",
+            site=self.site,
+            is_active=True,
         )
-        self.COURSE_PASSING_EVENT = "org.openedx.learning.course.passing.status.updated.v1"
-        self.CCX_COURSE_PASSING_EVENT = "org.openedx.learning.ccx.course.passing.status.updated.v1"
+        self.COURSE_PASSING_EVENT = (
+            "org.openedx.learning.course.passing.status.updated.v1"
+        )
+        self.CCX_COURSE_PASSING_EVENT = (
+            "org.openedx.learning.ccx.course.passing.status.updated.v1"
+        )
 
     def test_discovery_eventtype_related_penalties(self):
-        penalty1 = BadgePenalty.objects.create(template=self.badge_template, event_type=self.COURSE_PASSING_EVENT)
+        penalty1 = BadgePenalty.objects.create(
+            template=self.badge_template, event_type=self.COURSE_PASSING_EVENT
+        )
         penalty1.requirements.add(
             BadgeRequirement.objects.create(
                 template=self.badge_template,
@@ -75,7 +112,9 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
                 description="Test course passing award description",
             )
         )
-        penalty2 = BadgePenalty.objects.create(template=self.badge_template, event_type=self.CCX_COURSE_PASSING_EVENT)
+        penalty2 = BadgePenalty.objects.create(
+            template=self.badge_template, event_type=self.CCX_COURSE_PASSING_EVENT
+        )
         penalty2.requirements.add(
             BadgeRequirement.objects.create(
                 template=self.badge_template,
@@ -83,7 +122,9 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
                 description="Test ccx course passing award description",
             )
         )
-        penalty3 = BadgePenalty.objects.create(template=self.badge_template, event_type=self.CCX_COURSE_PASSING_EVENT)
+        penalty3 = BadgePenalty.objects.create(
+            template=self.badge_template, event_type=self.CCX_COURSE_PASSING_EVENT
+        )
         penalty3.requirements.add(
             BadgeRequirement.objects.create(
                 template=self.badge_template,
@@ -91,12 +132,17 @@ class BadgePenaltyDiscoveryTestCase(TestCase):
                 description="Test ccx course passing revoke description",
             )
         )
-        course_passing_penalties = discover_penalties(event_type=self.COURSE_PASSING_EVENT)
-        ccx_course_passing_penalties = discover_penalties(event_type=self.CCX_COURSE_PASSING_EVENT)
+        course_passing_penalties = discover_penalties(
+            event_type=self.COURSE_PASSING_EVENT
+        )
+        ccx_course_passing_penalties = discover_penalties(
+            event_type=self.CCX_COURSE_PASSING_EVENT
+        )
         self.assertEqual(course_passing_penalties.count(), 1)
         self.assertEqual(ccx_course_passing_penalties.count(), 2)
         self.assertEqual(
-            course_passing_penalties[0].requirements.first().description, "Test course passing award description"
+            course_passing_penalties[0].requirements.first().description,
+            "Test course passing award description",
         )
         self.assertEqual(
             ccx_course_passing_penalties[0].requirements.first().description,
@@ -117,8 +163,12 @@ class TestProcessPenalties(TestCase):
         self.badge_template = BadgeTemplate.objects.create(
             uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site
         )
-        self.COURSE_PASSING_EVENT = "org.openedx.learning.course.passing.status.updated.v1"
-        self.CCX_COURSE_PASSING_EVENT = "org.openedx.learning.ccx.course.passing.status.updated.v1"
+        self.COURSE_PASSING_EVENT = (
+            "org.openedx.learning.course.passing.status.updated.v1"
+        )
+        self.CCX_COURSE_PASSING_EVENT = (
+            "org.openedx.learning.ccx.course.passing.status.updated.v1"
+        )
 
     def test_process_penalties_all_datarules_success(self):
         requirement1 = BadgeRequirement.objects.create(
@@ -133,49 +183,63 @@ class TestProcessPenalties(TestCase):
         )
         DataRule.objects.create(
             requirement=requirement1,
-            data_path="course_passing_status.user.pii.username",
+            data_path="course.display_name",
             operator="eq",
-            value="test_username",
+            value="Test course",
         )
         DataRule.objects.create(
             requirement=requirement2,
-            data_path="course_passing_status.user.pii.email",
+            data_path="course.display_name",
             operator="eq",
-            value="test_email",
+            value="Test course",
         )
 
-        progress = BadgeProgress.objects.create(username="test_username", template=self.badge_template)
+        progress = BadgeProgress.objects.create(
+            username="test_username", template=self.badge_template
+        )
         Fulfillment.objects.create(progress=progress, requirement=requirement1)
         Fulfillment.objects.create(progress=progress, requirement=requirement2)
 
-        self.assertEqual(BadgeProgress.objects.filter(username="test_username").count(), 1)
+        self.assertEqual(
+            BadgeProgress.objects.filter(username="test_username").count(), 1
+        )
         self.assertEqual(Fulfillment.objects.filter(progress=progress).count(), 2)
-        self.assertEqual(Fulfillment.objects.filter(progress=progress, requirement=requirement1).count(), 1)
-        self.assertEqual(Fulfillment.objects.filter(progress=progress, requirement=requirement1).count(), 1)
+        self.assertEqual(
+            Fulfillment.objects.filter(
+                progress=progress, requirement=requirement1
+            ).count(),
+            1,
+        )
+        self.assertEqual(
+            Fulfillment.objects.filter(
+                progress=progress, requirement=requirement1
+            ).count(),
+            1,
+        )
 
-        bp = BadgePenalty.objects.create(template=self.badge_template, event_type=self.COURSE_PASSING_EVENT)
+        bp = BadgePenalty.objects.create(
+            template=self.badge_template, event_type=self.COURSE_PASSING_EVENT
+        )
         bp.requirements.set(
             (requirement1, requirement2),
         )
         PenaltyDataRule.objects.create(
             penalty=bp,
-            data_path="course_passing_status.user.pii.username",
+            data_path="course.display_name",
             operator="ne",
-            value="test_username1",
+            value="Test course 1",
         )
         PenaltyDataRule.objects.create(
             penalty=bp,
-            data_path="course_passing_status.user.pii.email",
+            data_path="course.display_name",
             operator="ne",
-            value="test_email1",
+            value="Test course 2",
         )
         self.badge_template.is_active = True
         self.badge_template.save()
         kwargs = {
             "course_passing_status": {
-                "user": {
-                    "pii": {"username": "test_username", "email": "test_email", "name": "test_name"},
-                }
+                "course": {"display_name": "Test course"},
             }
         }
         process_penalties(self.COURSE_PASSING_EVENT, "test_username", kwargs)
@@ -194,25 +258,37 @@ class TestProcessPenalties(TestCase):
         )
         DataRule.objects.create(
             requirement=requirement1,
-            data_path="course_passing_status.user.pii.username",
+            data_path="course.display_name",
             operator="eq",
-            value="test_username",
+            value="Test course",
         )
         DataRule.objects.create(
             requirement=requirement2,
-            data_path="course_passing_status.user.pii.email",
+            data_path="course.display_name",
             operator="eq",
-            value="test_email",
+            value="Test course",
         )
 
         progress = BadgeProgress.objects.create(username="test_username")
         Fulfillment.objects.create(progress=progress, requirement=requirement1)
         Fulfillment.objects.create(progress=progress, requirement=requirement2)
 
-        self.assertEqual(BadgeProgress.objects.filter(username="test_username").count(), 1)
+        self.assertEqual(
+            BadgeProgress.objects.filter(username="test_username").count(), 1
+        )
         self.assertEqual(Fulfillment.objects.filter(progress=progress).count(), 2)
-        self.assertEqual(Fulfillment.objects.filter(progress=progress, requirement=requirement1).count(), 1)
-        self.assertEqual(Fulfillment.objects.filter(progress=progress, requirement=requirement1).count(), 1)
+        self.assertEqual(
+            Fulfillment.objects.filter(
+                progress=progress, requirement=requirement1
+            ).count(),
+            1,
+        )
+        self.assertEqual(
+            Fulfillment.objects.filter(
+                progress=progress, requirement=requirement1
+            ).count(),
+            1,
+        )
 
         BadgePenalty.objects.create(
             template=self.badge_template, event_type=self.COURSE_PASSING_EVENT
@@ -221,22 +297,304 @@ class TestProcessPenalties(TestCase):
         )
         PenaltyDataRule.objects.create(
             penalty=BadgePenalty.objects.first(),
-            data_path="course_passing_status.user.pii.username",
+            data_path="course.display_name",
             operator="ne",
-            value="test_username",
+            value="Test course 1",
         )
         PenaltyDataRule.objects.create(
             penalty=BadgePenalty.objects.first(),
-            data_path="course_passing_status.user.pii.email",
+            data_path="course.display_name",
             operator="ne",
-            value="test_email",
+            value="Test course",
         )
         kwargs = {
             "course_passing_status": {
-                "user": {
-                    "pii": {"username": "test_username", "email": "test_email", "name": "test_name"},
-                }
+                "course": {"display_name": "Test course"},
             }
         }
         process_penalties(self.COURSE_PASSING_EVENT, "test_username", kwargs)
         self.assertEqual(Fulfillment.objects.filter(progress=progress).count(), 2)
+
+
+class TestProcessRequirements(TestCase):
+    def setUp(self):
+        self.organization = CredlyOrganization.objects.create(
+            uuid=uuid.uuid4(), api_key="test-api-key", name="test_organization"
+        )
+        self.site = Site.objects.create(domain="test_domain", name="test_name")
+        self.badge_template = BadgeTemplate.objects.create(
+            uuid=uuid.uuid4(),
+            name="test_template",
+            state="draft",
+            site=self.site,
+            is_active=True,
+        )
+        self.COURSE_PASSING_EVENT = (
+            "org.openedx.learning.course.passing.status.updated.v1"
+        )
+        self.CCX_COURSE_PASSING_EVENT = (
+            "org.openedx.learning.ccx.course.passing.status.updated.v1"
+        )
+
+    # test cases
+    #     A course completion - course A w/o a group;
+    #     A or B course completion - courses A, B have the same group value;
+    #     A or B or C course completion - courses A, B, C have the same group value;
+    #     A or - courses A is the only course in the group;
+    #     (A or B) and C - A, B have the same group value; course C w/o a group;
+    #     (A or B) and (C or D) - courses A, B have the same group value; courses C, D have the same group value;
+
+    def test_course_a_completion(self):
+        requirement = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="A course passing award description",
+        )
+        DataRule.objects.create(
+            requirement=requirement,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        kwargs = {
+            "course": {"display_name": "A"},
+        }
+        process_requirements(self.COURSE_PASSING_EVENT, "test_username", kwargs)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement).count(), 1)
+
+    def test_course_a_or_b_completion(self):
+        requirement_a = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="A or B course passing award description",
+            group="a_or_b",
+        )
+        requirement_b = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="A or B course passing award description",
+            group="a_or_b",
+        )
+        DataRule.objects.create(
+            requirement=requirement_a,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        DataRule.objects.create(
+            requirement=requirement_b,
+            data_path="course.display_name",
+            operator="eq",
+            value="B",
+        )
+        kwargs = {
+            "course": {"display_name": "A"},
+        }
+        process_requirements(self.COURSE_PASSING_EVENT, "test_username", kwargs)
+        self.assertEqual(
+            Fulfillment.objects.filter(requirement=requirement_a).count(), 1
+        )
+        self.assertEqual(
+            Fulfillment.objects.filter(requirement=requirement_b).count(), 0
+        )
+        self.assertTrue(
+            BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed
+        )
+
+    def test_course_a_or_b_or_c_completion(self):
+        requirement_a = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="A or B or C course passing award description",
+            group="a_or_b_or_c",
+        )
+        requirement_b = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="A or B or C course passing award description",
+            group="a_or_b_or_c",
+        )
+        requirement_c = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="A or B or C course passing award description",
+            group="a_or_b_or_c",
+        )
+        DataRule.objects.create(
+            requirement=requirement_a,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        DataRule.objects.create(
+            requirement=requirement_b,
+            data_path="course.display_name",
+            operator="eq",
+            value="B",
+        )
+        DataRule.objects.create(
+            requirement=requirement_c,
+            data_path="course.display_name",
+            operator="eq",
+            value="C",
+        )
+        kwargs = {
+            "course": {"display_name": "A"},
+        }
+        process_requirements(self.COURSE_PASSING_EVENT, "test_username", kwargs)
+        self.assertEqual(
+            Fulfillment.objects.filter(requirement=requirement_a).count(), 1
+        )
+        self.assertEqual(
+            Fulfillment.objects.filter(requirement=requirement_b).count(), 0
+        )
+        self.assertEqual(
+            Fulfillment.objects.filter(requirement=requirement_c).count(), 0
+        )
+        self.assertTrue(
+            BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed
+        )
+
+    def test_course_a_or_completion(self):
+        requirement = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="A or course passing award description",
+            group="a_or",
+        )
+        DataRule.objects.create(
+            requirement=requirement,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        kwargs = {
+            "course": {"display_name": "A"},
+        }
+        process_requirements(self.COURSE_PASSING_EVENT, "test_username", kwargs)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement).count(), 1)
+        self.assertTrue(
+            BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed
+        )
+
+    def test_course_a_or_b_and_c_completion(self):
+        requirement_a = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="A or B course passing award description",
+            group="a_or_b",
+        )
+        requirement_b = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="A or B course passing award description",
+            group="a_or_b",
+        )
+        requirement_c = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="C course passing award description",
+        )
+        DataRule.objects.create(
+            requirement=requirement_a,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        DataRule.objects.create(
+            requirement=requirement_b,
+            data_path="course.display_name",
+            operator="eq",
+            value="B",
+        )
+        DataRule.objects.create(
+            requirement=requirement_c,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        kwargs = {
+            "course": {"display_name": "A"},
+        }
+        process_requirements(self.COURSE_PASSING_EVENT, "test_username", kwargs)
+        self.assertEqual(
+            Fulfillment.objects.filter(requirement=requirement_a).count(), 1
+        )
+        self.assertEqual(
+            Fulfillment.objects.filter(requirement=requirement_b).count(), 0
+        )
+        self.assertEqual(
+            Fulfillment.objects.filter(requirement=requirement_c).count(), 1
+        )
+        self.assertTrue(
+            BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed
+        )
+
+    def test_course_a_or_b_and_c_or_d_completion(self):
+        requirement_a = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="A or B course passing award description",
+            group="a_or_b",
+        )
+        requirement_b = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="A or B course passing award description",
+            group="a_or_b",
+        )
+        requirement_c = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="C or D course passing award description",
+            group="c_or_d",
+        )
+        requirement_d = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=self.COURSE_PASSING_EVENT,
+            description="C or D course passing award description",
+            group="c_or_d",
+        )
+        DataRule.objects.create(
+            requirement=requirement_a,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        DataRule.objects.create(
+            requirement=requirement_b,
+            data_path="course.display_name",
+            operator="eq",
+            value="B",
+        )
+        DataRule.objects.create(
+            requirement=requirement_c,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        DataRule.objects.create(
+            requirement=requirement_d,
+            data_path="course.display_name",
+            operator="eq",
+            value="D",
+        )
+        kwargs = {
+            "course": {"display_name": "A"},
+        }
+        process_requirements(self.COURSE_PASSING_EVENT, "test_username", kwargs)
+        self.assertEqual(
+            Fulfillment.objects.filter(requirement=requirement_a).count(), 1
+        )
+        self.assertEqual(
+            Fulfillment.objects.filter(requirement=requirement_b).count(), 0
+        )
+        self.assertEqual(
+            Fulfillment.objects.filter(requirement=requirement_c).count(), 1
+        )
+        self.assertEqual(
+            Fulfillment.objects.filter(requirement=requirement_d).count(), 0
+        )
+        self.assertTrue(
+            BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed
+        )
