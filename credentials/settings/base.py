@@ -609,4 +609,11 @@ BADGES_CONFIG = {
         "CREDLY_SANDBOX_API_BASE_URL": "https://sandbox-api.credly.com/v1/",
         "USE_SANDBOX": False,
     },
+    "EXCLUDED_KEY_PATHS": [
+        "user.id",
+        "user.is_active",
+        "user.pii.username",
+        "user.pii.email",
+        "user.pii.name",
+    ]
 }
