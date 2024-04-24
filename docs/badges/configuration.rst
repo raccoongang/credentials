@@ -77,12 +77,29 @@ Available event type subset is pre-configured in the application settings.
 
     Technically, any public signal from the `openedx-events`_ library can be used for badge template requirements setup, if it includes user PII (UserData), so users can be identified.
 
+Rules
+~~~~~
+
+A list of configured data rules (if any), see "Data Rules".
+
 Description
 ~~~~~~~~~~~
 
 **Description** is an optional human-readable reminder that describes what the requirement is about.
 
     Badge Requirement can be **deeper specified** via its Data Rules.
+
+Group
+~~~~~
+
+Optional field for badge requirement.
+
+Allows mark 2 or more badge requirements as a group. Requirements group is fulfilled if any of its requirements is fulfilled ("OR" logic is applied inside a group).
+
+.. image:: ../_static/images/badges/badges-admin-rules-group.png
+        :alt: Badge requirement rules group
+
+See `configuration examples`_.
 
 Data Rules
 ----------
@@ -132,5 +149,5 @@ Credly badge template record includes:
 3. Credly service attributes (state, dashboard link);
 4. Configured requirements;
 
-.. _openedx-events: https://github.com/openedx/openedx-events
 .. _`configuration examples`: examples.html
+.. _openedx-events: https://github.com/openedx/openedx-events
