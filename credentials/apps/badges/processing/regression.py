@@ -16,7 +16,7 @@ def discover_penalties(event_type: str) -> List[BadgePenalty]:
     """
     Picks all relevant penalties based on the event type.
     """
- 
+
     return BadgePenalty.objects.filter(event_type=event_type, template__is_active=True)
 
 
