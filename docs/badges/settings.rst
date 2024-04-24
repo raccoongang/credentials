@@ -38,6 +38,7 @@ The feature has its configuration:
             "org.openedx.learning.course.passing.status.updated.v1",
             "org.openedx.learning.ccx.course.passing.status.updated.v1",
         ],
+        # Credly integration:
         "credly": {
             "CREDLY_BASE_URL": "https://credly.com/",
             "CREDLY_API_BASE_URL": "https://api.credly.com/v1/",
@@ -45,10 +46,19 @@ The feature has its configuration:
             "CREDLY_SANDBOX_API_BASE_URL": "https://sandbox-api.credly.com/v1/",
             "USE_SANDBOX": False,
         },
+        # Requirements data rules:
+        "EXCLUDED_KEY_PATHS": [
+            "user.id",
+            "user.is_active",
+            "user.pii.username",
+            "user.pii.email",
+            "user.pii.name",
+        ],
     }
 
 - ``events`` - explicit event bus signals list (only events with PII user data in payload are applicable).
 - ``credly`` - Credly integration details.
+- ``EXCLUDED_KEY_PATHS`` - event payload paths to exclude from data rule options (see: Configuration_).
 
 Credly integration
 ~~~~~~~~~~~~~~~~~~
@@ -157,4 +167,5 @@ For producing and consuming a single package (broker) is used - event-bus-redis_
     **LMS event bus consumer** is only required if LMS wants to receive information about badges processing results (awarding/revocation).
 
 
+.. _Configuration: configuration.html
 .. _event-bus-redis: https://github.com/openedx/event-bus-redis
