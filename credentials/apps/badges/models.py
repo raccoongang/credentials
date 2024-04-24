@@ -6,9 +6,7 @@ import logging
 import operator
 import uuid
 
-from attrs import asdict
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
@@ -168,7 +166,7 @@ class BadgeRequirement(models.Model):
         null=True,
         blank=True,
         help_text=_(
-            "Optional. Requirements with identical Group ID become interchangeable (OR processing logic applies)."
+            "Optional. Put requirements into the same arbitrary Group ID to make them interchangeable (OR processing logic applies)."
         ),
     )
 

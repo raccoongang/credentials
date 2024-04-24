@@ -255,12 +255,8 @@ class TestProcessRequirements(TestCase):
             site=self.site,
             is_active=True,
         )
-        self.COURSE_PASSING_EVENT = (
-            "org.openedx.learning.course.passing.status.updated.v1"
-        )
-        self.CCX_COURSE_PASSING_EVENT = (
-            "org.openedx.learning.ccx.course.passing.status.updated.v1"
-        )
+        self.COURSE_PASSING_EVENT = "org.openedx.learning.course.passing.status.updated.v1"
+        self.CCX_COURSE_PASSING_EVENT = "org.openedx.learning.ccx.course.passing.status.updated.v1"
 
     # test cases
     #     A course completion - course A w/o a group;
@@ -317,15 +313,9 @@ class TestProcessRequirements(TestCase):
             "course": {"display_name": "A"},
         }
         process_requirements(self.COURSE_PASSING_EVENT, "test_username", kwargs)
-        self.assertEqual(
-            Fulfillment.objects.filter(requirement=requirement_a).count(), 1
-        )
-        self.assertEqual(
-            Fulfillment.objects.filter(requirement=requirement_b).count(), 0
-        )
-        self.assertTrue(
-            BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed
-        )
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_a).count(), 1)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_b).count(), 0)
+        self.assertTrue(BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed)
 
     def test_course_a_or_b_or_c_completion(self):
         requirement_a = BadgeRequirement.objects.create(
@@ -368,18 +358,10 @@ class TestProcessRequirements(TestCase):
             "course": {"display_name": "A"},
         }
         process_requirements(self.COURSE_PASSING_EVENT, "test_username", kwargs)
-        self.assertEqual(
-            Fulfillment.objects.filter(requirement=requirement_a).count(), 1
-        )
-        self.assertEqual(
-            Fulfillment.objects.filter(requirement=requirement_b).count(), 0
-        )
-        self.assertEqual(
-            Fulfillment.objects.filter(requirement=requirement_c).count(), 0
-        )
-        self.assertTrue(
-            BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed
-        )
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_a).count(), 1)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_b).count(), 0)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_c).count(), 0)
+        self.assertTrue(BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed)
 
     def test_course_a_or_completion(self):
         requirement = BadgeRequirement.objects.create(
@@ -399,9 +381,7 @@ class TestProcessRequirements(TestCase):
         }
         process_requirements(self.COURSE_PASSING_EVENT, "test_username", kwargs)
         self.assertEqual(Fulfillment.objects.filter(requirement=requirement).count(), 1)
-        self.assertTrue(
-            BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed
-        )
+        self.assertTrue(BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed)
 
     def test_course_a_or_b_and_c_completion(self):
         requirement_a = BadgeRequirement.objects.create(
@@ -443,18 +423,10 @@ class TestProcessRequirements(TestCase):
             "course": {"display_name": "A"},
         }
         process_requirements(self.COURSE_PASSING_EVENT, "test_username", kwargs)
-        self.assertEqual(
-            Fulfillment.objects.filter(requirement=requirement_a).count(), 1
-        )
-        self.assertEqual(
-            Fulfillment.objects.filter(requirement=requirement_b).count(), 0
-        )
-        self.assertEqual(
-            Fulfillment.objects.filter(requirement=requirement_c).count(), 1
-        )
-        self.assertTrue(
-            BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed
-        )
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_a).count(), 1)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_b).count(), 0)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_c).count(), 1)
+        self.assertTrue(BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed)
 
     def test_course_a_or_b_and_c_or_d_completion(self):
         requirement_a = BadgeRequirement.objects.create(
@@ -509,18 +481,8 @@ class TestProcessRequirements(TestCase):
             "course": {"display_name": "A"},
         }
         process_requirements(self.COURSE_PASSING_EVENT, "test_username", kwargs)
-        self.assertEqual(
-            Fulfillment.objects.filter(requirement=requirement_a).count(), 1
-        )
-        self.assertEqual(
-            Fulfillment.objects.filter(requirement=requirement_b).count(), 0
-        )
-        self.assertEqual(
-            Fulfillment.objects.filter(requirement=requirement_c).count(), 1
-        )
-        self.assertEqual(
-            Fulfillment.objects.filter(requirement=requirement_d).count(), 0
-        )
-        self.assertTrue(
-            BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed
-        )
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_a).count(), 1)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_b).count(), 0)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_c).count(), 1)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_d).count(), 0)
+        self.assertTrue(BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed)

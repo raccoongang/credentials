@@ -36,7 +36,12 @@ class BadgeRequirementInline(admin.TabularInline):
     model = BadgeRequirement
     show_change_link = True
     extra = 0
-    fields = ("event_type", "rules", "description")
+    fields = (
+        "event_type",
+        "rules",
+        "description",
+        "group",
+    )
     readonly_fields = ("rules",)
 
     def rules(self, obj):

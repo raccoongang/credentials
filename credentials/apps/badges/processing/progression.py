@@ -20,7 +20,6 @@ def discover_requirements(event_type: str) -> List[BadgeRequirement]:
     return BadgeRequirement.objects.filter(event_type=event_type, template__is_active=True)
 
 
-
 def process_requirements(event_type, username, payload):
     """
     Finds all relevant requirements, tests them one by one, marks as completed if needed.
