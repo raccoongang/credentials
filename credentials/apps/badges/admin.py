@@ -39,11 +39,6 @@ class BadgeRequirementInline(admin.TabularInline):
     fields = ("event_type", "rules", "description")
     readonly_fields = ("rules",)
 
-    # FIXME: disable until "Release VI"
-    exclude = [
-        "group",
-    ]
-
     def rules(self, obj):
         """
         Display all data rules for the requirement.
@@ -289,8 +284,7 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         "template_link",
         "event_type",
         "description",
-        # FIXME: disable until "Release VI"
-        # "group",
+        "group",
     ]
 
     def has_add_permission(self, request):
