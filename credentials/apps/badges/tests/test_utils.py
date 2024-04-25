@@ -2,12 +2,23 @@ import unittest
 
 from attr import asdict
 from datetime import datetime
+from django.conf import settings
 from unittest.mock import patch
 
-from openedx_events.learning.data import UserData, UserPersonalData, CourseData, CoursePassingStatusData
+from openedx_events.learning.data import (
+    UserData,
+    UserPersonalData,
+    CourseData,
+    CoursePassingStatusData,
+)
 
 from credentials.apps.badges.checks import badges_checks
-from credentials.apps.badges.utils import extract_payload, keypath, get_user_data
+from credentials.apps.badges.utils import (
+    extract_payload,
+    keypath,
+    get_user_data,
+    get_event_type_keypaths,
+)
 
 
 class TestKeypath(unittest.TestCase):
@@ -53,7 +64,11 @@ class TestGetUserData(unittest.TestCase):
             end=datetime(2024, 6, 1),
         )
         self.user_data_1 = UserData(
-            id=1, is_active=True, pii=UserPersonalData(username="user1", email="user1@example.com", name="John Doe")
+            id=1,
+            is_active=True,
+            pii=UserPersonalData(
+                username="user1", email="user1@example.com", name="John Doe"
+            ),
         )
 
         self.course_data_2 = CourseData(
@@ -63,12 +78,18 @@ class TestGetUserData(unittest.TestCase):
             end=datetime(2024, 7, 15),
         )
         self.user_data_2 = UserData(
-            id=2, is_active=False, pii=UserPersonalData(username="user2", email="user2@example.com", name="Jane Doe")
+            id=2,
+            is_active=False,
+            pii=UserPersonalData(
+                username="user2", email="user2@example.com", name="Jane Doe"
+            ),
         )
 
         self.passing_status_1 = {
             "course_passing_status": CoursePassingStatusData(
-                status=CoursePassingStatusData.PASSING, course=self.course_data_1, user=self.user_data_1
+                status=CoursePassingStatusData.PASSING,
+                course=self.course_data_1,
+                user=self.user_data_1,
             )
         }
 
@@ -93,10 +114,16 @@ class TestExtractPayload(unittest.TestCase):
 
     def test_extract_payload(self):
         user_data = UserData(
-            id=1, is_active=True, pii=UserPersonalData(username="user1", email="user1@example.com ", name="John Doe")
+            id=1,
+            is_active=True,
+            pii=UserPersonalData(
+                username="user1", email="user1@example.com ", name="John Doe"
+            ),
         )
         course_passing_status = CoursePassingStatusData(
-            status=CoursePassingStatusData.PASSING, course=self.course_data, user=user_data
+            status=CoursePassingStatusData.PASSING,
+            course=self.course_data,
+            user=user_data,
         )
         public_signal_kwargs = {"course_passing_status": course_passing_status}
         result = extract_payload(public_signal_kwargs)
@@ -115,8 +142,12 @@ class TestBadgesChecks(unittest.TestCase):
         mock_get_badging_event_types.return_value = []
         errors = badges_checks()
         self.assertEqual(len(errors), 1)
-        self.assertEqual(errors[0].msg, "BADGES_CONFIG['events'] must include at least one event.")
-        self.assertEqual(errors[0].hint, "Add at least one event to BADGES_CONFIG['events'] setting.")
+        self.assertEqual(
+            errors[0].msg, "BADGES_CONFIG['events'] must include at least one event."
+        )
+        self.assertEqual(
+            errors[0].hint, "Add at least one event to BADGES_CONFIG['events'] setting."
+        )
         self.assertEqual(errors[0].id, "badges.E001")
 
     @patch("credentials.apps.badges.checks.get_badging_event_types")
@@ -124,3 +155,17 @@ class TestBadgesChecks(unittest.TestCase):
         mock_get_badging_event_types.return_value = ["event1", "event2"]
         errors = badges_checks()
         self.assertEqual(len(errors), 0)
+
+
+class TestGetEventTypeKeypaths(unittest.TestCase):
+    def setUp(self):
+        self.EVENT_TYPE = "org.openedx.learning.course.passing.status.updated.v1"
+
+    def test_get_event_type_keypaths(self):
+        event_type_keypaths = get_event_type_keypaths(self.EVENT_TYPE)
+        self.assertIsNotNone(event_type_keypaths)
+        self.assertIn("status", event_type_keypaths)
+        self.assertIn("course.display_name", event_type_keypaths)
+
+        for excluded_keypath in settings.BADGES_CONFIG.get("EXCLUDED_KEY_PATHS", []):
+            self.assertNotIn(excluded_keypath, event_type_keypaths)
