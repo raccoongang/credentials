@@ -2,12 +2,13 @@ import unittest
 
 from attr import asdict
 from datetime import datetime
+from django.conf import settings
 from unittest.mock import patch
 
 from openedx_events.learning.data import UserData, UserPersonalData, CourseData, CoursePassingStatusData
 
 from credentials.apps.badges.checks import badges_checks
-from credentials.apps.badges.utils import extract_payload, keypath, get_user_data
+from credentials.apps.badges.utils import extract_payload, keypath, get_user_data, get_event_type_keypaths
 
 
 class TestKeypath(unittest.TestCase):
@@ -124,3 +125,17 @@ class TestBadgesChecks(unittest.TestCase):
         mock_get_badging_event_types.return_value = ["event1", "event2"]
         errors = badges_checks()
         self.assertEqual(len(errors), 0)
+
+
+class TestGetEventTypeKeypaths(unittest.TestCase):
+    def setUp(self):
+        self.EVENT_TYPE = "org.openedx.learning.course.passing.status.updated.v1"
+
+    def test_get_event_type_keypaths(self):
+        event_type_keypaths = get_event_type_keypaths(self.EVENT_TYPE)
+        self.assertIsNotNone(event_type_keypaths)
+        self.assertIn("status", event_type_keypaths)
+        self.assertIn("course.display_name", event_type_keypaths)
+
+        for excluded_keypath in settings.BADGES_CONFIG.get("EXCLUDED_KEY_PATHS", []):
+            self.assertNotIn(excluded_keypath, event_type_keypaths)

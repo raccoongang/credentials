@@ -123,7 +123,10 @@ def get_event_type_keypaths(event_type: str) -> list:
         keypaths = []
         for field in attr.fields(data):
             if attr.has(field.type):
-                keypaths += [f"{field.name}.{keypath}" for keypath in get_data_keypaths(field.type)]
+                keypaths += [
+                    f"{field.name}.{keypath}"
+                    for keypath in get_data_keypaths(field.type)
+                ]
             else:
                 keypaths.append(field.name)
         return keypaths
@@ -131,7 +134,12 @@ def get_event_type_keypaths(event_type: str) -> list:
     keypaths = []
     for field in attr.fields(data):
         if attr.has(field.type):
-            keypaths += [f"{field.name}.{keypath}" for keypath in get_data_keypaths(field.type)]
+            keypaths += [
+                f"{field.name}.{keypath}"
+                for keypath in get_data_keypaths(field.type)
+                if f"{field.name}.{keypath}"
+                not in settings.BADGES_CONFIG.get("EXCLUDED_KEY_PATHS", [])
+            ]
         else:
             keypaths.append(field.name)
     return keypaths
