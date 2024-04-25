@@ -164,6 +164,7 @@ ONE OF MULTIPLE SPECIFIC COURSES completion
 - Requirement 1:
     - event type: ``org.openedx.learning.course.passing.status.updated.v1``
     - description: ``On the "Demo" course OR "Other" course completion.``
+    - group: ``unique-group-identifier``
 - Data rule 1:
     - key path: ``status``
     - operator: ``equals``
@@ -172,12 +173,20 @@ ONE OF MULTIPLE SPECIFIC COURSES completion
     - key path: ``course.course_key``
     - operator: ``equals``
     - value: ``course-v1:edX+DemoX+Demo_Course``
-    - group: ``any logical unique identifier``
-- Data rule 3:
+
+- Requirement 2:
+    - event type: ``org.openedx.learning.course.passing.status.updated.v1``
+    - description: ``On the "Demo" course OR "Other" course completion.``
+    - group: ``unique-group-identifier``
+- Data rule 1:
+    - key path: ``status``
+    - operator: ``equals``
+    - value: ``passing``
+- Data rule 2:
     - key path: ``course.course_key``
     - operator: ``equals``
     - value: ``course-v1:edX+DemoX+OTHER_Course``
-    - group: ``any logical unique identifier``
+
 
 SPECIFIC MASTER course OR ANY of its CCX courses EXCEPT a SPECIFIC CCX course completion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -186,7 +195,8 @@ SPECIFIC MASTER course OR ANY of its CCX courses EXCEPT a SPECIFIC CCX course co
 
 - Requirement 1:
     - event type: ``org.openedx.learning.ccx.course.passing.status.updated.v1``
-    - description: ``On the "Demo" course OR any Demo CCX courses completion BUT NOT CCX3.``
+    - description: ``On the "Demo" course completion OR...``
+    - group: ``demo``
 - Data rule 1:
     - key path: ``status``
     - operator: ``equals``
@@ -195,12 +205,19 @@ SPECIFIC MASTER course OR ANY of its CCX courses EXCEPT a SPECIFIC CCX course co
     - key path: ``course.course_key``
     - operator: ``equals``
     - value: ``course-v1:edX+DemoX+Demo_Course``
+
+- Requirement 2:
+    - event type: ``org.openedx.learning.ccx.course.passing.status.updated.v1``
+    - description: ``...On any Demo CCX courses completion EXCLUDING CCX3.``
     - group: ``demo``
+- Data rule 1:
+    - key path: ``status``
+    - operator: ``equals``
+    - value: ``passing``
 - Data rule 3:
     - key path: ``course.master_course_key``
     - operator: ``equals``
     - value: ``course-v1:edX+DemoX+Demo_Course``
-    - group: ``demo``
 - Data rule 4:
     - key path: ``course.ccx_course_key``
     - operator: ``not equals``
