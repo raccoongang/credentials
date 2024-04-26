@@ -60,7 +60,7 @@ class BadgeRequirementInline(admin.TabularInline):
                     for rule in obj.rules.all()
                 )
             ),
-        )
+        ) if obj.rules.exists() else _("No rules specified.")
 
 
 class BadgePenaltyInline(admin.TabularInline):
