@@ -33,6 +33,10 @@ from credentials.apps.badges.toggles import is_badges_enabled
 
 
 class BadgeRequirementInline(admin.TabularInline):
+    """
+    Badge template requirement inline setup.
+    """
+
     model = BadgeRequirement
     show_change_link = True
     extra = 0
@@ -60,12 +64,19 @@ class BadgeRequirementInline(admin.TabularInline):
 
 
 class BadgePenaltyInline(admin.TabularInline):
+    """
+    Badge template penalty inline setup.
+    """
+
     model = BadgePenalty
     show_change_link = True
     extra = 0
     form = BadgePenaltyForm
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
+        """
+        Filter requirements by parent badge template.
+        """
         if db_field.name == "requirements":
             template_id = request.resolver_match.kwargs.get("object_id")
             if template_id:
@@ -74,6 +85,10 @@ class BadgePenaltyInline(admin.TabularInline):
 
 
 class FulfillmentInline(admin.TabularInline):
+    """
+    Badge template fulfillment inline setup.
+    """
+
     model = Fulfillment
     extra = 0
     readonly_fields = [
@@ -82,6 +97,10 @@ class FulfillmentInline(admin.TabularInline):
 
 
 class DataRuleInline(admin.TabularInline):
+    """
+    Data rule inline setup.
+    """
+
     model = DataRule
     extra = 0
     form = DataRuleForm
