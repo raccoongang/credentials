@@ -25,3 +25,4 @@ This repository contains the edX Credentials Service, used as the backend to sup
    edx_extensions
    lms_user_id
    decisions
+   badges/index
