@@ -440,24 +440,26 @@ class BadgeProgress(models.Model):
         """
 
         requirements = BadgeRequirement.objects.filter(template=self.template)
-
         group_ids = requirements.filter(group__isnull=False).values_list("group", flat=True).distinct()
 
         requirements_count = requirements.filter(group__isnull=True).count() + group_ids.count()
-
         fulfilled_requirements_count = Fulfillment.objects.filter(
             progress=self,
             requirement__template=self.template,
             requirement__group__isnull=True,
         ).count()
 
-        fulfilled_group_count = Fulfillment.objects.filter(
-            requirement__in=requirements.filter(group__in=group_ids)
-        ).values('requirement__group').distinct().count()
+        for group_id in group_ids:
+            group_requirements = requirements.filter(group=group_id)
+            group_fulfilled_requirements_count = Fulfillment.objects.filter(
+                progress=self,
+                requirement__in=group_requirements,
+            ).count()
 
-        fulfilled_requirements_count += fulfilled_group_count
+            if group_fulfilled_requirements_count > 0:
+                fulfilled_requirements_count += 1
 
-        if fulfilled_requirements_count == 0:
+        if fulfilled_requirements_count == 0 or requirements_count == 0:
             return 0.00
         return round(fulfilled_requirements_count / requirements_count, 2)
 

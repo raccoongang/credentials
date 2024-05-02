@@ -129,7 +129,6 @@ class TestBadgesChecks(unittest.TestCase):
         self.assertEqual(len(errors), 0)
 
 
-<<<<<<< HEAD
 class TestCredlyCheck(unittest.TestCase):
     def test_credly_configured(self):
         settings.BADGES_CONFIG = {
@@ -208,17 +207,3 @@ class TestGetCredlyApiBaseUrl(unittest.TestCase):
         }
         result = get_credly_api_base_url(settings)
         self.assertEqual(result, "https://api.credly.com")
-=======
-class TestGetEventTypeKeypaths(unittest.TestCase):
-    def setUp(self):
-        self.EVENT_TYPE = "org.openedx.learning.course.passing.status.updated.v1"
-
-    def test_get_event_type_keypaths(self):
-        event_type_keypaths = get_event_type_keypaths(self.EVENT_TYPE)
-        self.assertIsNotNone(event_type_keypaths)
-        self.assertIn("status", event_type_keypaths)
-        self.assertIn("course.display_name", event_type_keypaths)
-
-        for excluded_keypath in settings.BADGES_CONFIG.get("EXCLUDED_KEY_PATHS", []):
-            self.assertNotIn(excluded_keypath, event_type_keypaths)
->>>>>>> aci.main
