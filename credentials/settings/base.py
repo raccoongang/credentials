@@ -378,7 +378,11 @@ CREDENTIALS_SERVICE_USER = "credentials_service_user"
 
 JWT_AUTH = {
     "JWT_ISSUER": [
-        {"AUDIENCE": "SET-ME-PLEASE", "ISSUER": "http://127.0.0.1:8000/oauth2", "SECRET_KEY": "SET-ME-PLEASE"}
+        {
+            "AUDIENCE": "SET-ME-PLEASE",
+            "ISSUER": "http://127.0.0.1:8000/oauth2",
+            "SECRET_KEY": "SET-ME-PLEASE",
+        }
     ],
     "JWT_ALGORITHM": "HS256",
     "JWT_VERIFY_EXPIRATION": True,
@@ -397,7 +401,9 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 ACE_ENABLED_CHANNELS = ["django_email"]
 ACE_CHANNEL_DEFAULT_EMAIL = "django_email"
 ACE_CHANNEL_TRANSACTIONAL_EMAIL = "django_email"
-ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = ""  # unused, but required to be set or we see an exception
+ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = (
+    ""  # unused, but required to be set or we see an exception
+)
 
 # Set up logging for development use (logging to stdout)
 LOGGING = get_logger_config(debug=DEBUG, dev_env=True, local_loglevel="DEBUG")
@@ -410,7 +416,9 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.DjangoModelPermissions",),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.DjangoModelPermissions",
+    ),
     "PAGE_SIZE": 20,
     "DATETIME_FORMAT": "%Y-%m-%dT%H:%M:%SZ",
     "EXCEPTION_HANDLER": "credentials.apps.api.v2.views.credentials_throttle_handler",
@@ -529,7 +537,9 @@ ALLOWED_EMAIL_HTML_TAGS = [
 # .. toggle_creation_date: 2021-04-30
 # .. toggle_target_removal_date: 2021-06-01
 # .. toggle_tickets: https://openedx.atlassian.net/browse/MICROBA-1169, https://openedx.atlassian.net/browse/MICROBA-1198 (ticket for removal)
-USE_CERTIFICATE_AVAILABLE_DATE = WaffleSwitch("credentials.use_certificate_available_date", module_name=__name__)
+USE_CERTIFICATE_AVAILABLE_DATE = WaffleSwitch(
+    "credentials.use_certificate_available_date", module_name=__name__
+)
 
 LOGO_TRADEMARK_URL = "https://edx-cdn.org/v3/default/logo-trademark.svg"
 LOGO_TRADEMARK_URL_PNG = "https://edx-cdn.org/v3/default/logo-trademark.png"
@@ -563,7 +573,10 @@ EVENT_BUS_PRODUCER_CONFIG = {
     # .. toggle_warning: The default may be changed in a later release.
     # .. toggle_use_cases: opt_in
     "org.openedx.learning.badge.awarded.v1": {
-        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": BADGES_ENABLED},
+        "learning-badges-lifecycle": {
+            "event_key_field": "badge.uuid",
+            "enabled": BADGES_ENABLED,
+        },
     },
     # .. setting_name: EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.badge.revoked.v1']
     #    ['learning-badges-lifecycle']['enabled']
@@ -573,7 +586,10 @@ EVENT_BUS_PRODUCER_CONFIG = {
     # .. toggle_warning: The default may be changed in a later release.
     # .. toggle_use_cases: opt_in
     "org.openedx.learning.badge.revoked.v1": {
-        "learning-badges-lifecycle": {"event_key_field": "badge.uuid", "enabled": BADGES_ENABLED},
+        "learning-badges-lifecycle": {
+            "event_key_field": "badge.uuid",
+            "enabled": BADGES_ENABLED,
+        },
     },
 }
 
@@ -609,11 +625,13 @@ BADGES_CONFIG = {
         "CREDLY_SANDBOX_API_BASE_URL": "https://sandbox-api.credly.com/v1/",
         "USE_SANDBOX": False,
     },
-    "EXCLUDED_KEY_PATHS": [
-        "user.id",
-        "user.is_active",
-        "user.pii.username",
-        "user.pii.email",
-        "user.pii.name",
-    ]
+    "rules": {
+        "ignored_keypaths": [
+            "user.id",
+            "user.is_active",
+            "user.pii.username",
+            "user.pii.email",
+            "user.pii.name",
+        ],
+    },
 }

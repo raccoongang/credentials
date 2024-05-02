@@ -137,5 +137,5 @@ class TestGetEventTypeKeypaths(unittest.TestCase):
         self.assertIn("status", event_type_keypaths)
         self.assertIn("course.display_name", event_type_keypaths)
 
-        for excluded_keypath in settings.BADGES_CONFIG.get("EXCLUDED_KEY_PATHS", []):
-            self.assertNotIn(excluded_keypath, event_type_keypaths)
+        for ignored_keypath in settings.BADGES_CONFIG["rules"].get("ignored_keypaths", []):
+            self.assertNotIn(ignored_keypath, event_type_keypaths)

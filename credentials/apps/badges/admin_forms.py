@@ -2,15 +2,13 @@
 Badges admin forms.
 """
 
-import inspect
-
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 
 from credentials.apps.badges.credly.api_client import CredlyAPIClient
 from credentials.apps.badges.credly.exceptions import CredlyAPIError
-from credentials.apps.badges.models import BadgePenalty, CredlyOrganization, DataRule
+from credentials.apps.badges.models import BadgePenalty, BadgeRequirement, CredlyOrganization, DataRule
 from credentials.apps.badges.utils import get_event_type_keypaths
 
 
@@ -101,3 +99,27 @@ class DataRuleForm(forms.ModelForm):
         if self.parent_instance:
             event_type = self.parent_instance.event_type
             self.fields["data_path"].choices = Choices(*get_event_type_keypaths(event_type=event_type))
+
+
+class BadgeRequirementFormSet(forms.BaseInlineFormSet):
+    def get_form_kwargs(self, index):
+        kwargs = super().get_form_kwargs(index)
+        kwargs["parent_instance"] = self.instance
+        return kwargs
+
+
+class BadgeRequirementForm(forms.ModelForm):
+    class Meta:
+        model = BadgeRequirement
+        fields = "__all__"
+
+    group = forms.ChoiceField()
+
+    def __init__(self, *args, parent_instance=None, **kwargs):
+        self.template = parent_instance
+        super().__init__(*args, **kwargs)
+
+        self.fields["group"].choices = Choices(
+            *[(chr(i), chr(i)) for i in range(65, 91)]
+        )
+        self.fields["group"].initial = chr(65 + self.template.requirements.count())

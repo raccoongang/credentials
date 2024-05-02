@@ -13,6 +13,8 @@ from django.urls import reverse
 
 from credentials.apps.badges.admin_forms import (
     BadgePenaltyForm,
+    BadgeRequirementForm,
+    BadgeRequirementFormSet,
     CredlyOrganizationAdminForm,
     DataRuleForm,
     DataRuleFormSet,
@@ -43,6 +45,8 @@ class BadgeRequirementInline(admin.TabularInline):
         "group",
     )
     readonly_fields = ("rules",)
+    form = BadgeRequirementForm
+    formset = BadgeRequirementFormSet
 
     def rules(self, obj):
         """

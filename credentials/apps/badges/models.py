@@ -426,8 +426,6 @@ class BadgeProgress(models.Model):
     def ratio(self) -> float:
         """
         Calculates badge template progress ratio.
-
-        FIXME: simplify
         """
 
         requirements = BadgeRequirement.objects.filter(template=self.template)
@@ -444,11 +442,16 @@ class BadgeProgress(models.Model):
 
         for group_id in group_ids:
             group_requirements = requirements.filter(group=group_id)
-            group_fulfillment_count = Fulfillment.objects.filter(requirement__in=group_requirements).count()
-            fulfilled_requirements_count += 1 if group_fulfillment_count > 0 else 0
+            group_fulfilled_requirements_count = Fulfillment.objects.filter(
+                progress=self,
+                requirement__in=group_requirements,
+            ).count()
+            if group_fulfilled_requirements_count > 0:
+                fulfilled_requirements_count += 1
 
-        if fulfilled_requirements_count == 0:
+        if fulfilled_requirements_count == 0 or requirements_count == 0:
             return 0.00
+
         return round(fulfilled_requirements_count / requirements_count, 2)
 
     @property
@@ -483,6 +486,7 @@ class Fulfillment(models.Model):
         null=True,
         related_name="fulfillments",
     )
+    group = models.CharField( max_length=255, null=True, blank=True, help_text=_("Group ID for the requirement."))
 
 
 class CredlyBadge(UserCredential):
