@@ -226,7 +226,7 @@ class BadgeRequirement(models.Model):
         Evaluates payload rules.
         """
 
-        return all(rule.apply(data) for rule in self.rules.all())
+        return all(rule.apply(data) for rule in self.rules.all()) if self.rules.exists() else False
 
     @property
     def is_active(self):
@@ -446,12 +446,12 @@ class BadgeProgress(models.Model):
                 progress=self,
                 requirement__in=group_requirements,
             ).count()
+
             if group_fulfilled_requirements_count > 0:
                 fulfilled_requirements_count += 1
 
-        if fulfilled_requirements_count == 0 or requirements_count == 0:
+        if 0 in (requirements_count, fulfilled_requirements_count):
             return 0.00
-
         return round(fulfilled_requirements_count / requirements_count, 2)
 
     @property

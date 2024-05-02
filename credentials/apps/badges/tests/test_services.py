@@ -400,20 +400,25 @@ class TestProcessRequirements(TestCase):
             value="A",
         )
         DataRule.objects.create(
-            requirement=requirement_b,
-            data_path="course.display_name",
-            operator="eq",
-            value="A",
-        )
-        DataRule.objects.create(
             requirement=requirement_c,
             data_path="course.display_name",
             operator="eq",
             value="A",
         )
-
-        self.assertFalse(BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed)
         
+        process_requirements(COURSE_PASSING_EVENT, "test_username", COURSE_PASSING_DATA)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_a).count(), 0)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_b).count(), 0)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_c).count(), 1)
+        self.assertFalse(BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed)
+
+        DataRule.objects.create(
+            requirement=requirement_b,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+
         process_requirements(COURSE_PASSING_EVENT, "test_username", COURSE_PASSING_DATA)
 
         self.assertEqual(Fulfillment.objects.filter(requirement=requirement_a).count(), 0)
@@ -460,12 +465,6 @@ class TestProcessRequirements(TestCase):
             value="B",
         )
         DataRule.objects.create(
-            requirement=requirement_c,
-            data_path="course.display_name",
-            operator="eq",
-            value="A",
-        )
-        DataRule.objects.create(
             requirement=requirement_d,
             data_path="course.display_name",
             operator="eq",
@@ -478,9 +477,22 @@ class TestProcessRequirements(TestCase):
 
         self.assertEqual(Fulfillment.objects.filter(requirement=requirement_a).count(), 1)
         self.assertEqual(Fulfillment.objects.filter(requirement=requirement_b).count(), 0)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_c).count(), 0)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_d).count(), 0)
+        self.assertFalse(BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed)
+
+        DataRule.objects.create(
+            requirement=requirement_c,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        process_requirements(COURSE_PASSING_EVENT, "test_username", COURSE_PASSING_DATA)
+
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_a).count(), 1)
+        self.assertEqual(Fulfillment.objects.filter(requirement=requirement_b).count(), 0)
         self.assertEqual(Fulfillment.objects.filter(requirement=requirement_c).count(), 1)
         self.assertEqual(Fulfillment.objects.filter(requirement=requirement_d).count(), 0)
-
         self.assertTrue(BadgeProgress.for_user(username="test_username", template_id=self.badge_template.id).completed)
     
     def tearDown(self):
