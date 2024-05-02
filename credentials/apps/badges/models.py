@@ -447,7 +447,7 @@ class BadgeProgress(models.Model):
             group_fulfillment_count = Fulfillment.objects.filter(requirement__in=group_requirements).count()
             fulfilled_requirements_count += 1 if group_fulfillment_count > 0 else 0
 
-        if fulfilled_requirements_count == 0:
+        if 0 in (requirements_count, fulfilled_requirements_count):
             return 0.00
         return round(fulfilled_requirements_count / requirements_count, 2)
 
