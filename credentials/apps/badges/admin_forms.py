@@ -63,11 +63,17 @@ class CredlyOrganizationAdminForm(forms.ModelForm):
 
 
 class BadgePenaltyForm(forms.ModelForm):
+    """
+    Form for BadgePenalty model.
+    """
     class Meta:
         model = BadgePenalty
         fields = "__all__"
 
     def clean(self):
+        """
+        Ensure that all penalties belong to the same template.
+        """
         cleaned_data = super().clean()
         requirements = cleaned_data.get("requirements")
 
@@ -79,13 +85,23 @@ class BadgePenaltyForm(forms.ModelForm):
 
 
 class DataRuleFormSet(forms.BaseInlineFormSet):
+    """
+    Formset for DataRule model.
+    """
     def get_form_kwargs(self, index):
+        """
+        Pass parent instance to the form.
+        """
+
         kwargs = super().get_form_kwargs(index)
         kwargs["parent_instance"] = self.instance
         return kwargs
 
 
 class DataRuleForm(forms.ModelForm):
+    """
+    Form for DataRule model.
+    """
     class Meta:
         model = DataRule
         fields = "__all__"
@@ -93,6 +109,9 @@ class DataRuleForm(forms.ModelForm):
     data_path = forms.ChoiceField()
 
     def __init__(self, *args, parent_instance=None, **kwargs):
+        """
+        Load data paths based on the parent instance event type.
+        """
         self.parent_instance = parent_instance
         super().__init__(*args, **kwargs)
 

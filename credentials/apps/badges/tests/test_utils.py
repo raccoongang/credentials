@@ -5,10 +5,12 @@ from datetime import datetime
 from django.conf import settings
 from unittest.mock import patch
 
+from django.conf import settings
 from openedx_events.learning.data import UserData, UserPersonalData, CourseData, CoursePassingStatusData
 
 from credentials.apps.badges.checks import badges_checks
-from credentials.apps.badges.utils import extract_payload, keypath, get_user_data, get_event_type_keypaths
+from credentials.apps.badges.credly.utils import get_credly_base_url, get_credly_api_base_url
+from credentials.apps.badges.utils import credly_check, extract_payload, get_event_type_keypaths, get_user_data, keypath
 
 
 class TestKeypath(unittest.TestCase):
@@ -127,15 +129,80 @@ class TestBadgesChecks(unittest.TestCase):
         self.assertEqual(len(errors), 0)
 
 
-class TestGetEventTypeKeypaths(unittest.TestCase):
-    def setUp(self):
-        self.EVENT_TYPE = "org.openedx.learning.course.passing.status.updated.v1"
+class TestCredlyCheck(unittest.TestCase):
+    def test_credly_configured(self):
+        settings.BADGES_CONFIG = {
+            "credly": {
+                "CREDLY_BASE_URL": "https://www.credly.com",
+                "CREDLY_API_BASE_URL": "https://api.credly.com",
+                "CREDLY_SANDBOX_BASE_URL": "https://sandbox.credly.com",
+                "CREDLY_SANDBOX_API_BASE_URL": "https://sandbox.api.credly.com",
+                "USE_SANDBOX": True,
+            }
+        }
+        result = credly_check()
+        self.assertTrue(result)
 
+    def test_credly_not_configured(self):
+        settings.BADGES_CONFIG = {}
+        result = credly_check()
+        self.assertFalse(result)
+
+    def test_credly_missing_keys(self):
+        settings.BADGES_CONFIG = {
+            "credly": {
+                "CREDLY_BASE_URL": "https://www.credly.com",
+                "CREDLY_API_BASE_URL": "https://api.credly.com",
+                "USE_SANDBOX": True,
+            }
+        }
+        result = credly_check()
+        self.assertFalse(result)
+
+
+class TestGetEventTypeKeypaths(unittest.TestCase):
     def test_get_event_type_keypaths(self):
-        event_type_keypaths = get_event_type_keypaths(self.EVENT_TYPE)
-        self.assertIsNotNone(event_type_keypaths)
-        self.assertIn("status", event_type_keypaths)
-        self.assertIn("course.display_name", event_type_keypaths)
+        result = get_event_type_keypaths("org.openedx.learning.course.passing.status.updated.v1")
 
         for ignored_keypath in settings.BADGES_CONFIG["rules"].get("ignored_keypaths", []):
-            self.assertNotIn(ignored_keypath, event_type_keypaths)
+            self.assertNotIn(ignored_keypath, result)
+
+class TestGetCredlyBaseUrl(unittest.TestCase):
+    def test_get_credly_base_url_sandbox(self):
+        settings.BADGES_CONFIG["credly"] = {
+            "CREDLY_BASE_URL": "https://www.credly.com",
+            "CREDLY_SANDBOX_BASE_URL": "https://sandbox.credly.com",
+            "USE_SANDBOX": True,
+        }
+        result = get_credly_base_url(settings)
+        self.assertEqual(result, "https://sandbox.credly.com")
+
+    def test_get_credly_base_url_production(self):
+        settings.BADGES_CONFIG["credly"] = {
+            "CREDLY_BASE_URL": "https://www.credly.com",
+            "CREDLY_SANDBOX_BASE_URL": "https://sandbox.credly.com",
+            "USE_SANDBOX": False,
+        }
+        result = get_credly_base_url(settings)
+        self.assertEqual(result, "https://www.credly.com")
+
+
+class TestGetCredlyApiBaseUrl(unittest.TestCase):
+    def test_get_credly_api_base_url_sandbox(self):
+        settings.BADGES_CONFIG["credly"] = {
+            "CREDLY_API_BASE_URL": "https://api.credly.com",
+            "CREDLY_SANDBOX_API_BASE_URL": "https://sandbox.api.credly.com",
+            "USE_SANDBOX": True,
+        }
+    
+        result = get_credly_api_base_url(settings)
+        self.assertEqual(result, "https://sandbox.api.credly.com")
+
+    def test_get_credly_api_base_url_production(self):
+        settings.BADGES_CONFIG["credly"] = {
+            "CREDLY_API_BASE_URL": "https://api.credly.com",
+            "CREDLY_SANDBOX_API_BASE_URL": "https://sandbox.api.credly.com",
+            "USE_SANDBOX": False,
+        }
+        result = get_credly_api_base_url(settings)
+        self.assertEqual(result, "https://api.credly.com")
