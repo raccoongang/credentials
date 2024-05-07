@@ -230,7 +230,7 @@ class BadgeRequirement(models.Model):
         Evaluates payload rules.
         """
 
-        return all(rule.apply(data) for rule in self.rules.all())
+        return all(rule.apply(data) for rule in self.rules.all()) if self.rules.exists() else False
 
     @property
     def is_active(self):
@@ -459,7 +459,7 @@ class BadgeProgress(models.Model):
             if group_fulfilled_requirements_count > 0:
                 fulfilled_requirements_count += 1
 
-        if fulfilled_requirements_count == 0 or requirements_count == 0:
+        if 0 in (requirements_count, fulfilled_requirements_count):
             return 0.00
         return round(fulfilled_requirements_count / requirements_count, 2)
 
@@ -499,6 +499,7 @@ class Fulfillment(models.Model):
         null=True,
         related_name="fulfillments",
     )
+    group = models.CharField( max_length=255, null=True, blank=True, help_text=_("Group ID for the requirement."))
 
 
 class CredlyBadge(UserCredential):

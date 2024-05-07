@@ -163,10 +163,9 @@ class TestCredlyCheck(unittest.TestCase):
 class TestGetEventTypeKeypaths(unittest.TestCase):
     def test_get_event_type_keypaths(self):
         result = get_event_type_keypaths("org.openedx.learning.course.passing.status.updated.v1")
-        expected_keypaths = ["status", "course.display_name", "course.start", "course.end"]
-        for exp_keypath in expected_keypaths:
-            self.assertIn(exp_keypath, result)
 
+        for ignored_keypath in settings.BADGES_CONFIG["rules"].get("ignored_keypaths", []):
+            self.assertNotIn(ignored_keypath, result)
 
 class TestGetCredlyBaseUrl(unittest.TestCase):
     def test_get_credly_base_url_sandbox(self):
