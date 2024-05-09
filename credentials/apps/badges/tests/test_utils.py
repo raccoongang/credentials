@@ -164,7 +164,7 @@ class TestGetEventTypeKeypaths(unittest.TestCase):
     def test_get_event_type_keypaths(self):
         result = get_event_type_keypaths("org.openedx.learning.course.passing.status.updated.v1")
 
-        for ignored_keypath in settings.BADGES_CONFIG["rules"].get("ignored_keypaths", []):
+        for ignored_keypath in settings.BADGES_CONFIG.get("rules", {}).get("ignored_keypaths", []):
             self.assertNotIn(ignored_keypath, result)
 
 class TestGetCredlyBaseUrl(unittest.TestCase):
