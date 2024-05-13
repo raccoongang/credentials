@@ -152,7 +152,7 @@ def get_event_type_keypaths(event_type: str) -> list:
                 f"{field.name}.{keypath}"
                 for keypath in get_data_keypaths(field.type)
                 if f"{field.name}.{keypath}"
-                not in settings.BADGES_CONFIG["rules"].get("ignored_keypaths", [])
+                not in settings.BADGES_CONFIG.get("rules", {}).get("ignored_keypaths", [])
             ]
         else:
             keypaths.append(field.name)
