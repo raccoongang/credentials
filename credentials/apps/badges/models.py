@@ -363,7 +363,7 @@ class BadgePenalty(models.Model):
         Evaluates payload rules.
         """
 
-        return all(rule.apply(data) for rule in self.rules.all())
+        return all(rule.apply(data) for rule in self.rules.all()) if self.rules.exists() else False
 
     def reset_requirements(self, username: str):
         """

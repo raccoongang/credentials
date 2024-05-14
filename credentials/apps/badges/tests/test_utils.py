@@ -71,7 +71,7 @@ class TestGetUserData(unittest.TestCase):
 
         self.passing_status_1 = {
             "course_passing_status": CoursePassingStatusData(
-                status=CoursePassingStatusData.PASSING, course=self.course_data_1, user=self.user_data_1
+                is_passing=True, course=self.course_data_1, user=self.user_data_1
             )
         }
 
@@ -99,7 +99,7 @@ class TestExtractPayload(unittest.TestCase):
             id=1, is_active=True, pii=UserPersonalData(username="user1", email="user1@example.com ", name="John Doe")
         )
         course_passing_status = CoursePassingStatusData(
-            status=CoursePassingStatusData.PASSING, course=self.course_data, user=user_data
+            is_passing=True, course=self.course_data, user=user_data
         )
         public_signal_kwargs = {"course_passing_status": course_passing_status}
         result = extract_payload(public_signal_kwargs)

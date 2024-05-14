@@ -8,7 +8,7 @@ from model_utils import Choices
 
 from credentials.apps.badges.credly.api_client import CredlyAPIClient
 from credentials.apps.badges.credly.exceptions import CredlyAPIError
-from credentials.apps.badges.models import BadgePenalty, BadgeRequirement, CredlyOrganization, DataRule
+from credentials.apps.badges.models import BadgePenalty, BadgeRequirement, CredlyOrganization, DataRule, PenaltyDataRule
 from credentials.apps.badges.utils import get_event_type_keypaths
 
 
@@ -142,3 +142,40 @@ class BadgeRequirementForm(forms.ModelForm):
             *[(chr(i), chr(i)) for i in range(65, 91)]
         )
         self.fields["group"].initial = chr(65 + self.template.requirements.count())
+
+
+class PenaltyDataRuleFormSet(forms.BaseInlineFormSet):
+    """
+    Formset for PenaltyDataRule model.
+    """
+    def get_form_kwargs(self, index):
+        """
+        Pass parent instance to the form.
+        """
+
+        kwargs = super().get_form_kwargs(index)
+        kwargs["parent_instance"] = self.instance
+        return kwargs
+
+
+class PenaltyDataRuleForm(forms.ModelForm):
+    """
+    Form for PenaltyDataRule model.
+    """
+
+    class Meta:
+        model = PenaltyDataRule
+        fields = "__all__"
+
+    data_path = forms.ChoiceField()
+
+    def __init__(self, *args, parent_instance=None, **kwargs):
+        """
+        Load data paths based on the parent instance event type.
+        """
+        self.parent_instance = parent_instance
+        super().__init__(*args, **kwargs)
+
+        if self.parent_instance:
+            event_type = self.parent_instance.event_type
+            self.fields["data_path"].choices = Choices(*get_event_type_keypaths(event_type=event_type))
