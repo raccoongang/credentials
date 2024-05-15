@@ -89,6 +89,10 @@ class BadgeTemplate(AbstractCredential):
         if not self.origin:
             self.origin = self.ORIGIN
             self.save(*args, **kwargs)
+    
+    @property
+    def groups(self):
+        return self.requirements.values_list("group", flat=True).distinct()
 
     @classmethod
     def by_uuid(cls, template_uuid):
@@ -184,7 +188,7 @@ class BadgeRequirement(models.Model):
         """
         template_id = self.template.id
         progress = BadgeProgress.for_user(username=username, template_id=template_id)
-        fulfillment, created = Fulfillment.objects.get_or_create(progress=progress, requirement=self)
+        fulfillment, created = Fulfillment.objects.get_or_create(progress=progress, requirement=self, group=self.group)
 
         if created:
             notify_requirement_fulfilled(
@@ -224,6 +228,18 @@ class BadgeRequirement(models.Model):
         """
 
         return self.fulfillments.filter(progress__username=username, progress__template=self.template).exists()
+
+    @classmethod
+    def is_group_fulfilled(cls, *, group: str, template: BadgeTemplate, username: str) -> bool:
+        """
+        Checks if the group is fulfilled.
+        """
+
+        progress = BadgeProgress.for_user(username=username, template_id=template.id)
+        requirements = cls.objects.filter(template=template, group=group)
+        fulfilled_requirements = requirements.filter(fulfillments__progress=progress).count()
+
+        return fulfilled_requirements > 0
 
     def apply_rules(self, data: dict) -> bool:
         """
@@ -439,29 +455,18 @@ class BadgeProgress(models.Model):
         Calculates badge template progress ratio.
         """
 
-        requirements = BadgeRequirement.objects.filter(template=self.template)
-        group_ids = requirements.filter(group__isnull=False).values_list("group", flat=True).distinct()
-
-        requirements_count = requirements.filter(group__isnull=True).count() + group_ids.count()
-        fulfilled_requirements_count = Fulfillment.objects.filter(
-            progress=self,
-            requirement__template=self.template,
-            requirement__group__isnull=True,
-        ).count()
-
-        for group_id in group_ids:
-            group_requirements = requirements.filter(group=group_id)
-            group_fulfilled_requirements_count = Fulfillment.objects.filter(
-                progress=self,
-                requirement__in=group_requirements,
-            ).count()
-
-            if group_fulfilled_requirements_count > 0:
-                fulfilled_requirements_count += 1
-
-        if 0 in (requirements_count, fulfilled_requirements_count):
+        if not self.groups:
             return 0.00
-        return round(fulfilled_requirements_count / requirements_count, 2)
+        
+        true_values = len(list(filter(lambda x: x, self.groups.values())))
+        return round(true_values / len(self.groups.keys()), 2)
+
+    @property
+    def groups(self):
+        return {
+            group: BadgeRequirement.is_group_fulfilled(group=group, template=self.template, username=self.username)
+            for group in self.template.groups
+        }
 
     @property
     def completed(self):
@@ -471,16 +476,17 @@ class BadgeProgress(models.Model):
 
         return self.ratio == 1.00
 
-    def validate(self):
+    def progress(self):
         """
-        Performs self-check and notifies about the current status.
+        Notify about the progress.
         """
-
-        if self.completed:
-            notify_progress_complete(self, self.username, self.template.id)
-
-        if not self.completed:
-            notify_progress_incomplete(self, self.username, self.template.id)
+        notify_progress_complete(self, self.username, self.template.id)
+    
+    def regress(self):
+        """
+        Notify about the regression.
+        """
+        notify_progress_incomplete(self, self.username, self.template.id)
 
     def reset(self):
         Fulfillment.objects.filter(progress=self).delete()

@@ -25,7 +25,7 @@ from credentials.apps.badges.signals.handlers import handle_badge_completion
 
 COURSE_PASSING_EVENT = "org.openedx.learning.course.passing.status.updated.v1"
 COURSE_PASSING_DATA = CoursePassingStatusData(
-    status="passing",
+    is_passing=True,
     course=CourseData(course_key=CourseKey.from_string("course-v1:edX+DemoX.1+2014"), display_name="A"),
     user=UserData(
         id=1,
