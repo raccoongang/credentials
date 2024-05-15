@@ -271,7 +271,7 @@ openapi-codec==1.3.2
     # via
     #   -r requirements/base.txt
     #   django-rest-swagger
-openedx-events @ git+https://github.com/raccoongang/openedx-events.git@aci.main
+openedx-events==9.10.0
     # via
     #   -r requirements/base.txt
     #   edx-event-bus-redis
