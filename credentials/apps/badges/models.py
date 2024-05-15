@@ -297,10 +297,25 @@ class AbstractDataRule(models.Model):
         """
 
         comparison_func = getattr(operator, self.operator, None)
+        
         if comparison_func:
             data_value = str(keypath(data, self.data_path))
-            return comparison_func(data_value, self.value)
+            return comparison_func(data_value, self._value_to_bool())
         return False
+    
+    def _value_to_bool(self):
+        """
+        Converts the value to a boolean or returns the original value if it is not a boolean string.
+        """
+
+        TRUE_VALUES = ["True", "true", "Yes", "yes", "+"]
+        FALSE_VALUES = ["False", "false", "No", "no", "-"]
+
+        if self.value in TRUE_VALUES:
+            return "True"
+        if self.value in FALSE_VALUES:
+            return "False"
+        return self.value
 
 
 class DataRule(AbstractDataRule):
