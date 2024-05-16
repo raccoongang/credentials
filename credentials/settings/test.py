@@ -51,9 +51,4 @@ JWT_AUTH.update(
 STATICFILES_STORAGE = None
 add_plugins(__name__, PROJECT_TYPE, SettingsType.TEST)
 
-BADGES_ENABLED = True
-BADGES_CONFIG["events"] = [
-    "org.openedx.learning.course.passing.status.updated.v1",
-    "org.openedx.learning.ccx.course.passing.status.updated.v1",
-]
 BADGES_CONFIG["credly"]["USE_SANDBOX"] = True

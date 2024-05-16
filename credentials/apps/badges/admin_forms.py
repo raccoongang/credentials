@@ -2,15 +2,13 @@
 Badges admin forms.
 """
 
-import inspect
-
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 
 from credentials.apps.badges.credly.api_client import CredlyAPIClient
 from credentials.apps.badges.credly.exceptions import CredlyAPIError
-from credentials.apps.badges.models import BadgePenalty, CredlyOrganization, DataRule
+from credentials.apps.badges.models import BadgePenalty, BadgeRequirement, CredlyOrganization, DataRule
 from credentials.apps.badges.utils import get_event_type_keypaths
 
 
@@ -65,11 +63,17 @@ class CredlyOrganizationAdminForm(forms.ModelForm):
 
 
 class BadgePenaltyForm(forms.ModelForm):
+    """
+    Form for BadgePenalty model.
+    """
     class Meta:
         model = BadgePenalty
         fields = "__all__"
 
     def clean(self):
+        """
+        Ensure that all penalties belong to the same template.
+        """
         cleaned_data = super().clean()
         requirements = cleaned_data.get("requirements")
 
@@ -81,13 +85,23 @@ class BadgePenaltyForm(forms.ModelForm):
 
 
 class DataRuleFormSet(forms.BaseInlineFormSet):
+    """
+    Formset for DataRule model.
+    """
     def get_form_kwargs(self, index):
+        """
+        Pass parent instance to the form.
+        """
+
         kwargs = super().get_form_kwargs(index)
         kwargs["parent_instance"] = self.instance
         return kwargs
 
 
 class DataRuleForm(forms.ModelForm):
+    """
+    Form for DataRule model.
+    """
     class Meta:
         model = DataRule
         fields = "__all__"
@@ -95,9 +109,36 @@ class DataRuleForm(forms.ModelForm):
     data_path = forms.ChoiceField()
 
     def __init__(self, *args, parent_instance=None, **kwargs):
+        """
+        Load data paths based on the parent instance event type.
+        """
         self.parent_instance = parent_instance
         super().__init__(*args, **kwargs)
 
         if self.parent_instance:
             event_type = self.parent_instance.event_type
             self.fields["data_path"].choices = Choices(*get_event_type_keypaths(event_type=event_type))
+
+
+class BadgeRequirementFormSet(forms.BaseInlineFormSet):
+    def get_form_kwargs(self, index):
+        kwargs = super().get_form_kwargs(index)
+        kwargs["parent_instance"] = self.instance
+        return kwargs
+
+
+class BadgeRequirementForm(forms.ModelForm):
+    class Meta:
+        model = BadgeRequirement
+        fields = "__all__"
+
+    group = forms.ChoiceField()
+
+    def __init__(self, *args, parent_instance=None, **kwargs):
+        self.template = parent_instance
+        super().__init__(*args, **kwargs)
+
+        self.fields["group"].choices = Choices(
+            *[(chr(i), chr(i)) for i in range(65, 91)]
+        )
+        self.fields["group"].initial = chr(65 + self.template.requirements.count())

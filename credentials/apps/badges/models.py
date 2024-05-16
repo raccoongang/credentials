@@ -219,6 +219,10 @@ class BadgeRequirement(models.Model):
         return bool(deleted)
 
     def is_fulfilled(self, username: str) -> bool:
+        """
+        Checks if the requirement is fulfilled for the user.
+        """
+
         return self.fulfillments.filter(progress__username=username, progress__template=self.template).exists()
 
     def apply_rules(self, data: dict) -> bool:
@@ -226,7 +230,7 @@ class BadgeRequirement(models.Model):
         Evaluates payload rules.
         """
 
-        return all(rule.apply(data) for rule in self.rules.all())
+        return all(rule.apply(data) for rule in self.rules.all()) if self.rules.exists() else False
 
     @property
     def is_active(self):
@@ -291,6 +295,7 @@ class AbstractDataRule(models.Model):
         and `self.value` is "30", then calling `apply({"user": {"age": 30}})` will return True
         because the age matches the specified value.
         """
+
         comparison_func = getattr(operator, self.operator, None)
         if comparison_func:
             data_value = str(keypath(data, self.data_path))
@@ -357,9 +362,14 @@ class BadgePenalty(models.Model):
         """
         Evaluates payload rules.
         """
+
         return all(rule.apply(data) for rule in self.rules.all())
 
     def reset_requirements(self, username: str):
+        """
+        Resets all related requirements for the user.
+        """
+        
         for requirement in self.requirements.all():
             requirement.reset(username)
 
@@ -419,6 +429,7 @@ class BadgeProgress(models.Model):
         """
         Service shortcut.
         """
+
         progress, __ = cls.objects.get_or_create(username=username, template_id=template_id)
         return progress
 
@@ -426,16 +437,12 @@ class BadgeProgress(models.Model):
     def ratio(self) -> float:
         """
         Calculates badge template progress ratio.
-
-        FIXME: simplify
         """
 
         requirements = BadgeRequirement.objects.filter(template=self.template)
-
         group_ids = requirements.filter(group__isnull=False).values_list("group", flat=True).distinct()
 
         requirements_count = requirements.filter(group__isnull=True).count() + group_ids.count()
-
         fulfilled_requirements_count = Fulfillment.objects.filter(
             progress=self,
             requirement__template=self.template,
@@ -444,15 +451,24 @@ class BadgeProgress(models.Model):
 
         for group_id in group_ids:
             group_requirements = requirements.filter(group=group_id)
-            group_fulfillment_count = Fulfillment.objects.filter(requirement__in=group_requirements).count()
-            fulfilled_requirements_count += 1 if group_fulfillment_count > 0 else 0
+            group_fulfilled_requirements_count = Fulfillment.objects.filter(
+                progress=self,
+                requirement__in=group_requirements,
+            ).count()
 
-        if fulfilled_requirements_count == 0:
+            if group_fulfilled_requirements_count > 0:
+                fulfilled_requirements_count += 1
+
+        if 0 in (requirements_count, fulfilled_requirements_count):
             return 0.00
         return round(fulfilled_requirements_count / requirements_count, 2)
 
     @property
     def completed(self):
+        """
+        Checks if the badge template is completed.
+        """
+
         return self.ratio == 1.00
 
     def validate(self):
@@ -483,6 +499,7 @@ class Fulfillment(models.Model):
         null=True,
         related_name="fulfillments",
     )
+    group = models.CharField( max_length=255, null=True, blank=True, help_text=_("Group ID for the requirement."))
 
 
 class CredlyBadge(UserCredential):
@@ -556,4 +573,5 @@ class CredlyBadge(UserCredential):
         """
         Checks if this user credential already has issued (external) Credly badge.
         """
+        
         return self.external_uuid and (self.state in self.ISSUING_STATES)

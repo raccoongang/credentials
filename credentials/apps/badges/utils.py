@@ -3,7 +3,7 @@ import inspect
 
 from attrs import asdict
 from django.conf import settings
-from openedx_events.learning.data import UserData, UserPersonalData
+from openedx_events.learning.data import UserData
 from openedx_events.tooling import OpenEdxPublicSignal
 
 
@@ -15,6 +15,10 @@ def get_badging_event_types():
 
 
 def credly_check():
+    """
+    Checks if Credly is configured.
+    """
+
     credly_settings = settings.BADGES_CONFIG.get("credly", None)
     if credly_settings is None:
         return False
@@ -50,10 +54,15 @@ def keypath(payload, keys_path):
     >>> keypath(payload, 'a.b.d')
     None
     """
+
     keys = keys_path.split(".")
     current = payload
 
     def traverse(current, keys):
+        """
+        Recursive function to traverse the dictionary.
+        """
+
         if not keys:
             return current
         key = keys[0]
@@ -116,14 +125,22 @@ def get_event_type_keypaths(event_type: str) -> list:
     Returns:
         list: A list of all possible keypaths for the given event type.
     """
+
     signal = OpenEdxPublicSignal.get_signal_by_type(event_type)
     data = extract_payload(signal.init_data)
 
     def get_data_keypaths(data):
+        """
+        Extracts all possible keypaths for a given dataclass.
+        """
+
         keypaths = []
         for field in attr.fields(data):
             if attr.has(field.type):
-                keypaths += [f"{field.name}.{keypath}" for keypath in get_data_keypaths(field.type)]
+                keypaths += [
+                    f"{field.name}.{keypath}"
+                    for keypath in get_data_keypaths(field.type)
+                ]
             else:
                 keypaths.append(field.name)
         return keypaths
@@ -131,7 +148,12 @@ def get_event_type_keypaths(event_type: str) -> list:
     keypaths = []
     for field in attr.fields(data):
         if attr.has(field.type):
-            keypaths += [f"{field.name}.{keypath}" for keypath in get_data_keypaths(field.type)]
+            keypaths += [
+                f"{field.name}.{keypath}"
+                for keypath in get_data_keypaths(field.type)
+                if f"{field.name}.{keypath}"
+                not in settings.BADGES_CONFIG.get("rules", {}).get("ignored_keypaths", [])
+            ]
         else:
             keypaths.append(field.name)
     return keypaths
