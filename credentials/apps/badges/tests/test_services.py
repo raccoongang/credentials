@@ -133,7 +133,7 @@ class TestProcessPenalties(TestCase):
         )
         self.site = Site.objects.create(domain="test_domain", name="test_name")
         self.badge_template = BadgeTemplate.objects.create(
-            uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site
+            uuid=uuid.uuid4(), name="test_template", state="draft", site=self.site, is_active=True
         )
         
         self.CCX_COURSE_PASSING_EVENT = "org.openedx.learning.ccx.course.passing.status.updated.v1"
@@ -151,15 +151,15 @@ class TestProcessPenalties(TestCase):
         )
         DataRule.objects.create(
             requirement=requirement1,
-            data_path="course_passing_status.user.pii.username",
+            data_path="course.display_name",
             operator="eq",
-            value="test_username",
+            value="A",
         )
         DataRule.objects.create(
             requirement=requirement2,
-            data_path="course_passing_status.user.pii.email",
-            operator="eq",
-            value="test_email",
+            data_path="course.display_name",
+            operator="ne",
+            value="B",
         )
 
         progress = BadgeProgress.objects.create(username="test_username", template=self.badge_template)
@@ -199,15 +199,15 @@ class TestProcessPenalties(TestCase):
         )
         DataRule.objects.create(
             requirement=requirement1,
-            data_path="course_passing_status.user.pii.username",
+            data_path="course.display_name",
             operator="eq",
-            value="test_username",
+            value="A",
         )
         DataRule.objects.create(
             requirement=requirement2,
-            data_path="course_passing_status.user.pii.email",
+            data_path="course.display_name",
             operator="eq",
-            value="test_email",
+            value="B",
         )
 
         progress = BadgeProgress.objects.create(username="test_username")
@@ -238,6 +238,126 @@ class TestProcessPenalties(TestCase):
         )
         process_penalties(COURSE_PASSING_EVENT, "test_username", COURSE_PASSING_DATA)
         self.assertEqual(Fulfillment.objects.filter(progress=progress).count(), 2)
+
+    def test_process_single_requirement_penalty(self):
+        requirement = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=COURSE_PASSING_EVENT,
+            description="Test course passing award description",
+        )
+        DataRule.objects.create(
+            requirement=requirement,
+            data_path="course.display_name",
+            operator="ne",
+            value="B",
+        )
+        progress = BadgeProgress.objects.create(username="test_username", template=self.badge_template)
+        Fulfillment.objects.create(progress=progress, requirement=requirement)
+        self.assertEqual(Fulfillment.objects.filter(progress=progress).count(), 1)
+
+        penalty = BadgePenalty.objects.create(template=self.badge_template, event_type=COURSE_PASSING_EVENT)
+        penalty.requirements.add(requirement)
+        PenaltyDataRule.objects.create(
+            penalty=penalty,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        process_penalties(COURSE_PASSING_EVENT, "test_username", COURSE_PASSING_DATA)
+        self.assertEqual(Fulfillment.objects.filter(progress=progress).count(), 0)
+    
+    def test_process_one_of_grouped_requirements_penalty(self):
+        requirement_a = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=COURSE_PASSING_EVENT,
+            description="Test course passing award description",
+            group="a_or_b",
+        )
+        requirement_b = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=COURSE_PASSING_EVENT,
+            description="Test course passing award description",
+            group="a_or_b",
+        )
+        DataRule.objects.create(
+            requirement=requirement_a,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        DataRule.objects.create(
+            requirement=requirement_b,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        progress = BadgeProgress.objects.create(username="test_username", template=self.badge_template)
+        Fulfillment.objects.create(progress=progress, requirement=requirement_a)
+        Fulfillment.objects.create(progress=progress, requirement=requirement_b)
+        self.assertEqual(Fulfillment.objects.filter(progress=progress).count(), 2)
+
+        penalty = BadgePenalty.objects.create(template=self.badge_template, event_type=COURSE_PASSING_EVENT)
+        penalty.requirements.add(requirement_b)
+        PenaltyDataRule.objects.create(
+            penalty=penalty,
+            data_path="course.display_name",
+            operator="ne",
+            value="B",
+        )
+        process_penalties(COURSE_PASSING_EVENT, "test_username", COURSE_PASSING_DATA)
+        self.assertEqual(Fulfillment.objects.filter(progress=progress).count(), 1)
+    
+    def test_process_mixed_penalty(self):
+        requirement_a = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=COURSE_PASSING_EVENT,
+            description="Test course passing award description",
+            group="a_or_b",
+        )
+        requirement_b = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=COURSE_PASSING_EVENT,
+            description="Test course passing award description",
+            group="a_or_b",
+        )
+        requirement_c = BadgeRequirement.objects.create(
+            template=self.badge_template,
+            event_type=COURSE_PASSING_EVENT,
+            description="Test course passing award description",
+        )
+        DataRule.objects.create(
+            requirement=requirement_a,
+            data_path="course.display_name",
+            operator="eq",
+            value="A",
+        )
+        DataRule.objects.create(
+            requirement=requirement_b,
+            data_path="course.display_name",
+            operator="eq",
+            value="B",
+        )
+        DataRule.objects.create(
+            requirement=requirement_c,
+            data_path="course.display_name",
+            operator="ne",
+            value="C",
+        )
+        progress = BadgeProgress.objects.create(username="test_username", template=self.badge_template)
+        Fulfillment.objects.create(progress=progress, requirement=requirement_a)
+        Fulfillment.objects.create(progress=progress, requirement=requirement_c)
+        self.assertEqual(Fulfillment.objects.filter(progress=progress).count(), 2)
+
+        penalty = BadgePenalty.objects.create(template=self.badge_template, event_type=COURSE_PASSING_EVENT)
+        penalty.requirements.add(requirement_a, requirement_c)
+        PenaltyDataRule.objects.create(
+            penalty=penalty,
+            data_path="course.display_name",
+            operator="ne",
+            value="B",
+        )
+        process_penalties(COURSE_PASSING_EVENT, "test_username", COURSE_PASSING_DATA)
+        self.assertEqual(Fulfillment.objects.filter(progress=progress).count(), 0)
 
 
 class TestProcessRequirements(TestCase):

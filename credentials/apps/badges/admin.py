@@ -18,6 +18,8 @@ from credentials.apps.badges.admin_forms import (
     CredlyOrganizationAdminForm,
     DataRuleForm,
     DataRuleFormSet,
+    PenaltyDataRuleForm,
+    PenaltyDataRuleFormSet,
 )
 
 from credentials.apps.badges.models import (
@@ -217,8 +219,7 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
     )
     inlines = [
         BadgeRequirementInline,
-        # FIXME: disable until "Release V"
-        # BadgePenaltyInline,
+        BadgePenaltyInline,
     ]
 
     def has_add_permission(self, request):
@@ -277,6 +278,8 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
 class DataRulePenaltyInline(admin.TabularInline):
     model = PenaltyDataRule
     extra = 0
+    form = PenaltyDataRuleForm
+    formset = PenaltyDataRuleFormSet
 
 
 class BadgeRequirementAdmin(admin.ModelAdmin):
@@ -362,7 +365,8 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "requirements":
-            template_id = request.resolver_match.kwargs.get("object_id")
+            object_id = request.resolver_match.kwargs.get("object_id")
+            template_id = self.get_object(request, object_id).template_id
             if template_id:
                 kwargs["queryset"] = BadgeRequirement.objects.filter(template_id=template_id)
         return super().formfield_for_manytomany(db_field, request, **kwargs)
@@ -463,6 +467,5 @@ if is_badges_enabled():
     admin.site.register(CredlyBadgeTemplate, CredlyBadgeTemplateAdmin)
     admin.site.register(CredlyBadge, CredlyBadgeAdmin)
     admin.site.register(BadgeRequirement, BadgeRequirementAdmin)
-    # FIXME: disable until "Release V"
-    # admin.site.register(BadgePenalty, BadgePenaltyAdmin)
+    admin.site.register(BadgePenalty, BadgePenaltyAdmin)
     admin.site.register(BadgeProgress, BadgeProgressAdmin)
