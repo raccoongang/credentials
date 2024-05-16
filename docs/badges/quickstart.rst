@@ -81,9 +81,9 @@ Enter the first badge template details page and configure its requirement(s):
         - operator: ``equals``
         - value: ``course-v1:edX+DemoX+Demo_Course``
     - Data rule 2:
-        - key path: ``status``
+        - key path: ``is_passing``
         - operator: ``equals``
-        - value: ``passing``
+        - value: ``true``
 
 It is possible to put more than one requirement in a badge template.
 

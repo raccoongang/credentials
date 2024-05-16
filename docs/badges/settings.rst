@@ -46,19 +46,21 @@ The feature has its configuration:
             "CREDLY_SANDBOX_API_BASE_URL": "https://sandbox-api.credly.com/v1/",
             "USE_SANDBOX": False,
         },
-        # Requirements data rules:
-        "EXCLUDED_KEY_PATHS": [
-            "user.id",
-            "user.is_active",
-            "user.pii.username",
-            "user.pii.email",
-            "user.pii.name",
-        ],
+        # requirements data rules:
+        "rules": {
+            "ignored_keypaths": [
+                "user.id",
+                "user.is_active",
+                "user.pii.username",
+                "user.pii.email",
+                "user.pii.name",
+            ],
+        },
     }
 
 - ``events`` - explicit event bus signals list (only events with PII user data in payload are applicable).
 - ``credly`` - Credly integration details.
-- ``EXCLUDED_KEY_PATHS`` - event payload paths to exclude from data rule options (see: Configuration_).
+- ``rules.ignored_keypaths`` - event payload paths to exclude from data rule options (see: Configuration_).
 
 Credly integration
 ~~~~~~~~~~~~~~~~~~

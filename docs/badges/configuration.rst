@@ -92,9 +92,12 @@ Description
 Group
 ~~~~~
 
-Optional field for badge requirement.
+Optional configuration (by default each badge requirement is assigned a separate Group).
 
-Allows mark 2 or more badge requirements as a group. Requirements group is fulfilled if any of its requirements is fulfilled ("OR" logic is applied inside a group).
+Allows putting 2 or more badge requirements as a Group.
+Requirements group is fulfilled if any of its requirements is fulfilled.
+
+    "OR" logic is applied inside a Group.
 
 .. image:: ../_static/images/badges/badges-admin-rules-group.png
         :alt: Badge requirement rules group
@@ -123,9 +126,17 @@ All key paths are generated based on the event type specified for the parent Bad
 .. image:: ../_static/images/badges/badges-admin-data-rules.png
         :alt: Badge requirement data rules
 
-1. **Key path** - payload path to the target attribute;
-2. **Operator** - how to compare expected and actual values;
-3. **Expected value** - an expected value for the target attribute;
+1. **Key path** - payload path to the target attribute
+    - dot-separated string;
+    - each event type has its unique pre-defined set of key paths;
+2. **Operator** - comparison operation to apply between expected and actual values;
+    - available operators: (payload)
+        -  ``"="`` (equals);
+        - ``"!="`` (not equals);
+3. **Expected value** - an expected value for the target attribute
+    - payload boolean positive values allowed: ``"true", "True", "yes", "Yes", "+"``;
+    - payload boolean negative values allowed: ``"false", "False", "no", "No", "-"``;
+
 
 Please, see `configuration examples`_ for clarity.
 
