@@ -1,5 +1,5 @@
 Badges (in progress)
-==============
+====================
 
     The Badges feature allows learners to earn achievements (badges) for their learning activities.
 
@@ -19,8 +19,5 @@ Current Badges version is highly integrated with the `Credly (by Pearson)`_ serv
     configuration
     examples
     processing
-    .. collecting
-    .. distribution
-    .. details
 
 .. _Credly (by Pearson): https://info.credly.com/
