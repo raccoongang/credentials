@@ -36,7 +36,7 @@ class CredlyOrganizationAdminForm(forms.ModelForm):
         uuid = cleaned_data.get("uuid")
         api_key = cleaned_data.get("api_key")
 
-        if str(uuid) in settings.BADGES_CONFIG["credly"].get("ORGANIZATIONS", {}).keys():
+        if str(uuid) in CredlyOrganization.get_preconfigured_organizations().keys():
             if api_key:
                 raise forms.ValidationError(_("You can't provide an API key for a configured organization."))
             

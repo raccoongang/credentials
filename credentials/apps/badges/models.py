@@ -57,6 +57,13 @@ class CredlyOrganization(TimeStampedModel):
         Get all organization IDs.
         """
         return list(cls.objects.values_list("uuid", flat=True))
+    
+    @classmethod
+    def get_preconfigured_organizations():
+        """
+        Get preconfigured organizations.
+        """
+        return settings.BADGES_CONFIG["credly"].get("ORGANIZATIONS", {})
 
 
 class BadgeTemplate(AbstractCredential):

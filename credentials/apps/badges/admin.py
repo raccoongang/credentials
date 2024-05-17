@@ -183,7 +183,7 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
             fields.append("api_key") if "api_key" not in fields else None
             return fields
         
-        if str(obj.uuid) in settings.BADGES_CONFIG["credly"].get("ORGANIZATIONS", {}).keys():
+        if str(obj.uuid) in CredlyOrganization.get_preconfigured_organizations().keys():
             fields = [field for field in fields if field != "api_key"]
             fields.append("api_key_hidden")
         else:
@@ -197,7 +197,7 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
         if not obj:
             return readonly_fields
 
-        if str(obj.uuid) in settings.BADGES_CONFIG["credly"].get("ORGANIZATIONS", {}).keys():
+        if str(obj.uuid) in CredlyOrganization.get_preconfigured_organizations().keys():
             readonly_fields.append("api_key_hidden")
         return readonly_fields
 
