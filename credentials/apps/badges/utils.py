@@ -115,6 +115,21 @@ def extract_payload(public_signal_kwargs: dict) -> attr.s:
             return value
 
 
+def get_event_type_data(event_type: str) -> attr.s:
+    """
+    Extracts the dataclass for a given event type.
+
+    Parameters:
+        - event_type: The event type to extract dataclass for.
+
+    Returns:
+        attr.s: The dataclass for the given event type.
+    """
+
+    signal = OpenEdxPublicSignal.get_signal_by_type(event_type)
+    return extract_payload(signal.init_data)
+
+
 def get_event_type_keypaths(event_type: str) -> list:
     """
     Extracts all possible keypaths for a given event type.
@@ -126,8 +141,7 @@ def get_event_type_keypaths(event_type: str) -> list:
         list: A list of all possible keypaths for the given event type.
     """
 
-    signal = OpenEdxPublicSignal.get_signal_by_type(event_type)
-    data = extract_payload(signal.init_data)
+    data = get_event_type_data(event_type)
 
     def get_data_keypaths(data):
         """
@@ -157,3 +171,35 @@ def get_event_type_keypaths(event_type: str) -> list:
         else:
             keypaths.append(field.name)
     return keypaths
+
+
+def get_event_type_attr_type_by_keypath(event_type: str, keypath: str):
+    """
+    Extracts the attribute type for a given keypath in the event type.
+
+    Parameters:
+        - event_type: The event type to extract dataclass for.
+        - keypath: The keypath to extract attribute type for.
+
+    Returns:
+        type: The attribute type for the given keypath in the event data.
+    """
+
+    data = get_event_type_data(event_type)
+    data_attrs = attr.fields(data)
+
+    def get_attr_type_by_keypath(data_attrs, keypath):
+        """
+        Extracts the attribute type for a given keypath in the dataclass.
+        """
+
+        keypath_parts = keypath.split(".")
+        for attr_ in data_attrs:
+            if attr_.name == keypath_parts[0]:
+                if len(keypath_parts) == 1:
+                    return attr_.type
+                elif attr.has(attr_.type):
+                    return get_attr_type_by_keypath(attr.fields(attr_.type), ".".join(keypath_parts[1:]))
+        return None
+    
+    return get_attr_type_by_keypath(data_attrs, keypath)
