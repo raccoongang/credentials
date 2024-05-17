@@ -51,6 +51,7 @@ class BadgeRequirementInline(admin.TabularInline):
         "group",
     )
     readonly_fields = ("rules",)
+    ordering  = ("group",)
     form = BadgeRequirementForm
     formset = BadgeRequirementFormSet
 
@@ -77,6 +78,12 @@ class BadgePenaltyInline(admin.TabularInline):
     model = BadgePenalty
     show_change_link = True
     extra = 0
+    fields = (
+        "event_type",
+        "rules",
+        "requirements",
+    )
+    readonly_fields = ("rules",)
     form = BadgePenaltyForm
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
@@ -88,6 +95,20 @@ class BadgePenaltyInline(admin.TabularInline):
             if template_id:
                 kwargs["queryset"] = BadgeRequirement.objects.filter(template_id=template_id)
         return super().formfield_for_manytomany(db_field, request, **kwargs)
+    
+    def rules(self, obj):
+        """
+        Display all data rules for the penalty.
+        """
+        return format_html(
+            "<ul>{}</ul>",
+            mark_safe(
+                "".join(
+                    f"<li>{rule.data_path} {rule.OPERATORS[rule.operator]} {rule.value}</li>"
+                    for rule in obj.rules.all()
+                )
+            ),
+        ) if obj.rules.exists() else _("No rules specified.")
 
 
 class FulfillmentInline(admin.TabularInline):
@@ -309,6 +330,7 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         "template",
         "event_type",
         "template_link",
+        "group",
     ]
 
     fields = [
@@ -358,10 +380,29 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
         "template",
         "requirements",
     ]
+    fields = [
+        "template_link",
+        "event_type",
+        "requirements",
+    ]
+    readonly_fields = [
+        "template_link",
+        "event_type",
+        "requirements",
+    ]
     form = BadgePenaltyForm
 
     def has_add_permission(self, request):
         return False
+
+    def template_link(self, instance):
+        """
+        Interactive link to parent (badge template).
+        """
+        url = reverse("admin:badges_credlybadgetemplate_change", args=[instance.template.pk])
+        return format_html('<a href="{}">{}</a>', url, instance.template)
+
+    template_link.short_description = _("badge template")
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "requirements":

@@ -8,7 +8,7 @@ from model_utils import Choices
 
 from credentials.apps.badges.credly.api_client import CredlyAPIClient
 from credentials.apps.badges.credly.exceptions import CredlyAPIError
-from credentials.apps.badges.models import BadgePenalty, BadgeRequirement, CredlyOrganization, DataRule, PenaltyDataRule
+from credentials.apps.badges.models import AbstractDataRule, BadgePenalty, BadgeRequirement, CredlyOrganization, DataRule, PenaltyDataRule
 from credentials.apps.badges.utils import get_event_type_keypaths
 
 
@@ -84,6 +84,25 @@ class BadgePenaltyForm(forms.ModelForm):
         return cleaned_data
 
 
+class DataRuleBoolValidationMixin:
+    """
+    Mixin for DataRule form to validate boolean fields.
+    """
+
+    def clean(self):
+        """
+        Validate boolean fields.
+        """
+
+        cleaned_data = super().clean()
+
+        last_key = cleaned_data.get("data_path").split(".")[-1]
+        if "is_" in last_key and cleaned_data.get("value") not in AbstractDataRule.BOOL_VALUES:
+            raise forms.ValidationError(_("Value must be a boolean."))
+        
+        return cleaned_data
+
+
 class DataRuleFormSet(forms.BaseInlineFormSet):
     """
     Formset for DataRule model.
@@ -98,7 +117,7 @@ class DataRuleFormSet(forms.BaseInlineFormSet):
         return kwargs
 
 
-class DataRuleForm(forms.ModelForm):
+class DataRuleForm(DataRuleBoolValidationMixin, forms.ModelForm):
     """
     Form for DataRule model.
     """
@@ -158,7 +177,7 @@ class PenaltyDataRuleFormSet(forms.BaseInlineFormSet):
         return kwargs
 
 
-class PenaltyDataRuleForm(forms.ModelForm):
+class PenaltyDataRuleForm(DataRuleBoolValidationMixin, forms.ModelForm):
     """
     Form for PenaltyDataRule model.
     """

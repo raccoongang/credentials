@@ -267,6 +267,10 @@ class AbstractDataRule(models.Model):
         # ('gt', '>'),
     )
 
+    TRUE_VALUES = ["True", "true", "Yes", "yes", "+"]
+    FALSE_VALUES = ["False", "false", "No", "no", "-"]
+    BOOL_VALUES = TRUE_VALUES + FALSE_VALUES
+
     data_path = models.CharField(
         max_length=255,
         help_text=_('Public signal\'s data payload nested property path, e.g: "user.pii.username".'),
@@ -324,12 +328,9 @@ class AbstractDataRule(models.Model):
         Converts the value to a boolean or returns the original value if it is not a boolean string.
         """
 
-        TRUE_VALUES = ["True", "true", "Yes", "yes", "+"]
-        FALSE_VALUES = ["False", "false", "No", "no", "-"]
-
-        if self.value in TRUE_VALUES:
+        if self.value in self.TRUE_VALUES:
             return "True"
-        if self.value in FALSE_VALUES:
+        if self.value in self.FALSE_VALUES:
             return "False"
         return self.value
 
@@ -381,7 +382,6 @@ class BadgePenalty(models.Model):
         BadgeRequirement,
         help_text=_("Badge requirements for which this penalty is defined."),
     )
-    description = models.TextField(null=True, blank=True, help_text=_("Provide more details if needed."))
 
     class Meta:
         verbose_name_plural = _("Badge penalties")
