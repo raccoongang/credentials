@@ -2,6 +2,7 @@
 Admin section configuration.
 """
 
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
@@ -143,8 +144,11 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "uuid",
-        "api_key",
     )
+    fields = [
+        "name",
+        "uuid",
+    ]
     readonly_fields = [
         "name",
     ]
@@ -164,6 +168,38 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
             )
 
         messages.success(request, _("Badge templates were successfully updated."))
+    
+    @admin.display(description=_("API key"))
+    def api_key_hidden(self, obj):
+        """
+        Hide API key and display text.
+        """
+
+        return _("Pre-configured from the environment.")
+    
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)
+        if not obj:
+            fields.append("api_key") if "api_key" not in fields else None
+            return fields
+        
+        if str(obj.uuid) in settings.BADGES_CONFIG["credly"].get("ORGANIZATIONS", {}).keys():
+            fields = [field for field in fields if field != "api_key"]
+            fields.append("api_key_hidden")
+        else:
+            fields = [field for field in fields if field != "api_key_hidden"]
+            fields.append("api_key") if "api_key" not in fields else None
+        return fields
+    
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super().get_readonly_fields(request, obj)
+
+        if not obj:
+            return readonly_fields
+
+        if str(obj.uuid) in settings.BADGES_CONFIG["credly"].get("ORGANIZATIONS", {}).keys():
+            readonly_fields.append("api_key_hidden")
+        return readonly_fields
 
 
 class CredlyBadgeTemplateAdmin(admin.ModelAdmin):

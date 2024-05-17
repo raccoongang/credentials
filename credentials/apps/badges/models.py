@@ -40,7 +40,7 @@ class CredlyOrganization(TimeStampedModel):
     """
 
     uuid = models.UUIDField(unique=True, help_text=_("Put your Credly Organization ID here."))
-    api_key = models.CharField(max_length=255, help_text=_("Credly API shared secret for Credly Organization."))
+    api_key = models.CharField(max_length=255, help_text=_("Credly API shared secret for Credly Organization."), blank=True)
     name = models.CharField(
         max_length=255,
         null=True,
