@@ -7,11 +7,19 @@ from unittest.mock import patch
 
 from django.conf import settings
 from openedx_events.learning.data import UserData, UserPersonalData, CourseData, CoursePassingStatusData
+from opaque_keys.edx.keys import CourseKey
 
 from credentials.apps.badges.checks import badges_checks
 from credentials.apps.badges.credly.utils import get_credly_base_url, get_credly_api_base_url
-from credentials.apps.badges.utils import credly_check, extract_payload, get_event_type_keypaths, get_user_data, keypath
+from credentials.apps.badges.utils import ( 
+    credly_check,
+    extract_payload,
+    get_event_type_keypaths,
+    get_user_data, keypath,
+    get_event_type_attr_type_by_keypath,
+)
 
+COURSE_PASSING_EVENT = "org.openedx.learning.course.passing.status.updated.v1"
 
 class TestKeypath(unittest.TestCase):
     def test_keypath_exists(self):
@@ -162,7 +170,7 @@ class TestCredlyCheck(unittest.TestCase):
 
 class TestGetEventTypeKeypaths(unittest.TestCase):
     def test_get_event_type_keypaths(self):
-        result = get_event_type_keypaths("org.openedx.learning.course.passing.status.updated.v1")
+        result = get_event_type_keypaths(COURSE_PASSING_EVENT)
 
         for ignored_keypath in settings.BADGES_CONFIG.get("rules", {}).get("ignored_keypaths", []):
             self.assertNotIn(ignored_keypath, result)
@@ -206,3 +214,20 @@ class TestGetCredlyApiBaseUrl(unittest.TestCase):
         }
         result = get_credly_api_base_url(settings)
         self.assertEqual(result, "https://api.credly.com")
+
+
+class TestGetEventTypeAttrTypeByKeypath(unittest.TestCase):
+    def test_get_event_type_attr_type_by_keypath(self):
+        keypath = "course.course_key"
+        result = get_event_type_attr_type_by_keypath(COURSE_PASSING_EVENT, keypath)
+        self.assertEqual(result, CourseKey)
+    
+    def test_get_event_type_attr_type_by_keypath_bool(self):
+        keypath = "is_passing"
+        result = get_event_type_attr_type_by_keypath(COURSE_PASSING_EVENT, keypath)
+        self.assertEqual(result, bool)
+
+    def test_get_event_type_attr_type_by_keypath_not_found(self):
+        keypath = "course.id"
+        result = get_event_type_attr_type_by_keypath(COURSE_PASSING_EVENT, keypath)
+        self.assertIsNone(result)
