@@ -144,10 +144,12 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "uuid",
+        "api_key_hidden",
     )
     fields = [
         "name",
         "uuid",
+        "api_key_hidden",
     ]
     readonly_fields = [
         "name",
@@ -175,20 +177,17 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
         Hide API key and display text.
         """
 
-        return _("Pre-configured from the environment.")
+        return _("Pre-configured from the environment.") if obj.is_preconfigured else obj.api_key
     
     def get_fields(self, request, obj=None):
         fields = super().get_fields(request, obj)
+
         if not obj:
-            fields.append("api_key") if "api_key" not in fields else None
             return fields
-        
-        if str(obj.uuid) in CredlyOrganization.get_preconfigured_organizations().keys():
-            fields = [field for field in fields if field != "api_key"]
-            fields.append("api_key_hidden")
-        else:
+
+        if not obj.is_preconfigured:
             fields = [field for field in fields if field != "api_key_hidden"]
-            fields.append("api_key") if "api_key" not in fields else None
+            fields.append("api_key")
         return fields
     
     def get_readonly_fields(self, request, obj=None):
@@ -197,7 +196,7 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
         if not obj:
             return readonly_fields
 
-        if str(obj.uuid) in CredlyOrganization.get_preconfigured_organizations().keys():
+        if obj.is_preconfigured:
             readonly_fields.append("api_key_hidden")
         return readonly_fields
 
