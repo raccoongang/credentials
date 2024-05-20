@@ -143,8 +143,13 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "uuid",
-        "api_key",
+        "api_key_hidden",
     )
+    fields = [
+        "name",
+        "uuid",
+        "api_key_hidden",
+    ]
     readonly_fields = [
         "name",
     ]
@@ -378,6 +383,11 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
 
     template_link.short_description = _("badge template")
 
+    def response_change(self, request, obj):
+        if "_save" in request.POST:
+            return HttpResponseRedirect(reverse("admin:badges_credlybadgetemplate_change", args=[obj.template.pk]))
+        return super().response_change(request, obj)
+
 
 class BadgePenaltyAdmin(admin.ModelAdmin):
     """
@@ -446,6 +456,11 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
         return format_html('<a href="{}">{}</a>', url, instance.template)
 
     template_link.short_description = _("badge template")
+
+    def response_change(self, request, obj):
+        if "_save" in request.POST:
+            return HttpResponseRedirect(reverse("admin:badges_credlybadgetemplate_change", args=[obj.template.pk]))
+        return super().response_change(request, obj)
 
 
 class BadgeProgressAdmin(admin.ModelAdmin):

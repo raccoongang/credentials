@@ -40,7 +40,7 @@ class CredlyOrganization(TimeStampedModel):
     """
 
     uuid = models.UUIDField(unique=True, help_text=_("Put your Credly Organization ID here."))
-    api_key = models.CharField(max_length=255, help_text=_("Credly API shared secret for Credly Organization."))
+    api_key = models.CharField(max_length=255, help_text=_("Credly API shared secret for Credly Organization."), blank=True)
     name = models.CharField(
         max_length=255,
         null=True,
@@ -57,6 +57,21 @@ class CredlyOrganization(TimeStampedModel):
         Get all organization IDs.
         """
         return list(cls.objects.values_list("uuid", flat=True))
+    
+    @classmethod
+    def get_preconfigured_organizations(cls):
+        """
+        Get preconfigured organizations.
+        """
+        return settings.BADGES_CONFIG["credly"].get("ORGANIZATIONS", {})
+    
+    @property
+    def is_preconfigured(self):
+        """
+        Checks if the organization is preconfigured.
+        """
+
+        return str(self.uuid) in CredlyOrganization.get_preconfigured_organizations().keys()
 
 
 class BadgeTemplate(AbstractCredential):
@@ -213,7 +228,7 @@ class BadgeRequirement(models.Model):
             requirement=self,
             progress__username=username,
         ).first()
-        deleted, __ = fulfillment.delete()
+        deleted, __ = fulfillment.delete() if fulfillment else (False, 0)
         if deleted:
             notify_requirement_regressed(
                 sender=self,
