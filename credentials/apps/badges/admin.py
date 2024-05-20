@@ -2,7 +2,6 @@
 Admin section configuration.
 """
 
-from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
@@ -387,6 +386,11 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
 
     template_link.short_description = _("badge template")
 
+    def response_change(self, request, obj):
+        if "_save" in request.POST:
+            return HttpResponseRedirect(reverse("admin:badges_credlybadgetemplate_change", args=[obj.template.pk]))
+        return super().response_change(request, obj)
+
 
 class BadgePenaltyAdmin(admin.ModelAdmin):
     """
@@ -455,6 +459,11 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
         return format_html('<a href="{}">{}</a>', url, instance.template)
 
     template_link.short_description = _("badge template")
+
+    def response_change(self, request, obj):
+        if "_save" in request.POST:
+            return HttpResponseRedirect(reverse("admin:badges_credlybadgetemplate_change", args=[obj.template.pk]))
+        return super().response_change(request, obj)
 
 
 class BadgeProgressAdmin(admin.ModelAdmin):
