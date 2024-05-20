@@ -180,11 +180,8 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
     
     def get_fields(self, request, obj=None):
         fields = super().get_fields(request, obj)
-
-        if not obj:
-            return fields
-
-        if not obj.is_preconfigured:
+        
+        if not (obj and obj.is_preconfigured):
             fields = [field for field in fields if field != "api_key_hidden"]
             fields.append("api_key")
         return fields
