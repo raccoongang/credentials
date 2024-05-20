@@ -136,7 +136,7 @@ class CredlyBadgeTemplateIssuer(BadgeTemplateIssuer):
             "reason": _("Open edX internal user credential was revoked"),
         }
         try:
-            response = credly_api.revoke_badge(user_credential.uuid, revoke_data)
+            response = credly_api.revoke_badge(user_credential.external_uuid, revoke_data)
         except CredlyAPIError:
             user_credential.state = "error"
             user_credential.save()
