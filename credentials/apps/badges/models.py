@@ -228,7 +228,7 @@ class BadgeRequirement(models.Model):
             requirement=self,
             progress__username=username,
         ).first()
-        deleted, __ = fulfillment.delete()
+        deleted, __ = fulfillment.delete() if fulfillment else (False, 0)
         if deleted:
             notify_requirement_regressed(
                 sender=self,
