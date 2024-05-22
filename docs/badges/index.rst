@@ -1,5 +1,5 @@
-Badges (in progress)
-====================
+Badges
+======
 
     The Badges feature allows learners to earn achievements (badges) for their learning activities.
 
@@ -8,6 +8,8 @@ Badges (in progress)
 
 
 Current Badges version is highly integrated with the `Credly (by Pearson)`_ service, but it is fully prepared to be used separately.
+
+Note: this feature shadows previously deprecated Badges (Badgr-based).
 
 ----
 
