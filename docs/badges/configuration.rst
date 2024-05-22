@@ -140,6 +140,22 @@ All key paths are generated based on the event type specified for the parent Bad
 
 Please, see `configuration examples`_ for clarity.
 
+Badge Penalties
+---------------
+
+    Penalties allow badge progress resetting based on user activity.
+
+Badge penalties are optional.
+There could be 0 or more badge penalties configured for a badge template.
+
+Each badge penalty is *targeted* to 1 or more badge requirements.
+A penalty setup is similar to a badge requirement, but has different effect: it decreases badge progress for a user.
+
+When a penalty has worked all linked badge requirements are "rolled back" (user's progress for such requirements is reset).
+
+.. image:: ../_static/images/badges/badges-admin-penalty-rules.png
+        :alt: Badge penalty rules edit
+
 Activation
 ----------
 
