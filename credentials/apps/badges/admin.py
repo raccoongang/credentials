@@ -18,6 +18,8 @@ from credentials.apps.badges.admin_forms import (
     CredlyOrganizationAdminForm,
     DataRuleForm,
     DataRuleFormSet,
+    PenaltyDataRuleForm,
+    PenaltyDataRuleFormSet,
 )
 
 from credentials.apps.badges.models import (
@@ -49,6 +51,7 @@ class BadgeRequirementInline(admin.TabularInline):
         "group",
     )
     readonly_fields = ("rules",)
+    ordering  = ("group",)
     form = BadgeRequirementForm
     formset = BadgeRequirementFormSet
 
@@ -75,6 +78,12 @@ class BadgePenaltyInline(admin.TabularInline):
     model = BadgePenalty
     show_change_link = True
     extra = 0
+    fields = (
+        "event_type",
+        "rules",
+        "requirements",
+    )
+    readonly_fields = ("rules",)
     form = BadgePenaltyForm
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
@@ -86,6 +95,20 @@ class BadgePenaltyInline(admin.TabularInline):
             if template_id:
                 kwargs["queryset"] = BadgeRequirement.objects.filter(template_id=template_id)
         return super().formfield_for_manytomany(db_field, request, **kwargs)
+    
+    def rules(self, obj):
+        """
+        Display all data rules for the penalty.
+        """
+        return format_html(
+            "<ul>{}</ul>",
+            mark_safe(
+                "".join(
+                    f"<li>{rule.data_path} {rule.OPERATORS[rule.operator]} {rule.value}</li>"
+                    for rule in obj.rules.all()
+                )
+            ),
+        ) if obj.rules.exists() else _("No rules specified.")
 
 
 class FulfillmentInline(admin.TabularInline):
@@ -120,8 +143,13 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "uuid",
-        "api_key",
+        "api_key_hidden",
     )
+    fields = [
+        "name",
+        "uuid",
+        "api_key_hidden",
+    ]
     readonly_fields = [
         "name",
     ]
@@ -141,6 +169,32 @@ class CredlyOrganizationAdmin(admin.ModelAdmin):
             )
 
         messages.success(request, _("Badge templates were successfully updated."))
+    
+    @admin.display(description=_("API key"))
+    def api_key_hidden(self, obj):
+        """
+        Hide API key and display text.
+        """
+
+        return _("Pre-configured from the environment.") if obj.is_preconfigured else obj.api_key
+    
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)
+        
+        if not (obj and obj.is_preconfigured):
+            fields = [field for field in fields if field != "api_key_hidden"]
+            fields.append("api_key")
+        return fields
+    
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super().get_readonly_fields(request, obj)
+
+        if not obj:
+            return readonly_fields
+
+        if obj.is_preconfigured:
+            readonly_fields.append("api_key_hidden")
+        return readonly_fields
 
 
 class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
@@ -217,8 +271,7 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
     )
     inlines = [
         BadgeRequirementInline,
-        # FIXME: disable until "Release V"
-        # BadgePenaltyInline,
+        BadgePenaltyInline,
     ]
 
     def has_add_permission(self, request):
@@ -277,6 +330,8 @@ class CredlyBadgeTemplateAdmin(admin.ModelAdmin):
 class DataRulePenaltyInline(admin.TabularInline):
     model = PenaltyDataRule
     extra = 0
+    form = PenaltyDataRuleForm
+    formset = PenaltyDataRuleFormSet
 
 
 class BadgeRequirementAdmin(admin.ModelAdmin):
@@ -306,6 +361,7 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         "template",
         "event_type",
         "template_link",
+        "group",
     ]
 
     fields = [
@@ -326,6 +382,11 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         return format_html('<a href="{}">{}</a>', url, instance.template)
 
     template_link.short_description = _("badge template")
+
+    def response_change(self, request, obj):
+        if "_save" in request.POST:
+            return HttpResponseRedirect(reverse("admin:badges_credlybadgetemplate_change", args=[obj.template.pk]))
+        return super().response_change(request, obj)
 
 
 class BadgePenaltyAdmin(admin.ModelAdmin):
@@ -355,14 +416,34 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
         "template",
         "requirements",
     ]
+    fields = [
+        "template_link",
+        "event_type",
+        "requirements",
+    ]
+    readonly_fields = [
+        "template_link",
+        "event_type",
+        "requirements",
+    ]
     form = BadgePenaltyForm
 
     def has_add_permission(self, request):
         return False
 
+    def template_link(self, instance):
+        """
+        Interactive link to parent (badge template).
+        """
+        url = reverse("admin:badges_credlybadgetemplate_change", args=[instance.template.pk])
+        return format_html('<a href="{}">{}</a>', url, instance.template)
+
+    template_link.short_description = _("badge template")
+
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "requirements":
-            template_id = request.resolver_match.kwargs.get("object_id")
+            object_id = request.resolver_match.kwargs.get("object_id")
+            template_id = self.get_object(request, object_id).template_id
             if template_id:
                 kwargs["queryset"] = BadgeRequirement.objects.filter(template_id=template_id)
         return super().formfield_for_manytomany(db_field, request, **kwargs)
@@ -375,6 +456,11 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
         return format_html('<a href="{}">{}</a>', url, instance.template)
 
     template_link.short_description = _("badge template")
+
+    def response_change(self, request, obj):
+        if "_save" in request.POST:
+            return HttpResponseRedirect(reverse("admin:badges_credlybadgetemplate_change", args=[obj.template.pk]))
+        return super().response_change(request, obj)
 
 
 class BadgeProgressAdmin(admin.ModelAdmin):
@@ -463,6 +549,5 @@ if is_badges_enabled():
     admin.site.register(CredlyBadgeTemplate, CredlyBadgeTemplateAdmin)
     admin.site.register(CredlyBadge, CredlyBadgeAdmin)
     admin.site.register(BadgeRequirement, BadgeRequirementAdmin)
-    # FIXME: disable until "Release V"
-    # admin.site.register(BadgePenalty, BadgePenaltyAdmin)
+    admin.site.register(BadgePenalty, BadgePenaltyAdmin)
     admin.site.register(BadgeProgress, BadgeProgressAdmin)

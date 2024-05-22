@@ -40,7 +40,7 @@ class CredlyOrganization(TimeStampedModel):
     """
 
     uuid = models.UUIDField(unique=True, help_text=_("Put your Credly Organization ID here."))
-    api_key = models.CharField(max_length=255, help_text=_("Credly API shared secret for Credly Organization."))
+    api_key = models.CharField(max_length=255, help_text=_("Credly API shared secret for Credly Organization."), blank=True)
     name = models.CharField(
         max_length=255,
         null=True,
@@ -57,6 +57,21 @@ class CredlyOrganization(TimeStampedModel):
         Get all organization IDs.
         """
         return list(cls.objects.values_list("uuid", flat=True))
+    
+    @classmethod
+    def get_preconfigured_organizations(cls):
+        """
+        Get preconfigured organizations.
+        """
+        return settings.BADGES_CONFIG["credly"].get("ORGANIZATIONS", {})
+    
+    @property
+    def is_preconfigured(self):
+        """
+        Checks if the organization is preconfigured.
+        """
+
+        return str(self.uuid) in CredlyOrganization.get_preconfigured_organizations().keys()
 
 
 class BadgeTemplate(AbstractCredential):
@@ -89,6 +104,10 @@ class BadgeTemplate(AbstractCredential):
         if not self.origin:
             self.origin = self.ORIGIN
             self.save(*args, **kwargs)
+    
+    @property
+    def groups(self):
+        return self.requirements.values_list("group", flat=True).distinct()
 
     @classmethod
     def by_uuid(cls, template_uuid):
@@ -184,7 +203,7 @@ class BadgeRequirement(models.Model):
         """
         template_id = self.template.id
         progress = BadgeProgress.for_user(username=username, template_id=template_id)
-        fulfillment, created = Fulfillment.objects.get_or_create(progress=progress, requirement=self)
+        fulfillment, created = Fulfillment.objects.get_or_create(progress=progress, requirement=self, group=self.group)
 
         if created:
             notify_requirement_fulfilled(
@@ -209,7 +228,7 @@ class BadgeRequirement(models.Model):
             requirement=self,
             progress__username=username,
         ).first()
-        deleted, __ = fulfillment.delete()
+        deleted, __ = fulfillment.delete() if fulfillment else (False, 0)
         if deleted:
             notify_requirement_regressed(
                 sender=self,
@@ -224,6 +243,18 @@ class BadgeRequirement(models.Model):
         """
 
         return self.fulfillments.filter(progress__username=username, progress__template=self.template).exists()
+
+    @classmethod
+    def is_group_fulfilled(cls, *, group: str, template: BadgeTemplate, username: str) -> bool:
+        """
+        Checks if the group is fulfilled.
+        """
+
+        progress = BadgeProgress.for_user(username=username, template_id=template.id)
+        requirements = cls.objects.filter(template=template, group=group)
+        fulfilled_requirements = requirements.filter(fulfillments__progress=progress).count()
+
+        return fulfilled_requirements > 0
 
     def apply_rules(self, data: dict) -> bool:
         """
@@ -250,6 +281,10 @@ class AbstractDataRule(models.Model):
         # ('lt', '<'),
         # ('gt', '>'),
     )
+
+    TRUE_VALUES = ["True", "true", "Yes", "yes", "+"]
+    FALSE_VALUES = ["False", "false", "No", "no", "-"]
+    BOOL_VALUES = TRUE_VALUES + FALSE_VALUES
 
     data_path = models.CharField(
         max_length=255,
@@ -297,10 +332,22 @@ class AbstractDataRule(models.Model):
         """
 
         comparison_func = getattr(operator, self.operator, None)
+        
         if comparison_func:
             data_value = str(keypath(data, self.data_path))
-            return comparison_func(data_value, self.value)
+            return comparison_func(data_value, self._value_to_bool())
         return False
+    
+    def _value_to_bool(self):
+        """
+        Converts the value to a boolean or returns the original value if it is not a boolean string.
+        """
+
+        if self.value in self.TRUE_VALUES:
+            return "True"
+        if self.value in self.FALSE_VALUES:
+            return "False"
+        return self.value
 
 
 class DataRule(AbstractDataRule):
@@ -350,7 +397,6 @@ class BadgePenalty(models.Model):
         BadgeRequirement,
         help_text=_("Badge requirements for which this penalty is defined."),
     )
-    description = models.TextField(null=True, blank=True, help_text=_("Provide more details if needed."))
 
     class Meta:
         verbose_name_plural = _("Badge penalties")
@@ -363,7 +409,7 @@ class BadgePenalty(models.Model):
         Evaluates payload rules.
         """
 
-        return all(rule.apply(data) for rule in self.rules.all())
+        return all(rule.apply(data) for rule in self.rules.all()) if self.rules.exists() else False
 
     def reset_requirements(self, username: str):
         """
@@ -439,29 +485,18 @@ class BadgeProgress(models.Model):
         Calculates badge template progress ratio.
         """
 
-        requirements = BadgeRequirement.objects.filter(template=self.template)
-        group_ids = requirements.filter(group__isnull=False).values_list("group", flat=True).distinct()
-
-        requirements_count = requirements.filter(group__isnull=True).count() + group_ids.count()
-        fulfilled_requirements_count = Fulfillment.objects.filter(
-            progress=self,
-            requirement__template=self.template,
-            requirement__group__isnull=True,
-        ).count()
-
-        for group_id in group_ids:
-            group_requirements = requirements.filter(group=group_id)
-            group_fulfilled_requirements_count = Fulfillment.objects.filter(
-                progress=self,
-                requirement__in=group_requirements,
-            ).count()
-
-            if group_fulfilled_requirements_count > 0:
-                fulfilled_requirements_count += 1
-
-        if 0 in (requirements_count, fulfilled_requirements_count):
+        if not self.groups:
             return 0.00
-        return round(fulfilled_requirements_count / requirements_count, 2)
+        
+        true_values = len(list(filter(lambda x: x, self.groups.values())))
+        return round(true_values / len(self.groups.keys()), 2)
+
+    @property
+    def groups(self):
+        return {
+            group: BadgeRequirement.is_group_fulfilled(group=group, template=self.template, username=self.username)
+            for group in self.template.groups
+        }
 
     @property
     def completed(self):
@@ -471,16 +506,17 @@ class BadgeProgress(models.Model):
 
         return self.ratio == 1.00
 
-    def validate(self):
+    def progress(self):
         """
-        Performs self-check and notifies about the current status.
+        Notify about the progress.
         """
-
-        if self.completed:
-            notify_progress_complete(self, self.username, self.template.id)
-
-        if not self.completed:
-            notify_progress_incomplete(self, self.username, self.template.id)
+        notify_progress_complete(self, self.username, self.template.id)
+    
+    def regress(self):
+        """
+        Notify about the regression.
+        """
+        notify_progress_incomplete(self, self.username, self.template.id)
 
     def reset(self):
         Fulfillment.objects.filter(progress=self).delete()

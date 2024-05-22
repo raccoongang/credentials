@@ -37,8 +37,14 @@ def notify_requirement_fulfilled(*, sender, username, badge_template_id, **kwarg
 
 def notify_requirement_regressed(*, sender, username, badge_template_id):
     """
-    FIXME: implement/use
+    Notifies about user's regression on the badge template.
     """
+
+    BADGE_REQUIREMENT_REGRESSED.send(
+        sender=sender,
+        username=username,
+        badge_template_id=badge_template_id,
+    )
 
 
 def notify_progress_complete(sender, username, badge_template_id):
@@ -55,7 +61,7 @@ def notify_progress_complete(sender, username, badge_template_id):
 
 def notify_progress_incomplete(sender, username, badge_template_id):
     """
-    FIXME: implement/use
+    Notifies about user's regression on the badge template.
     """
     BADGE_PROGRESS_INCOMPLETE.send(
         sender=sender,
