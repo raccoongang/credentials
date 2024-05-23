@@ -1,0 +1,63 @@
+@startuml name "Credly Badges award flow"
+
+!pragma teoz true
+autonumber
+
+title "Credly badges award effect (sequence diagram)"
+
+box "Open edX"
+    actor           "Open edX\n Learner" as learner
+    box "Platform IDA" #LightBlue
+        participant     "LMS" as lms
+    end box
+    participant     "EventBus" as ebus
+    box "Credentials IDA" #LightBlue
+        participant     "Badges app" as badges
+        participant     "Credly Badges app" as backend
+    end box
+end box
+box "External badging services"
+    box "Credly by Pearson" #LightSeaGreen
+        participant     "Credly" as credly
+    end box
+    participant     "Other" as other
+end box
+
+
+learner -> lms : Enters LMS course
+learner -> lms : Performs graded action\n (e.g. submits answer)
+
+lms -> ebus : Emits\n**COURSE_GRADE_NOW_PASSED**
+ebus <- badges : Receives\n**COURSE_GRADE_NOW_PASSED**
+
+rnote over badges,backend
+    **BadgeProcessor handles event**
+    - analyses Requirements
+    - updates Fulfillment(s)
+endrnote
+
+rnote over badges
+    **BadgeCollector handles event**
+    - analyses Fulfillment(s)
+    - awards Badge(s)
+    - emits awarding event
+endrnote
+
+ebus <- badges : Emits\n**BADGE_AWARDED**
+lms -> ebus : Receives\n**BADGE_AWARDED**
+
+rnote over backend
+    **CredlyBadgeCollector**
+    **handles event**
+    - analyses Fulfillment(s)
+    - awards CredlyBadge(s)
+    - emits awarding event
+endrnote
+
+ebus <- backend : Emits\n**BADGE_AWARDED**
+lms -> ebus : Receives\n**BADGE_AWARDED**
+
+backend -> credly : Issues user badge\n(API issuance request)
+backend -> learner : Optionally, notifies a Learner.
+
+@enduml
