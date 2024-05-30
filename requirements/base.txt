@@ -64,6 +64,7 @@ django==4.2.13
     #   django-crum
     #   django-extensions
     #   django-filter
+    #   django-model-utils
     #   django-simple-history
     #   django-statici18n
     #   django-storages

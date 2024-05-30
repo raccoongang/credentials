@@ -125,6 +125,7 @@ django==4.2.13
     #   django-filter
     #   django-simple-history
     #   django-model-utils
+    #   django-simple-history
     #   django-statici18n
     #   django-storages
     #   django-stubs
