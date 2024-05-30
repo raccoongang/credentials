@@ -6,6 +6,7 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.learning.data import CourseData, CoursePassingStatusData, UserData, UserPersonalData
 
+from credentials.apps.badges.exceptions import BadgesProcessingError
 from credentials.apps.badges.models import (
     BadgePenalty,
     BadgeProgress,
@@ -631,3 +632,15 @@ class TestIdentifyUser(TestCase):
     def test_identify_user(self):
         username = identify_user(event_type=COURSE_PASSING_EVENT, event_payload=COURSE_PASSING_DATA)
         self.assertEqual(username, "test_username")
+    
+    def test_identify_user_not_found(self):
+        event_type = "unknown_event_type"
+        event_payload = None
+
+        with self.assertRaises(BadgesProcessingError) as cm:
+            identify_user(event_type="unknown_event_type", event_payload=event_payload)   
+
+        self.assertEqual(
+            str(cm.exception),
+            f"User data cannot be found (got: None): {event_payload}. Does event {event_type} include user data at all?"
+        )
