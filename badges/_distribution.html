@@ -1,0 +1,930 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Distribution &#8212; edX Credentials 0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'badges/_distribution';</script>
+    <link rel="shortcut icon" href="https://logos.openedx.org/open-edx-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://logos.openedx.org/open-edx-logo-color.png" class="logo__image only-light" alt="edX Credentials 0.1 documentation - Home"/>
+    <script>document.write(`<img src="https://logos.openedx.org/open-edx-logo-color.png" class="logo__image only-dark" alt="edX Credentials 0.1 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    edX Credentials Service
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../asset_pipeline.html">Asset Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internationalization.html">Internationalization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theming.html">Theming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credentials_admin.html">Credentials Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../learner_records.html">Learner Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring_certificates.html">Configuring Certificates</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../verifiable_credentials/overview.html">Verifiable Credentials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/usage.html">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/components.html">Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/configuration.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/extensibility.html">Extensibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/storages.html">Storages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/tech_details.html">Implementation Details</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../pathways.html">Pathways</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analytics.html">Analytics</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="../credentials_api.html">Credentials API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../event_bus.html">Event Bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../edx_extensions.html">edX Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lms_user_id.html">LMS User ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../program_completion_emails.html">Program Completion Emails</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../decisions.html">Architectural Decision Records</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0001-record-architecture-decisions.html">1. Record Architecture Decisions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0002-front-end-technologies.html">2. Front End Technologies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0003-copy-core-data-locally.html">3. Copy core data locally</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0004-filter-lms-side.html">4. Filter some data on the LMS side</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0005-program-id-in-usercreditpathway.html">5. 0005 Program ID in UserCreditPathway</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0006-plugin-extensions.html">6. Django App Plugin extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0007-learner-status-endpoint.html">7. Endpoint for Learner Credential Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0008-verifiable-credentials-issuing.html">8. Issue verifiable credentials to learners</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0009-issue-verifiable-credentails-in-learner-records-mfe.html">9. Issue verifiable credentials to learners in the Learner Record MFE</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="index.html">Badges</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html">Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Configuration examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.html">Processing</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/openedx/credentials" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/openedx/credentials/edit/master/docs/badges/_distribution.rst" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/openedx/credentials/issues/new?title=Issue%20on%20page%20%2Fbadges/_distribution.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/badges/_distribution.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Distribution</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#credly-backend">Credly backend</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration">Configuration</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#organizations">Organizations</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#badge-templates-management">Badge templates management</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#badge-templates-creation">Badge templates creation</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#keeping-badge-templates-in-sync">Keeping badge templates in sync</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements-setup">Requirements setup</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ccx-courses">CCX courses</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#awarded-badges">Awarded badges</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#side-effects">Side effects</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#badge-issuance">Badge issuance</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#badge-revocation">Badge revocation</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#more-details">More details</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#credly-badges-initial-setup">Credly badges initial setup</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#badge-awarding-flow">Badge awarding flow</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#badge-revocation-flow">Badge revocation flow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="distribution">
+<h1>Distribution<a class="headerlink" href="#distribution" title="Permalink to this heading">#</a></h1>
+<blockquote>
+<div><p>Credentials Badges feature is self-contained, but it allows badges <em>distribution</em> (propagation) to external services as well.</p>
+</div></blockquote>
+<p><strong>Badge distribution backends</strong> are Credentials plugins (auto-discovered installable applications) which highly rely on internal <cite>badges</cite> application, but extend its functions.</p>
+<p>Badges backend may be responsible for:</p>
+<ul class="simple">
+<li><p>communication between external service and Open edX (Credentials);</p></li>
+<li><p>implementation of service-specific badge templates (credential types);</p></li>
+<li><p>earned (issued) learners’ badges propagation to corresponding services’ user profiles;</p></li>
+<li><p>additional side effects (e.g. users notification);</p></li>
+<li><p>etc.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There is <a class="reference external" href="https://info.credly.com/">Credly (by Pearson)</a> built-in backend which may serve as an integration example.</p>
+</div>
+<hr class="docutils" />
+<section id="credly-backend">
+<h2>Credly backend<a class="headerlink" href="#credly-backend" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="distribution.html#overview">Overview</a></p></li>
+<li><p><a class="reference external" href="distribution.html#configuration">Configuration</a></p></li>
+<li><p><a class="reference external" href="distribution.html#badge-templates-management">Badge templates management</a></p></li>
+<li><p><a class="reference external" href="distribution.html#requirements-setup">Requirements setup</a></p></li>
+<li><p><a class="reference external" href="distribution.html#awarded-badges">Awarded badges</a></p></li>
+<li><p><a class="reference external" href="distribution.html#side-effects">Side effects</a></p></li>
+<li><p><a class="reference external" href="distribution.html#more-details">More details</a></p></li>
+</ul>
+<section id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h3>
+<p>Credly badges distribution backend is implemented as a baked-in plugin (it is prepared to be extracted into a separate repo).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># package location:</span>
+<span class="n">credentials</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">badges</span><span class="o">/</span><span class="n">distribution</span><span class="o">/</span><span class="n">credly</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>This application extends the core badges functions in the following ways:</p>
+<ul class="simple">
+<li><p>another section appears in the Credentials admin interface;</p></li>
+<li><p>new badge template type is available for configuration;</p></li>
+<li><p>new specific user credential type is produced;</p></li>
+<li><p>Credly’s API integration configuration is available (per Credly Organization);</p></li>
+<li><dl class="simple">
+<dt>a set of automations is provided:</dt><dd><ul>
+<li><p>badge templates are pulled for each Credly Organization;</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>additional actions happen during badges progress collecting:</dt><dd><ul>
+<li><p>TBD</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<img alt="Credly Badges plugin" src="_static/images/badges/badges-admin-credly-badges.png" />
+</section>
+<section id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">#</a></h3>
+<p>Credly badges extension allows <a class="reference external" href="https://www.credly.com/docs/web_service_api">Credly web service API</a> authorization configuration.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Backend is configured to use (configurable from deployment environment) these settings:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># production:</span>
+<span class="n">CREDLY_API_BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://api.credly.com/v1/&quot;</span>
+
+<span class="c1"># sandbox:</span>
+<span class="n">CREDLY_API_BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://sandbox-api.credly.com/v1/&quot;</span>
+</pre></div>
+</div>
+</div>
+<section id="organizations">
+<h4>Organizations<a class="headerlink" href="#organizations" title="Permalink to this heading">#</a></h4>
+<blockquote>
+<div><p>Credly service has a concept of <cite>Organizations</cite> (Credly Organization). Integration happens in a context of one or more Credly Organizations to a single Open edX installation.</p>
+</div></blockquote>
+<p>Credly Badges application allows Credly Organizations management via admin interface:</p>
+<img alt="Credly Organization" src="_static/images/badges/badges-admin-credly-organization.png" />
+<p><code class="docutils literal notranslate"><span class="pre">CredlyOrganization</span></code> record represents API credentials (ID and API key) for a specific Credly Organization.</p>
+<p>On each Credly Organization record’s update plugin validates provided information by trying to fetch corresponding Credly organization details. Additional information is auto-filled on success.</p>
+</section>
+</section>
+<section id="badge-templates-management">
+<h3>Badge templates management<a class="headerlink" href="#badge-templates-management" title="Permalink to this heading">#</a></h3>
+<blockquote>
+<div><p>Credly badge templates are linked to their organization.</p>
+</div></blockquote>
+<p>The backend provides its own badge templates type (<code class="docutils literal notranslate"><span class="pre">origin</span> <span class="pre">=</span> <span class="pre">credly</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CredlyBadgeTemplate</span><span class="p">(</span><span class="n">BadgeTemplate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extended version of the core BadgeTemplate data model implementation.</span>
+
+<span class="sd">    In addition to standard field set also includes extra attributes from Credly badge template.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="n">core</span> <span class="n">properties</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span>
+
+    <span class="o">-</span> <span class="n">uuid</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">template</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
+    <span class="o">-</span> <span class="n">description</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">template</span><span class="o">-</span><span class="n">description</span><span class="o">&gt;</span>
+    <span class="o">-</span> <span class="n">icon</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">template</span><span class="o">-</span><span class="n">image_url</span><span class="o">&gt;</span>
+
+    <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="n">specific</span> <span class="n">properties</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span>
+
+    <span class="o">-</span> <span class="n">organization</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">CredlyOrganization</span> <span class="p">(</span><span class="n">relation</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="o">-</span> <span class="n">state</span><span class="p">:</span> <span class="s2">&quot;draft&quot;</span> <span class="o">|</span> <span class="s2">&quot;active&quot;</span> <span class="o">|</span> <span class="s2">&quot;archived&quot;</span> <span class="p">(</span><span class="n">managed</span> <span class="n">by</span> <span class="n">Credly</span><span class="p">)</span>
+    <span class="o">-</span> <span class="n">origin</span><span class="p">:</span> <span class="s2">&quot;credly&quot;</span>
+</pre></div>
+</div>
+<p>Under the hood <code class="docutils literal notranslate"><span class="pre">CredlyBadgeTemplate</span></code> data is split onto 2 data tables:</p>
+<ul class="simple">
+<li><p>core <cite>BadgeTemplate</cite> attributes are placed into a separate table, so badge templates with <code class="docutils literal notranslate"><span class="pre">credly</span></code> type are completely valid from perspective of the main badge application;</p></li>
+<li><p>extra <cite>CredlyBadgeTemplate</cite> attributes are kept in a separate table and linked 1-1 to the core data (Django model inheritance);</p></li>
+</ul>
+<section id="badge-templates-creation">
+<h4>Badge templates creation<a class="headerlink" href="#badge-templates-creation" title="Permalink to this heading">#</a></h4>
+<p>It is expected that Credly badge templates are pulled for each configured Credly Organization (e.g. auto-created).</p>
+<p>To mirror all existing Credly badge templates, navigate <code class="docutils literal notranslate"><span class="pre">Credly</span> <span class="pre">Organizations</span></code> list view, then select wanted organizations in a list and use <code class="docutils literal notranslate"><span class="pre">Sync</span> <span class="pre">organization</span> <span class="pre">badge</span> <span class="pre">templates</span></code> action.</p>
+<blockquote>
+<div><p>There is <code class="docutils literal notranslate"><span class="pre">sync_organization_badge_templates</span></code> management command as well.</p>
+</div></blockquote>
+<img alt="Credly badge templates synchronization" src="../_images/badges-admin-credly-templates-sync.png" />
+<p>The action will iterate through selected Credly organizations and:</p>
+<ol class="arabic simple">
+<li><p>Pull available for Organization badge templates from <a class="reference external" href="https://www.credly.com/docs/badge_templates">Credly API</a>:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GET</span> <span class="o">/</span><span class="n">organizations</span><span class="o">/&lt;</span><span class="n">organization_id</span><span class="o">&gt;/</span><span class="n">badge_templates</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Create <code class="docutils literal notranslate"><span class="pre">CredlyBadgeTemplate</span></code> records for each available template.</p></li>
+</ol>
+</section>
+<section id="keeping-badge-templates-in-sync">
+<h4>Keeping badge templates in sync<a class="headerlink" href="#keeping-badge-templates-in-sync" title="Permalink to this heading">#</a></h4>
+<p>Credly service provides <a class="reference external" href="https://credly.com/docs/webhooks">webhooks support</a> for different internal events.</p>
+<p>This Credly Badges backend implements a webhook endpoint to listen to incoming updates for badge templates.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">POST</span> <span class="o">&lt;</span><span class="n">CREDENTIALS</span><span class="o">-</span><span class="n">HOST</span><span class="o">&gt;/</span><span class="n">credly</span><span class="o">-</span><span class="n">badges</span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">webhook</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>To communicate an additional configuration is required on the Credly side (here is the Sandbox configuration example):</p>
+<ol class="arabic simple">
+<li><p>Set a full URL for your Credentials installation.</p></li>
+<li><p>Activate badge template events.</p></li>
+</ol>
+<img alt="Webhook configuration" src="_static/images/badges/badges-admin-credly-badges-webhook.png" />
+<p>The following Credly badge templates webhook events are processed:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">badge_template.created</span></code> (event is triggered whenever a badge template is created)</dt><dd><ul>
+<li><p>system creates new <code class="docutils literal notranslate"><span class="pre">CredlyBadgeTemplate</span></code> in inactive state;</p></li>
+<li><p>badge template is not processed until manual activation;</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">badge_template.changed</span></code> (event is triggered whenever a badge template is edited)</dt><dd><ul>
+<li><p>system updates corresponding <code class="docutils literal notranslate"><span class="pre">CredlyBadgeTemplate</span></code> relevant attributes;</p></li>
+<li><p>badge template processing continues;</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">badge_template.deleted</span></code> (event is triggered whenever a badge template is deleted)</dt><dd><ul>
+<li><p>system deactivate corresponding <code class="docutils literal notranslate"><span class="pre">CredlyBadgeTemplate</span></code>;</p></li>
+<li><p>badges issuance processing stops;</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+</section>
+<section id="requirements-setup">
+<h3>Requirements setup<a class="headerlink" href="#requirements-setup" title="Permalink to this heading">#</a></h3>
+<p>TBD</p>
+<p>Created badges <a class="reference external" href="configuration.html#requirements-setup">must be configured</a>.</p>
+<p>Desired Requirements are created for each badge template manually:</p>
+<ul class="simple">
+<li><p>create a Requirement for a single course with specific ID for completion event.</p></li>
+<li><p>create a Requirement for a single course with specific ID for revocation event (reverse effect).</p></li>
+</ul>
+<section id="ccx-courses">
+<h4>CCX courses<a class="headerlink" href="#ccx-courses" title="Permalink to this heading">#</a></h4>
+<p>TBD</p>
+<blockquote>
+<div><p>Both event types (for passing course grade and failing course grade) carry additional information for custom courses identification.</p>
+</div></blockquote>
+</section>
+</section>
+<section id="awarded-badges">
+<h3>Awarded badges<a class="headerlink" href="#awarded-badges" title="Permalink to this heading">#</a></h3>
+<p>Already awarded badges are stored as <a class="reference external" href="details.html#usercredential">UserCredential</a> records.</p>
+<p>Credly backend manages its own extended version of user credential:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CredlyBadge</span><span class="p">(</span><span class="n">UserCredential</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Earned badge.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="n">unified</span> <span class="n">attrs</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span>
+    <span class="o">...</span>
+    <span class="o">-</span> <span class="n">uuid</span>
+    <span class="o">-</span> <span class="n">username</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span>
+    <span class="o">-</span> <span class="n">status</span><span class="p">:</span> <span class="s2">&quot;awarded&quot;</span> <span class="o">|</span> <span class="s2">&quot;revoked&quot;</span>
+    <span class="o">...</span>
+
+    <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="n">specific</span> <span class="n">attrs</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span>
+
+    <span class="o">-</span> <span class="n">issued_badge_id</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">uuid</span><span class="o">&gt;</span>
+    <span class="o">-</span> <span class="n">issued_at</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">timestamp</span><span class="o">&gt;</span>
+    <span class="o">-</span> <span class="n">accept_badge_url</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">URL</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="side-effects">
+<h3>Side effects<a class="headerlink" href="#side-effects" title="Permalink to this heading">#</a></h3>
+<p><a class="reference external" href="details.html#badge-collector">Badge Collector</a> emits signals when:</p>
+<ul class="simple">
+<li><p>a badge is <a class="reference external" href="collecting.html#badge-awarding">awarded</a></p></li>
+<li><p>a badge is <a class="reference external" href="collecting.html#badge-revocation">revoked</a></p></li>
+</ul>
+<p>There are events which may be used as triggers for distribution <strong>side effects</strong>:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>on award:</dt><dd><ul>
+<li><p>credentials.apps.badges.distribution.credly.handlers.notify_user_awarding</p></li>
+<li><p>credentials.apps.badges.distribution.credly.handlers.issue_badge</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>on revoke:</dt><dd><ul>
+<li><p>credentials.apps.badges.distribution.credly.handlers.notify_user_revocation</p></li>
+<li><p>credentials.apps.badges.distribution.credly.handlers.revoke_badge</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<section id="badge-issuance">
+<h4>Badge issuance<a class="headerlink" href="#badge-issuance" title="Permalink to this heading">#</a></h4>
+<p>Badge issuance side effect is performed via <a class="reference external" href="https://www.credly.com/docs/issued_badges#issue-a-badge">issue a badge Credly API</a> endpoint.
+Required fields:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">recipient_email</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">user</span><span class="o">-</span><span class="n">email</span><span class="o">&gt;</span>
+<span class="n">issued_to_first_name</span><span class="p">:</span> <span class="o">&lt;</span><span class="nb">str</span><span class="o">&gt;</span>
+<span class="n">issued_to_last_name</span><span class="p">:</span> <span class="o">&lt;</span><span class="nb">str</span><span class="o">&gt;</span>
+<span class="n">badge_template_id</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">credly</span><span class="o">-</span><span class="n">badge</span><span class="o">-</span><span class="n">template_id</span><span class="o">&gt;</span>
+<span class="n">issued_at</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">timestamp</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="badge-revocation">
+<h4>Badge revocation<a class="headerlink" href="#badge-revocation" title="Permalink to this heading">#</a></h4>
+<p>Badge revocation side effect is performed via <a class="reference external" href="https://www.credly.com/docs/issued_badges#revoke-a-badge">revoke a badge Credly API</a> endpoint.
+Required data: <code class="docutils literal notranslate"><span class="pre">badge_id</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PUT</span> <span class="o">/</span><span class="n">organizations</span><span class="o">/&lt;</span><span class="n">organization_id</span><span class="o">&gt;/</span><span class="n">badges</span><span class="o">/&lt;</span><span class="n">badge_id</span><span class="o">&gt;/</span><span class="n">revoke</span>
+<span class="p">{</span>
+    <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;Check bounced&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;suppress_revoke_notification_email&quot;</span><span class="p">:</span> <span class="n">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="more-details">
+<h3>More details<a class="headerlink" href="#more-details" title="Permalink to this heading">#</a></h3>
+<p>Here are some details which should clarify how the feature works.</p>
+<section id="credly-badges-initial-setup">
+<h4>Credly badges initial setup<a class="headerlink" href="#credly-badges-initial-setup" title="Permalink to this heading">#</a></h4>
+<dl class="simple">
+<dt>Initial setup (1-4)</dt><dd><p>As a general prerequisite in order to integrate with Credly we must have Credly account (here represented with a single Organization).
+API interaction requires authorization credentials for the Open edX installation.</p>
+</dd>
+<dt>Open edX configuration (5-6)</dt><dd><p>Open edX installation (Credly API client) setup.
+Includes creation of a configuration record which must allow authorized interactions with Credly’s API.</p>
+</dd>
+<dt>Badge templates management (7-10)</dt><dd><p>Once API is available, Open edX badges can be bulk-created based on Credly Organization badge templates.
+Credly Badges backend caches extra data from templates.</p>
+</dd>
+<dt>Requirements setup (11-13)</dt><dd><p>Each created Open edX badge can be quickly configured for a pre-defined rules.
+Additionally each requirement must be specified to make award/revoke rules more specific.</p>
+</dd>
+</dl>
+<img alt="Credly Badges setup sequence diagram" src="../_images/badges-setup-sequence.png" />
+</section>
+<section id="badge-awarding-flow">
+<h4>Badge awarding flow<a class="headerlink" href="#badge-awarding-flow" title="Permalink to this heading">#</a></h4>
+<dl class="simple">
+<dt>Grade update (1-2)</dt><dd><p>Learner acts for course grade update.
+Learner’s grade satisfies course’s grading policy.</p>
+</dd>
+<dt>Event propagation (3-4)</dt><dd><p>Course “completion” event is emitted from LMS to Event Bus.
+Course “completion” event is consumed on the Credentials side.</p>
+</dd>
+<dt>Badges Processor</dt><dd><p>Processor receives event.
+All relevant Requirement records are analyzed for Event.
+Corresponding Fulfillment records are updated for User.</p>
+</dd>
+<dt>Badges Collector(s)</dt><dd><p>Collector analyzes Fulfillments completion.
+If ready badge is awarded (user credential record is created).
+Badge awarding event is emitted from Credentials to Event Bus.
+Credly API request for badge issuance is sent.
+Other side effects are possible (e.g. user notification).</p>
+</dd>
+</dl>
+<img alt="Credly Badges awarding sequence diagram" src="../_images/badges-award-sequence.png" />
+</section>
+<section id="badge-revocation-flow">
+<h4>Badge revocation flow<a class="headerlink" href="#badge-revocation-flow" title="Permalink to this heading">#</a></h4>
+<p>Revocation flow mirrors awarding flow.</p>
+<img alt="Credly Badges revocation sequence diagram" src="../_images/badges-revoke-sequence.png" />
+</section>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#credly-backend">Credly backend</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration">Configuration</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#organizations">Organizations</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#badge-templates-management">Badge templates management</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#badge-templates-creation">Badge templates creation</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#keeping-badge-templates-in-sync">Keeping badge templates in sync</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements-setup">Requirements setup</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ccx-courses">CCX courses</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#awarded-badges">Awarded badges</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#side-effects">Side effects</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#badge-issuance">Badge issuance</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#badge-revocation">Badge revocation</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#more-details">More details</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#credly-badges-initial-setup">Credly badges initial setup</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#badge-awarding-flow">Badge awarding flow</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#badge-revocation-flow">Badge revocation flow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Axim Collaborative, Inc
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Axim Collaborative, Inc.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+<div class="extra_footer">
+  
+        <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
+            <img
+                alt="Creative Commons License"
+                style="border-width:0"
+                src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"/>
+        </a>
+        <br>
+        These works by
+            <a
+                xmlns:cc="https://creativecommons.org/ns#"
+                href="https://openedx.org"
+                property="cc:attributionName"
+                rel="cc:attributionURL"
+            >Axim Collaborative, Inc</a>
+        are licensed under a
+            <a
+                rel="license"
+                href="https://creativecommons.org/licenses/by-sa/4.0/"
+            >Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    
+</div>
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

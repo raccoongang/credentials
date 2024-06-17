@@ -1,0 +1,742 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Components &#8212; edX Credentials 0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'verifiable_credentials/components';</script>
+    <link rel="shortcut icon" href="https://logos.openedx.org/open-edx-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuration" href="configuration.html" />
+    <link rel="prev" title="Usage" href="usage.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://logos.openedx.org/open-edx-logo-color.png" class="logo__image only-light" alt="edX Credentials 0.1 documentation - Home"/>
+    <script>document.write(`<img src="https://logos.openedx.org/open-edx-logo-color.png" class="logo__image only-dark" alt="edX Credentials 0.1 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    edX Credentials Service
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../asset_pipeline.html">Asset Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internationalization.html">Internationalization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theming.html">Theming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credentials_admin.html">Credentials Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../learner_records.html">Learner Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring_certificates.html">Configuring Certificates</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="overview.html">Verifiable Credentials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensibility.html">Extensibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="storages.html">Storages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tech_details.html">Implementation Details</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../pathways.html">Pathways</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analytics.html">Analytics</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="../credentials_api.html">Credentials API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../event_bus.html">Event Bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../edx_extensions.html">edX Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lms_user_id.html">LMS User ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../program_completion_emails.html">Program Completion Emails</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../decisions.html">Architectural Decision Records</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0001-record-architecture-decisions.html">1. Record Architecture Decisions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0002-front-end-technologies.html">2. Front End Technologies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0003-copy-core-data-locally.html">3. Copy core data locally</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0004-filter-lms-side.html">4. Filter some data on the LMS side</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0005-program-id-in-usercreditpathway.html">5. 0005 Program ID in UserCreditPathway</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0006-plugin-extensions.html">6. Django App Plugin extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0007-learner-status-endpoint.html">7. Endpoint for Learner Credential Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0008-verifiable-credentials-issuing.html">8. Issue verifiable credentials to learners</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decisions/0009-issue-verifiable-credentails-in-learner-records-mfe.html">9. Issue verifiable credentials to learners in the Learner Record MFE</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../badges/index.html">Badges</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../badges/quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../badges/settings.html">Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../badges/configuration.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../badges/examples.html">Configuration examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../badges/processing.html">Processing</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/openedx/credentials" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/openedx/credentials/edit/master/docs/verifiable_credentials/components.rst" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/openedx/credentials/issues/new?title=Issue%20on%20page%20%2Fverifiable_credentials/components.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/verifiable_credentials/components.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Components</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verifiable-credentials-application">Verifiable Credentials application</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#administration-site">Administration site</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learner-record-microfrontend">Learner Record Microfrontend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#status-list-api">Status List API</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#status-list-example">Status List example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#status-entry-example">Status Entry example</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="components">
+<h1>Components<a class="headerlink" href="#components" title="Permalink to this heading">#</a></h1>
+<p>The Verifiable Credentials feature includes the following parts:</p>
+<ul class="simple">
+<li><p><strong>Verifiable Credentials application</strong> (<cite>credentials.apps.verifiable_credentials</cite> within the Open edX Credentials IDA);</p></li>
+<li><p><strong>Learner Record MFE</strong> (<cite>frontend-app-learner-record</cite> micro-frontend);</p></li>
+<li><p>third-party plugins (see <a class="reference external" href="extensibility.html">Extensibility</a>)</p></li>
+<li><p>digital wallets (see <a class="reference external" href="storages.html">Storages</a>)</p></li>
+</ul>
+<section id="verifiable-credentials-application">
+<h2>Verifiable Credentials application<a class="headerlink" href="#verifiable-credentials-application" title="Permalink to this heading">#</a></h2>
+<p>The core backend logic and all related API are encapsulated in the <a class="reference external" href="https://github.com/openedx/credentials/tree/master/credentials/apps/verifiable_credentials">Verifiable Credentials application</a>.</p>
+<p>Once the Verifiable Credentials feature <a class="reference external" href="configuration.html">is enabled</a>:</p>
+<ol class="arabic simple">
+<li><p>Admin site “Verifiable Credentials” section becomes available in the Credentials IDA.</p></li>
+<li><p>Extra urls become available in the Credentials IDA.</p></li>
+<li><p>Extra API endpoints become available within the Credentials IDA.</p></li>
+</ol>
+<section id="administration-site">
+<h3>Administration site<a class="headerlink" href="#administration-site" title="Permalink to this heading">#</a></h3>
+<p>Application section includes:</p>
+<ul class="simple">
+<li><p>a list of available issuers</p></li>
+<li><p>a list of initiated issuance lines</p></li>
+</ul>
+<img alt="Admin section" src="../_images/verifiable_credentials-admin-section.png" />
+<p>Currently, only a single Issuer configuration can be active in a moment of time:</p>
+<img alt="Issuance Configurations" src="../_images/verifiable_credentials-issuer-configuration.png" />
+<p>Issuance configuration describes an Issuer - Organization/University/School on behalf of which verifiable credentials are created. Issuer’s ID becomes a part of a verifiable credential and a cryptographic proof is generated with the help of Issuer’s private key. Each Issuer has a verbose name. It can be deactivated (checkbox).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Private key itself is a secret that is generated with the help of a cryptographic software.
+Issuer ID must be a <a class="reference external" href="https://en.wikipedia.org/wiki/Decentralized_identifier">decentralized identifier</a> created based on a private key.</p>
+</div>
+<dl class="simple">
+<dt>Issuance Line</dt><dd><p>Each request for a verifiable credential issuance initiates a separate Issuance Line. It tracks verifiable credential processing life cycle and keeps a connection with a source Open edX user achievement.</p>
+</dd>
+</dl>
+<img alt="Issuance Lines" src="../_images/verifiable_credentials-issuance-lines.png" />
+<p>Issuance line has its unique identifier and additionally includes this information:</p>
+<ol class="arabic simple">
+<li><p><strong>User Credential</strong> - related Open edX achievement (e.g. “Program Certificate”)</p></li>
+<li><p><strong>Issuer ID</strong> - issuer’s which signs this verifiable credential</p></li>
+<li><p><strong>Storage ID</strong> - a storage backend (digital wallet) which will keep a verifiable credential</p></li>
+<li><p><strong>Processing status</strong> - if a verifiable credential was successfully uploaded to storage</p></li>
+<li><p><strong>Status list info</strong> - indicates if a verifiable credential still valid and unique status index within an Issuer’s status list</p></li>
+</ol>
+</section>
+</section>
+<section id="learner-record-microfrontend">
+<h2>Learner Record Microfrontend<a class="headerlink" href="#learner-record-microfrontend" title="Permalink to this heading">#</a></h2>
+<p>The Verifiable Credentials feature extends the <a class="reference external" href="https://github.com/openedx/frontend-app-learner-record">Learner Record MFE</a> with additional UI. An extra “Verifiable Credentials” page (tab) becomes available.</p>
+<img alt="Verifiable Credentials page" src="../_images/verifiable_credentials-learner-record-mfe.png" />
+<ol class="arabic simple">
+<li><p>Once the Verifiable Credentials feature <a class="reference external" href="configuration.html">is enabled</a> tabs navigation appears</p></li>
+<li><p>All learner’s Open edX credentials (currently, program certificates only) are listed within the page</p></li>
+<li><p>Achievement card has an action button that allows verifiable credential requesting based on the corresponding Open edX credential</p></li>
+<li><p>Storages options (experimental)</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, a single (built-in) storage backend is implemented out of the box (<a class="reference external" href="https://lcw.app/">Learner Credential Wallet</a>). In this case the only storage option is available by default, so “Create” action button won’t have a dropdown. Additional storages appear under the “Create with” dropdown automatically once configured.</p>
+</div>
+</section>
+<section id="status-list-api">
+<h2>Status List API<a class="headerlink" href="#status-list-api" title="Permalink to this heading">#</a></h2>
+<p>There are a plenty of reasons verifiable credential may be already invalid, inactive or disposed:</p>
+<ul class="simple">
+<li><p>revocation</p></li>
+<li><p>implicit expiration</p></li>
+<li><p>a lot of other purposes</p></li>
+</ul>
+<p>Open edX maintains status for internal credentials (“awarded”, “revoked”).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Once a Program Certificate X is revoked - <strong>all</strong> verifiable credentials which were issued based on that achievement must become revoked as well.</p>
+</div>
+<p>Public Status List API allows instant verifiable credentials checks. Each issuer maintains its own statuses sequence. Every issued verifiable credential takes a unique position in that sequence.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Status List API endpoint:</span>
+GET &lt;credentials-ida-host&gt;/verifiable_credentials/api/v1/status-list/2021/v1/&lt;issuer-id&gt;/
+
+<span class="c1"># Example:</span>
+https://credentials.example.com/verifiable_credentials/api/v1/status-list/2021/v1/did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id/
+</pre></div>
+</div>
+<p>A full set of status-related information is baked into a verifiable credential:</p>
+<ul class="simple">
+<li><p>where to find status list API endpoint</p></li>
+<li><p>what’s the exact status position in a sequence</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See Status List v2021 approach <a class="reference external" href="https://w3c.github.io/vc-status-list-2021/#privacy-considerations">Privacy Considerations</a></p>
+</div>
+<section id="status-list-example">
+<h3>Status List example<a class="headerlink" href="#status-list-example" title="Permalink to this heading">#</a></h3>
+<p>Status List itself is a verifiable credential. But it serves a different purpose.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># specific Issuer&#39;s status list:</span>
+
+<span class="o">{</span>
+<span class="s2">&quot;@context&quot;</span>: <span class="o">[</span>
+    <span class="s2">&quot;https://www.w3.org/2018/credentials/v1&quot;</span>,
+    <span class="s2">&quot;https://w3id.org/security/suites/ed25519-2020/v1&quot;</span>,
+    <span class="s2">&quot;https://w3id.org/vc/status-list/2021/v1&quot;</span>
+<span class="o">]</span>,
+<span class="s2">&quot;id&quot;</span>: <span class="s2">&quot;https://credentials.example.com/verifiable_credentials/api/v1/status-list/2021/v1/did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id/&quot;</span>,
+<span class="s2">&quot;type&quot;</span>: <span class="o">[</span>
+    <span class="s2">&quot;VerifiableCredential&quot;</span>,
+    <span class="s2">&quot;StatusList2021Credential&quot;</span>
+<span class="o">]</span>,
+<span class="s2">&quot;credentialSubject&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;id&quot;</span>: <span class="s2">&quot;https://credentials.example.com/verifiable_credentials/api/v1/status-list/2021/v1/did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id/#list&quot;</span>,
+    <span class="s2">&quot;type&quot;</span>: <span class="s2">&quot;StatusList2021&quot;</span>,
+    <span class="s2">&quot;encodedList&quot;</span>: <span class="s2">&quot;H4sIAJzSq2QC/+3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAODfAC7KO00QJwAA&quot;</span>,
+    <span class="s2">&quot;statusPurpose&quot;</span>: <span class="s2">&quot;revocation&quot;</span>
+<span class="o">}</span>,
+<span class="s2">&quot;issuer&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;id&quot;</span>: <span class="s2">&quot;did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id&quot;</span>
+<span class="o">}</span>,
+<span class="s2">&quot;issuanceDate&quot;</span>: <span class="s2">&quot;2023-05-16T20:33:39Z&quot;</span>,
+<span class="s2">&quot;proof&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;type&quot;</span>: <span class="s2">&quot;Ed25519Signature2020&quot;</span>,
+    <span class="s2">&quot;proofPurpose&quot;</span>: <span class="s2">&quot;assertionMethod&quot;</span>,
+    <span class="s2">&quot;proofValue&quot;</span>: <span class="s2">&quot;z2qgpEUHecAxtRNuRXqPavaLwq2cfTzLSykFa8FPEVxvuPxBkfHdqo17XTpA2q9wR7CYwBjsfDBXT2amXAZbRqdPz&quot;</span>,
+    <span class="s2">&quot;verificationMethod&quot;</span>: <span class="s2">&quot;did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id#z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id&quot;</span>,
+    <span class="s2">&quot;created&quot;</span>: <span class="s2">&quot;2023-07-10T09:42:52.259Z&quot;</span>
+<span class="o">}</span>,
+<span class="s2">&quot;issued&quot;</span>: <span class="s2">&quot;2023-05-16T20:33:39Z&quot;</span>,
+<span class="s2">&quot;validFrom&quot;</span>: <span class="s2">&quot;2023-05-16T20:33:39Z&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</section>
+<section id="status-entry-example">
+<h3>Status Entry example<a class="headerlink" href="#status-entry-example" title="Permalink to this heading">#</a></h3>
+<p>Every verifiable credential carries its status list “registration” info.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># specific verifiable credential status section:</span>
+
+<span class="s2">&quot;credentialStatus&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;id&quot;</span>: <span class="s2">&quot;https://credentials.example.com/verifiable_credentials/api/v1/status-list/2021/v1/did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id/#15&quot;</span>,
+    <span class="s2">&quot;type&quot;</span>: <span class="s2">&quot;StatusList2021Entry&quot;</span>,
+    <span class="s2">&quot;statusListCredential&quot;</span>: <span class="s2">&quot;https://credentials.example.com/verifiable_credentials/api/v1/status-list/2021/v1/did:key:z6MkkePoGJV8CQJJULSHHUEv71okD9PsrqXnZpNQuoUfb3id/&quot;</span>,
+    <span class="s2">&quot;statusPurpose&quot;</span>: <span class="s2">&quot;revocation&quot;</span>,
+    <span class="s2">&quot;statusListIndex&quot;</span>: <span class="s2">&quot;15&quot;</span>
+<span class="o">}</span>,
+</pre></div>
+</div>
+<p>Also see related <a class="reference external" href="configuration.html#status-list-helper">management command</a></p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="usage.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Usage</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="configuration.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Configuration</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verifiable-credentials-application">Verifiable Credentials application</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#administration-site">Administration site</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learner-record-microfrontend">Learner Record Microfrontend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#status-list-api">Status List API</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#status-list-example">Status List example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#status-entry-example">Status Entry example</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Axim Collaborative, Inc
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Axim Collaborative, Inc.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+<div class="extra_footer">
+  
+        <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
+            <img
+                alt="Creative Commons License"
+                style="border-width:0"
+                src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"/>
+        </a>
+        <br>
+        These works by
+            <a
+                xmlns:cc="https://creativecommons.org/ns#"
+                href="https://openedx.org"
+                property="cc:attributionName"
+                rel="cc:attributionURL"
+            >Axim Collaborative, Inc</a>
+        are licensed under a
+            <a
+                rel="license"
+                href="https://creativecommons.org/licenses/by-sa/4.0/"
+            >Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    
+</div>
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

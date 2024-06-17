@@ -1,0 +1,658 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>5. 0005 Program ID in UserCreditPathway &#8212; edX Credentials 0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'decisions/0005-program-id-in-usercreditpathway';</script>
+    <link rel="shortcut icon" href="https://logos.openedx.org/open-edx-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="6. Django App Plugin extensions" href="0006-plugin-extensions.html" />
+    <link rel="prev" title="4. Filter some data on the LMS side" href="0004-filter-lms-side.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://logos.openedx.org/open-edx-logo-color.png" class="logo__image only-light" alt="edX Credentials 0.1 documentation - Home"/>
+    <script>document.write(`<img src="https://logos.openedx.org/open-edx-logo-color.png" class="logo__image only-dark" alt="edX Credentials 0.1 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    edX Credentials Service
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../asset_pipeline.html">Asset Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internationalization.html">Internationalization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theming.html">Theming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credentials_admin.html">Credentials Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../learner_records.html">Learner Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring_certificates.html">Configuring Certificates</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../verifiable_credentials/overview.html">Verifiable Credentials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/usage.html">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/components.html">Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/configuration.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/extensibility.html">Extensibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/storages.html">Storages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../verifiable_credentials/tech_details.html">Implementation Details</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../pathways.html">Pathways</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analytics.html">Analytics</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="../credentials_api.html">Credentials API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../event_bus.html">Event Bus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../edx_extensions.html">edX Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lms_user_id.html">LMS User ID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../program_completion_emails.html">Program Completion Emails</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../decisions.html">Architectural Decision Records</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="0001-record-architecture-decisions.html">1. Record Architecture Decisions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="0002-front-end-technologies.html">2. Front End Technologies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="0003-copy-core-data-locally.html">3. Copy core data locally</a></li>
+<li class="toctree-l2"><a class="reference internal" href="0004-filter-lms-side.html">4. Filter some data on the LMS side</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">5. 0005 Program ID in UserCreditPathway</a></li>
+<li class="toctree-l2"><a class="reference internal" href="0006-plugin-extensions.html">6. Django App Plugin extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="0007-learner-status-endpoint.html">7. Endpoint for Learner Credential Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="0008-verifiable-credentials-issuing.html">8. Issue verifiable credentials to learners</a></li>
+<li class="toctree-l2"><a class="reference internal" href="0009-issue-verifiable-credentails-in-learner-records-mfe.html">9. Issue verifiable credentials to learners in the Learner Record MFE</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../badges/index.html">Badges</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../badges/quickstart.html">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../badges/settings.html">Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../badges/configuration.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../badges/examples.html">Configuration examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../badges/processing.html">Processing</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/openedx/credentials" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/openedx/credentials/edit/master/docs/decisions/0005-program-id-in-usercreditpathway.rst" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/openedx/credentials/issues/new?title=Issue%20on%20page%20%2Fdecisions/0005-program-id-in-usercreditpathway.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/decisions/0005-program-id-in-usercreditpathway.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>0005 Program ID in UserCreditPathway</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#status">5.1. Status</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context">5.2. Context</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reporting">5.2.1. Reporting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#credit-for-multiple-programs">5.2.2. Credit for Multiple Programs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requesting-credit-before-completion">5.2.3. Requesting Credit Before Completion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decision">5.3. Decision</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consequences">5.4. Consequences</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rejected-alternatives">5.5. Rejected Alternatives</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#programcertrecord-id">5.5.1. ProgramCertRecord ID</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">5.6. References</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="program-id-in-usercreditpathway">
+<h1><span class="section-number">5. </span>0005 Program ID in UserCreditPathway<a class="headerlink" href="#program-id-in-usercreditpathway" title="Permalink to this heading">#</a></h1>
+<section id="status">
+<h2><span class="section-number">5.1. </span>Status<a class="headerlink" href="#status" title="Permalink to this heading">#</a></h2>
+<p>Accepted</p>
+</section>
+<section id="context">
+<h2><span class="section-number">5.2. </span>Context<a class="headerlink" href="#context" title="Permalink to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Pathway</span></code> model represents a way for learners to request credit for a <code class="docutils literal notranslate"><span class="pre">Program</span></code> from an institution. A <code class="docutils literal notranslate"><span class="pre">Pathway</span></code> can be associated with many <code class="docutils literal notranslate"><span class="pre">Program</span></code>s, and any <code class="docutils literal notranslate"><span class="pre">Program</span></code> may be associated with many <code class="docutils literal notranslate"><span class="pre">Pathway</span></code>s.</p>
+<p>This is specific to <code class="docutils literal notranslate"><span class="pre">Program</span></code>, and not applied to <code class="docutils literal notranslate"><span class="pre">Curriculum</span></code> which is a separate implementation of programs, but mostly used for Masters Degrees.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">UserCreditPathway</span></code> model represents a record of any time a learner has requested credit using a <code class="docutils literal notranslate"><span class="pre">Pathway</span></code>. This keeps track of only the <code class="docutils literal notranslate"><span class="pre">User</span></code> ID, the <code class="docutils literal notranslate"><span class="pre">Pathway</span></code> ID, and a <code class="docutils literal notranslate"><span class="pre">status</span></code> column (which indicates whether or not the email requesting credit has actually been sent).</p>
+<p>We create a <code class="docutils literal notranslate"><span class="pre">UserCreditPathway</span></code> record whenever a learner requests credit for a <code class="docutils literal notranslate"><span class="pre">Program</span></code> on their Program Record page. Once a <code class="docutils literal notranslate"><span class="pre">UserCreditPathway</span></code> record has been created associating that <code class="docutils literal notranslate"><span class="pre">User</span></code> with that <code class="docutils literal notranslate"><span class="pre">Pathway</span></code>, we do not allow the same <code class="docutils literal notranslate"><span class="pre">User</span></code> to request credit along the same <code class="docutils literal notranslate"><span class="pre">Pathway</span></code> again. (Presumably, this was to prevent users from spamming institutions with emails requesting credit.)</p>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">UserCreditPathway</span></code> model does not keep track of the <code class="docutils literal notranslate"><span class="pre">Program</span></code> for which credit was requested, only the <code class="docutils literal notranslate"><span class="pre">Pathway</span></code>. Since a <code class="docutils literal notranslate"><span class="pre">Pathway</span></code> can be associated with multiple <code class="docutils literal notranslate"><span class="pre">Program</span></code>, we don’t have a record of which <code class="docutils literal notranslate"><span class="pre">Program</span></code> the user was requesting credit for.</p>
+<p>This is causing some problems:</p>
+<section id="reporting">
+<h3><span class="section-number">5.2.1. </span>Reporting<a class="headerlink" href="#reporting" title="Permalink to this heading">#</a></h3>
+<p>There may be a business case for understanding which <code class="docutils literal notranslate"><span class="pre">Program</span></code>s users most often want to request credit for. This is not possible to understand with the current data.</p>
+</section>
+<section id="credit-for-multiple-programs">
+<h3><span class="section-number">5.2.2. </span>Credit for Multiple Programs<a class="headerlink" href="#credit-for-multiple-programs" title="Permalink to this heading">#</a></h3>
+<p>Because we prevent users from requesting credit along the same <code class="docutils literal notranslate"><span class="pre">Pathway</span></code> more than once, and because multiple <code class="docutils literal notranslate"><span class="pre">Program</span></code>s may be associated with the same <code class="docutils literal notranslate"><span class="pre">Pathway</span></code>, users who complete multiple <code class="docutils literal notranslate"><span class="pre">Program</span></code>s that use the same <code class="docutils literal notranslate"><span class="pre">Pathway</span></code> can only request credit for one <code class="docutils literal notranslate"><span class="pre">Program</span></code>.</p>
+</section>
+<section id="requesting-credit-before-completion">
+<h3><span class="section-number">5.2.3. </span>Requesting Credit Before Completion<a class="headerlink" href="#requesting-credit-before-completion" title="Permalink to this heading">#</a></h3>
+<p>Users are allowed to request credit for a given <code class="docutils literal notranslate"><span class="pre">Program</span></code> before they have completed the <code class="docutils literal notranslate"><span class="pre">Program</span></code>. (There are some imaginable business reasons for allowing this.) However, due to our current constraints, they are not able to request credit again once they do complete the <code class="docutils literal notranslate"><span class="pre">Program</span></code>.</p>
+<p>We have some existing code that tries to mitigate this by resending a request for credit when a learner is awarded a program certificate: if that learner already has a <code class="docutils literal notranslate"><span class="pre">UserCreditPathway</span></code> record along the relevant pathway, we automatically send the credit request again. The learner does not consent to it, and they are not notified that the request has been resent.</p>
+</section>
+</section>
+<section id="decision">
+<h2><span class="section-number">5.3. </span>Decision<a class="headerlink" href="#decision" title="Permalink to this heading">#</a></h2>
+<p>We will add the <code class="docutils literal notranslate"><span class="pre">program_id</span></code> to the <code class="docutils literal notranslate"><span class="pre">UserCreditPathway</span></code> model. This will be added at the same point that the <code class="docutils literal notranslate"><span class="pre">UserCreditPathway</span></code> record is first created: when the user through the UI decides to request credit from an institution. We already have the <code class="docutils literal notranslate"><span class="pre">program_id</span></code> at this point, but we have not been saving it.</p>
+<p>Note: this <code class="docutils literal notranslate"><span class="pre">program_id</span></code> is the ID of the relevant <code class="docutils literal notranslate"><span class="pre">Program</span></code> in the Credentials service. This ID differs from the program ID in Discovery or the LMS. The <code class="docutils literal notranslate"><span class="pre">program_uuid</span></code> can be found by joining to the related <code class="docutils literal notranslate"><span class="pre">Program</span></code> object.</p>
+<p>We will remove any checks preventing learners from re-requesting credit. We will no longer check for existing <code class="docutils literal notranslate"><span class="pre">UserCreditPathway</span></code> records when determining what options to show in the UI.</p>
+<p>We will remove the code that resubmits credit requests upon program completion.</p>
+</section>
+<section id="consequences">
+<h2><span class="section-number">5.4. </span>Consequences<a class="headerlink" href="#consequences" title="Permalink to this heading">#</a></h2>
+<p>There will now be data available showing which <code class="docutils literal notranslate"><span class="pre">Program</span></code>s learners have requested credit for, along with the <code class="docutils literal notranslate"><span class="pre">Pathway</span></code>s used. This can be used for reporting and business purposes as necessary.</p>
+<p>However, this data will only start being collected at the time this feature is released. Any preexisting records in the <code class="docutils literal notranslate"><span class="pre">UserCreditPathway</span></code> table will not include the <code class="docutils literal notranslate"><span class="pre">program_id</span></code>; that field will be <code class="docutils literal notranslate"><span class="pre">null</span></code>.</p>
+<p>Learners will now be able to request credit for multiple <code class="docutils literal notranslate"><span class="pre">Program</span></code>s, even if they use the same <code class="docutils literal notranslate"><span class="pre">Pathway</span></code>.</p>
+<p>Learners will now be able to re-request credit for the same <code class="docutils literal notranslate"><span class="pre">Program</span></code>. This prevents students from getting stuck if they requested credit before completion, and also opens up the risk of learners spamming institutions with credit requests.</p>
+<p>No automatic process will request credit on the learner’s behalf.</p>
+<p>There will be some changes in the UI to accommodate this shift.</p>
+<p>Note: with this decision, the <code class="docutils literal notranslate"><span class="pre">UserCreditPathway</span></code> model will now only keep a record of these credit requests; it will no longer be used for any application logic.</p>
+</section>
+<section id="rejected-alternatives">
+<h2><span class="section-number">5.5. </span>Rejected Alternatives<a class="headerlink" href="#rejected-alternatives" title="Permalink to this heading">#</a></h2>
+<section id="programcertrecord-id">
+<h3><span class="section-number">5.5.1. </span>ProgramCertRecord ID<a class="headerlink" href="#programcertrecord-id" title="Permalink to this heading">#</a></h3>
+<p>Instead of adding the Credentials <code class="docutils literal notranslate"><span class="pre">Program</span></code> ID to the <code class="docutils literal notranslate"><span class="pre">UserCreditPathway</span></code> model, we considered adding the <code class="docutils literal notranslate"><span class="pre">ProgramCertRecord</span></code> ID. A <code class="docutils literal notranslate"><span class="pre">ProgramCertRecord</span></code> is created whenever a learner decides to share their progress in a program (either publicly or by requesting credit). The <code class="docutils literal notranslate"><span class="pre">ProgramCertRecord</span></code> model links a <code class="docutils literal notranslate"><span class="pre">Program</span></code> and a <code class="docutils literal notranslate"><span class="pre">User</span></code> with a <code class="docutils literal notranslate"><span class="pre">uuid</span></code>. That <code class="docutils literal notranslate"><span class="pre">uuid</span></code> is used to generate a public link to the learner’s Program Record page. This link is what is sent to institutions when credit is requested, or can be shared by the learner however they wish.</p>
+<p>Using the <code class="docutils literal notranslate"><span class="pre">ProgramCertRecord</span></code> ID could make sense, since the URL that it represents is technically what the learner is sharing with the institution.</p>
+<p>However, we are mostly interested in adding a field to help us understand which <code class="docutils literal notranslate"><span class="pre">Program</span></code> was shared, so we are choosing to link the <code class="docutils literal notranslate"><span class="pre">Program</span></code> directly instead. Also, the <code class="docutils literal notranslate"><span class="pre">ProgramCertRecord</span></code> model is confusing: from the name, it would be easy to think that a <code class="docutils literal notranslate"><span class="pre">ProgramCertRecord</span></code> connects a <code class="docutils literal notranslate"><span class="pre">User</span></code>, a <code class="docutils literal notranslate"><span class="pre">Program</span></code>, and a program certificate; or that a <code class="docutils literal notranslate"><span class="pre">ProgramCertRecord</span></code> exists for every learner who has completed a course in a program, or else for learners who have completed every course in a program. It does none of these things. It no longer has anything to do with certificates, and a <code class="docutils literal notranslate"><span class="pre">ProgramCertRecord</span></code> only exists when a learner has decided to share their progress in a program. We would like to move away from this confusing model.</p>
+</section>
+</section>
+<section id="references">
+<h2><span class="section-number">5.6. </span>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
+<p>Pathways Documentation: <a class="reference external" href="https://edx-credentials.readthedocs.io/en/latest/pathways.html">https://edx-credentials.readthedocs.io/en/latest/pathways.html</a></p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="0004-filter-lms-side.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>Filter some data on the LMS side</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="0006-plugin-extensions.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">6. </span>Django App Plugin extensions</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#status">5.1. Status</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context">5.2. Context</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reporting">5.2.1. Reporting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#credit-for-multiple-programs">5.2.2. Credit for Multiple Programs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requesting-credit-before-completion">5.2.3. Requesting Credit Before Completion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decision">5.3. Decision</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consequences">5.4. Consequences</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rejected-alternatives">5.5. Rejected Alternatives</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#programcertrecord-id">5.5.1. ProgramCertRecord ID</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">5.6. References</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Axim Collaborative, Inc
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Axim Collaborative, Inc.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+<div class="extra_footer">
+  
+        <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
+            <img
+                alt="Creative Commons License"
+                style="border-width:0"
+                src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"/>
+        </a>
+        <br>
+        These works by
+            <a
+                xmlns:cc="https://creativecommons.org/ns#"
+                href="https://openedx.org"
+                property="cc:attributionName"
+                rel="cc:attributionURL"
+            >Axim Collaborative, Inc</a>
+        are licensed under a
+            <a
+                rel="license"
+                href="https://creativecommons.org/licenses/by-sa/4.0/"
+            >Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    
+</div>
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
