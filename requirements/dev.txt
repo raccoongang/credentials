@@ -10,7 +10,7 @@ asgiref==3.8.1
     #   django
     #   django-cors-headers
     #   django-stubs
-astroid==3.2.2
+astroid==3.2.3
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -38,7 +38,7 @@ black==24.4.2
     # via -r requirements/test.txt
 bleach==6.1.0
     # via -r requirements/test.txt
-cachetools==5.3.3
+cachetools==5.4.0
     # via
     #   -r requirements/test.txt
     #   tox
@@ -89,7 +89,7 @@ coreschema==0.0.4
     # via
     #   -r requirements/test.txt
     #   coreapi
-coverage==7.5.4
+coverage==7.6.0
     # via -r requirements/test.txt
 cryptography==42.0.8
     # via
@@ -113,7 +113,7 @@ distlib==0.3.8
     # via
     #   -r requirements/test.txt
     #   virtualenv
-django==4.2.13
+django==4.2.14
     # via
     #   -c requirements/common_constraints.txt
     #   -r requirements/test.txt
@@ -123,7 +123,6 @@ django==4.2.13
     #   django-debug-toolbar
     #   django-extensions
     #   django-filter
-    #   django-simple-history
     #   django-model-utils
     #   django-simple-history
     #   django-statici18n
@@ -159,7 +158,7 @@ django-crum==0.7.9
     #   -r requirements/test.txt
     #   edx-django-utils
     #   edx-toggles
-django-debug-toolbar==4.4.5
+django-debug-toolbar==4.4.6
     # via -r requirements/dev.in
 django-extensions==3.2.3
     # via -r requirements/test.txt
@@ -243,7 +242,7 @@ edx-i18n-tools==1.6.0
     #   -r requirements/dev.in
     #   -r requirements/test.txt
     #   edx-credentials-themes
-edx-lint==5.3.6
+edx-lint==5.3.7
     # via -r requirements/test.txt
 edx-opaque-keys[django]==2.10.0
     # via
@@ -258,7 +257,7 @@ edx-toggles==5.2.0
     #   -r requirements/test.txt
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
-exceptiongroup==1.2.1
+exceptiongroup==1.2.2
     # via
     #   -r requirements/test.txt
     #   pytest
@@ -336,7 +335,7 @@ mypy-extensions==1.0.0
     #   mypy
 mysqlclient==2.2.4
     # via -r requirements/test.txt
-newrelic==9.11.0
+newrelic==9.12.0
     # via
     #   -r requirements/test.txt
     #   edx-django-utils
@@ -355,6 +354,7 @@ openedx-events==9.11.0
     # via
     #   -r requirements/test.txt
     #   edx-event-bus-kafka
+    #   edx-event-bus-redis
 packaging==24.1
     # via
     #   -r requirements/test.txt
@@ -476,8 +476,6 @@ pytz==2024.1
     # via
     #   -r requirements/test.txt
     #   drf-yasg
-pywatchman==2.0.0 ; "linux" in sys_platform
-    # via -r requirements/dev.in
 pyyaml==6.0.1
     # via
     #   -r requirements/test.txt
@@ -488,7 +486,7 @@ pyyaml==6.0.1
     #   responses
 qrcode==7.4.2
     # via -r requirements/test.txt
-redis==5.0.4
+redis==5.0.7
     # via
     #   -r requirements/test.txt
     #   walrus
@@ -539,7 +537,7 @@ slumber==0.7.1
     # via
     #   -r requirements/test.txt
     #   edx-rest-api-client
-social-auth-app-django==5.4.1
+social-auth-app-django==5.4.2
     # via
     #   -r requirements/test.txt
     #   edx-auth-backends
@@ -548,7 +546,7 @@ social-auth-core==4.5.4
     #   -r requirements/test.txt
     #   edx-auth-backends
     #   social-auth-app-django
-sqlparse==0.5.0
+sqlparse==0.5.1
     # via
     #   -r requirements/test.txt
     #   django
@@ -576,7 +574,7 @@ tomli==2.0.1
     #   pyproject-api
     #   pytest
     #   tox
-tomlkit==0.12.5
+tomlkit==0.13.0
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -611,7 +609,7 @@ virtualenv==20.26.3
     # via
     #   -r requirements/test.txt
     #   tox
-walrus==0.9.3
+walrus==0.9.4
     # via
     #   -r requirements/test.txt
     #   edx-event-bus-redis

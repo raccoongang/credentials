@@ -9,7 +9,7 @@ asgiref==3.8.1
     #   -r requirements/base.txt
     #   django
     #   django-cors-headers
-astroid==3.2.2
+astroid==3.2.3
     # via
     #   pylint
     #   pylint-celery
@@ -36,7 +36,7 @@ black==24.4.2
     # via -r requirements/test.in
 bleach==6.1.0
     # via -r requirements/base.txt
-cachetools==5.3.3
+cachetools==5.4.0
     # via tox
 certifi==2024.7.4
     # via
@@ -80,7 +80,7 @@ coreschema==0.0.4
     # via
     #   -r requirements/base.txt
     #   coreapi
-coverage==7.5.4
+coverage==7.6.0
     # via -r requirements/test.in
 cryptography==42.0.8
     # via
@@ -218,7 +218,7 @@ edx-i18n-tools==1.6.0
     # via
     #   -r requirements/base.txt
     #   edx-credentials-themes
-edx-lint==5.3.6
+edx-lint==5.3.7
     # via -r requirements/test.in
 edx-opaque-keys[django]==2.10.0
     # via
@@ -233,7 +233,7 @@ edx-toggles==5.2.0
     #   -r requirements/base.txt
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
-exceptiongroup==1.2.1
+exceptiongroup==1.2.2
     # via pytest
 factory-boy==3.3.0
     # via -r requirements/test.in
@@ -297,7 +297,7 @@ mypy-extensions==1.0.0
     # via black
 mysqlclient==2.2.4
     # via -r requirements/base.txt
-newrelic==9.11.0
+newrelic==9.12.0
     # via
     #   -r requirements/base.txt
     #   edx-django-utils
@@ -316,6 +316,7 @@ openedx-events==9.11.0
     # via
     #   -r requirements/base.txt
     #   edx-event-bus-kafka
+    #   edx-event-bus-redis
 packaging==24.1
     # via
     #   -r requirements/base.txt
@@ -435,7 +436,7 @@ pyyaml==6.0.1
     #   responses
 qrcode==7.4.2
     # via -r requirements/base.txt
-redis==5.0.4
+redis==5.0.7
     # via
     #   -r requirements/base.txt
     #   walrus
@@ -486,7 +487,7 @@ slumber==0.7.1
     # via
     #   -r requirements/base.txt
     #   edx-rest-api-client
-social-auth-app-django==5.4.1
+social-auth-app-django==5.4.2
     # via
     #   -r requirements/base.txt
     #   edx-auth-backends
@@ -495,7 +496,7 @@ social-auth-core==4.5.4
     #   -r requirements/base.txt
     #   edx-auth-backends
     #   social-auth-app-django
-sqlparse==0.5.0
+sqlparse==0.5.1
     # via
     #   -r requirements/base.txt
     #   django
@@ -519,7 +520,7 @@ tomli==2.0.1
     #   pyproject-api
     #   pytest
     #   tox
-tomlkit==0.12.5
+tomlkit==0.13.0
     # via pylint
 tox==4.16.0
     # via -r requirements/test.in
@@ -545,7 +546,7 @@ urllib3==1.26.19
     #   responses
 virtualenv==20.26.3
     # via tox
-walrus==0.9.3
+walrus==0.9.4
     # via
     #   -r requirements/base.txt
     #   edx-event-bus-redis
