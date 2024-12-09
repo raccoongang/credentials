@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
+from credentials.apps.catalog.models import Course
 from credentials.apps.credentials.models import UserCredential
 from credentials.apps.verifiable_credentials.utils import capitalize_first
 
@@ -182,6 +183,11 @@ class IssuanceLine(TimeStampedModel):
     @property
     def program(self):
         return getattr(self.user_credential.credential, "program", None)
+
+    @property
+    def course(self):
+        course_id = getattr(self.user_credential.credential, "course_id", None)
+        return Course.objects.filter(course_runs__key=course_id).first()
 
     @property
     def platform_name(self):
