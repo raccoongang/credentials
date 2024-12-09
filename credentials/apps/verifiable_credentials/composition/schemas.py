@@ -3,7 +3,6 @@ Complementary schemas for verifiable credential composition.
 """
 
 from rest_framework import serializers
-from django.contrib.contenttypes.models import ContentType
 
 
 class EducationalOccupationalProgramSchema(serializers.Serializer):  # pylint: disable=abstract-method
@@ -46,20 +45,19 @@ class EducationalOccupationalCredentialSchema(serializers.Serializer):  # pylint
     id = serializers.CharField(default=TYPE, help_text="https://schema.org/EducationalOccupationalCredential")
     name = serializers.CharField(source="user_credential.credential.title")
     description = serializers.CharField(source="user_credential.uuid")
-    program = EducationalOccupationalProgramSchema(source="*")
-    course = EducationalOccupationalCourseSchema(source="*")
 
     def to_representation(self, instance):
         """
-        Dynamically remove fields based on the type before serialization.
+        Dynamically add fields based on the type.
         """
-        program_content_type = ContentType.objects.get(app_label="credentials", model="programcertificate")
-        if instance.user_credential.credential_content_type == program_content_type:
-            self.fields.pop("course", None)
-        else:
-            self.fields.pop("program", None)
+        representation = super().to_representation(instance)
 
-        return super().to_representation(instance)
+        if instance.user_credential.credential_content_type.model == "programcertificate":
+            representation["program"] = EducationalOccupationalProgramSchema(instance).data
+        elif instance.user_credential.credential_content_type.model == "coursecertificate":
+            representation["course"] = EducationalOccupationalCourseSchema(instance).data
+
+        return representation
 
     class Meta:
         read_only_fields = "__all__"
