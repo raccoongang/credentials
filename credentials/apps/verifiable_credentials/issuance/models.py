@@ -133,48 +133,58 @@ class IssuanceLine(TimeStampedModel):
         """
         Verifiable credential achievement description resolution.
         """
-        effort_portion = (
-            _(", with total {hours_of_effort} Hours of effort required to complete it").format(
-                hours_of_effort=self.program.total_hours_of_effort
+        if self.credential_content_type == "programcertificate":
+            effort_portion = (
+                _(", with total {hours_of_effort} Hours of effort required to complete it").format(
+                    hours_of_effort=self.program.total_hours_of_effort
+                )
+                if self.program.total_hours_of_effort
+                else ""
             )
-            if self.program.total_hours_of_effort
-            else ""
-        )
 
-        program_certificate_description = _(
-            "{credential_type} is granted on program {program_title} completion offered by {organizations}, in collaboration with {platform_name}. The {program_title} program includes {course_count} course(s){effort_info}."  # pylint: disable=line-too-long
-        ).format(
-            credential_type=self.credential_verbose_type,
-            program_title=self.program.title,
-            organizations=", ".join(list(self.program.authoring_organizations.values_list("name", flat=True))),
-            platform_name=self.platform_name,
-            course_count=self.program.course_runs.count(),
-            effort_info=effort_portion,
-        )
-        type_to_description = {
-            "programcertificate": program_certificate_description,
-            "coursecertificate": "",
-        }
-        return capitalize_first(type_to_description.get(self.credential_content_type))
+            description = _(
+                "{credential_type} is granted on program {program_title} completion offered by {organizations}, in collaboration with {platform_name}. The {program_title} program includes {course_count} course(s){effort_info}."  # pylint: disable=line-too-long
+            ).format(
+                credential_type=self.credential_verbose_type,
+                program_title=self.program.title,
+                organizations=", ".join(list(self.program.authoring_organizations.values_list("name", flat=True))),
+                platform_name=self.platform_name,
+                course_count=self.program.course_runs.count(),
+                effort_info=effort_portion,
+            )
+        elif self.credential_content_type == "coursecertificate":
+            description = _("{credential_type} is granted on course {course_title} completion offered by {organization}, in collaboration with {platform_name}").format(
+                credential_type=self.credential_verbose_type,
+                course_title=getattr(self.course, "title", ""),
+                platform_name=self.platform_name,
+                organization=self.user_credential.credential.course_key.org,
+            )
+        return capitalize_first(description)
 
     @property
     def credential_narrative(self):
         """
         Verifiable credential achievement criteria narrative.
         """
-        program_certificate_narrative = _(
-            "{recipient_fullname} successfully completed all courses and received passing grades for a Professional Certificate in {program_title} a program offered by {organizations}, in collaboration with {platform_name}."  # pylint: disable=line-too-long
-        ).format(
-            recipient_fullname=self.subject_fullname or _("recipient"),
-            program_title=self.program.title,
-            organizations=", ".join(list(self.program.authoring_organizations.values_list("name", flat=True))),
-            platform_name=self.platform_name,
-        )
-        type_to_narrative = {
-            "programcertificate": program_certificate_narrative,
-            "coursecertificate": "",
-        }
-        return capitalize_first(type_to_narrative.get(self.credential_content_type))
+        if self.credential_content_type == "programcertificate":
+            narrative = _(
+                "{recipient_fullname} successfully completed all courses and received passing grades for a Professional Certificate in {program_title} a program offered by {organizations}, in collaboration with {platform_name}."  # pylint: disable=line-too-long
+            ).format(
+                recipient_fullname=self.subject_fullname or _("recipient"),
+                program_title=self.program.title,
+                organizations=", ".join(list(self.program.authoring_organizations.values_list("name", flat=True))),
+                platform_name=self.platform_name,
+            )
+        elif self.credential_content_type == "coursecertificate":
+            narrative = _(
+                "{recipient_fullname} successfully completed a course and received a passing grade for a Course Certificate in {course_title} a course offered by {organization}, in collaboration with {platform_name}. "  # pylint: disable=line-too-long
+            ).format(
+                recipient_fullname=self.subject_fullname or _("recipient"),
+                course_title=getattr(self.course, "title", ""),
+                organization=self.user_credential.credential.course_key.org,
+                platform_name=self.platform_name,
+            )
+        return capitalize_first(narrative)
 
     @property
     def credential_content_type(self):
