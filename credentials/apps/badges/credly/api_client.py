@@ -1,23 +1,24 @@
 import base64
 import logging
+import requests
 from functools import lru_cache
 from urllib.parse import urljoin
 
-import requests
 from attrs import asdict
 from django.conf import settings
 from django.contrib.sites.models import Site
-from requests.exceptions import HTTPError
 
-from credentials.apps.badges.credly.exceptions import CredlyAPIError, CredlyError
+from credentials.apps.badges.credly.exceptions import CredlyError
 from credentials.apps.badges.credly.utils import get_credly_api_base_url
 from credentials.apps.badges.models import CredlyBadgeTemplate, CredlyOrganization
+from credentials.apps.badges.base_api_client import BaseBadgeProviderClient
+
 
 
 logger = logging.getLogger(__name__)
 
 
-class CredlyAPIClient:
+class CredlyAPIClient(BaseBadgeProviderClient):
     """
     A client for interacting with the Credly API.
 
@@ -25,6 +26,7 @@ class CredlyAPIClient:
     such as fetching organization details, fetching badge templates, issuing badges,
     and revoking badges.
     """
+    PROVIDER_NAME = "Credly"
 
     def __init__(self, organization_id, api_key=None):
         """
@@ -52,43 +54,6 @@ class CredlyAPIClient:
             return organization
         except CredlyOrganization.DoesNotExist:
             raise CredlyError(f"CredlyOrganization with the uuid {organization_id} does not exist!")
-
-    def perform_request(self, method, url_suffix, data=None):
-        """
-        Perform an HTTP request to the specified URL suffix.
-
-        Args:
-            method (str): HTTP method to use for the request.
-            url_suffix (str): URL suffix to append to the base Credly API URL.
-            data (dict, optional): Data to send with the request.
-
-        Returns:
-            dict: JSON response from the API.
-
-        Raises:
-            requests.HTTPError: If the API returns an error response.
-        """
-        url = urljoin(self.base_api_url, url_suffix)
-        logger.debug(f"Credly API: {method.upper()} {url}")
-        response = requests.request(method.upper(), url, headers=self._get_headers(), json=data, timeout=10)
-        self._raise_for_error(response)
-        return response.json()
-
-    def _raise_for_error(self, response):
-        """
-        Raises a CredlyAPIError if the response status code indicates an error.
-
-        Args:
-            response (requests.Response): Response object from the Credly API request.
-
-        Raises:
-            CredlyAPIError: If the response status code indicates an error.
-        """
-        try:
-            response.raise_for_status()
-        except HTTPError:
-            logger.error(f"Error while processing Credly API request: {response.status_code} - {response.text}")
-            raise CredlyAPIError(f"Credly API:{response.text}({response.status_code})")
 
     def _get_headers(self):
         """
