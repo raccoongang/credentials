@@ -21,6 +21,7 @@ class BaseBadgeProviderClient(ABC):
     """
 
     PROVIDER_NAME = None
+    REQUESTS_TIMEOUT = 10
 
     def __init__(self):
         self.base_api_url = None
@@ -42,7 +43,7 @@ class BaseBadgeProviderClient(ABC):
         """
         url = urljoin(self.base_api_url, url_suffix)
         logger.debug(f"{self.PROVIDER_NAME} API: {method.upper()} {url}")
-        response = requests.request(method.upper(), url, headers=self._get_headers(), json=data, timeout=10)
+        response = requests.request(method.upper(), url, headers=self._get_headers(), json=data, timeout=self.REQUESTS_TIMEOUT)
         self._raise_for_error(response)
         return response.json()
 
