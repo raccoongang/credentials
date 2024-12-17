@@ -63,10 +63,21 @@ class BaseBadgeProviderClient(ABC):
             logger.error(f"Error while processing request: {response.status_code} - {response.text}")
             raise BadgeProviderError(f"{self.PROVIDER_NAME} API:{response.text}({response.status_code})")
 
+    @property
+    def base_api_url(self):
+        return self._get_base_api_url()
+
     @abstractmethod
     def _get_headers(self):
         """
         Returns the headers for making API requests.
+        """
+        pass
+
+    @abstractmethod
+    def _get_base_api_url(self):
+        """
+        Returns the base URL for the badge provider API.
         """
         pass
 

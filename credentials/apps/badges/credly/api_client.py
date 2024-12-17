@@ -43,7 +43,8 @@ class CredlyAPIClient(BaseBadgeProviderClient):
         self.api_key = api_key
         self.organization_id = organization_id
 
-        self.base_api_url = urljoin(get_credly_api_base_url(settings), f"organizations/{self.organization_id}/")
+    def _get_base_api_url(self):
+        return urljoin(get_credly_api_base_url(settings), f"organizations/{self.organization_id}/")  
 
     def _get_organization(self, organization_id):
         """
