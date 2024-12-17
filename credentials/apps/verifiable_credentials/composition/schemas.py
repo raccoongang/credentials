@@ -4,6 +4,8 @@ Complementary schemas for verifiable credential composition.
 
 from rest_framework import serializers
 
+from ..constants import CredentialsType
+
 
 class EducationalOccupationalProgramSchema(serializers.Serializer):  # pylint: disable=abstract-method
     """
@@ -52,9 +54,9 @@ class EducationalOccupationalCredentialSchema(serializers.Serializer):  # pylint
         """
         representation = super().to_representation(instance)
 
-        if instance.user_credential.credential_content_type.model == "programcertificate":
+        if instance.user_credential.credential_content_type.model == CredentialsType.PROGRAM:
             representation["program"] = EducationalOccupationalProgramSchema(instance).data
-        elif instance.user_credential.credential_content_type.model == "coursecertificate":
+        elif instance.user_credential.credential_content_type.model == CredentialsType.COURSE:
             representation["course"] = EducationalOccupationalCourseSchema(instance).data
 
         return representation

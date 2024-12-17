@@ -19,6 +19,7 @@ from credentials.apps.verifiable_credentials.utils import capitalize_first
 from ..composition.utils import get_data_model, get_data_models
 from ..settings import vc_settings
 from ..storages.utils import get_storage
+from ..constants import CredentialsType
 
 
 User = get_user_model()
@@ -107,8 +108,8 @@ class IssuanceLine(TimeStampedModel):
         Map internal credential types to verbose labels (source models do not provide those).
         """
         contenttype_to_verbose_name = {
-            "programcertificate": _("program certificate"),
-            "coursecertificate": _("course certificate"),
+            CredentialsType.PROGRAM: _("program certificate"),
+            CredentialsType.COURSE: _("course certificate"),
         }
         return contenttype_to_verbose_name.get(self.credential_content_type)
 
@@ -121,10 +122,10 @@ class IssuanceLine(TimeStampedModel):
             return credential_title
 
         contenttype_to_name = {
-            "programcertificate": _("program certificate for passing a program {program_title}").format(
+            CredentialsType.PROGRAM: _("program certificate for passing a program {program_title}").format(
                 program_title=getattr(self.program, "title", "")
             ),
-            "coursecertificate": self.credential_verbose_type,
+            CredentialsType.COURSE: self.credential_verbose_type,
         }
         return capitalize_first(contenttype_to_name.get(self.credential_content_type))
 
@@ -133,7 +134,7 @@ class IssuanceLine(TimeStampedModel):
         """
         Verifiable credential achievement description resolution.
         """
-        if self.credential_content_type == "programcertificate":
+        if self.credential_content_type == CredentialsType.PROGRAM:
             effort_portion = (
                 _(", with total {hours_of_effort} Hours of effort required to complete it").format(
                     hours_of_effort=self.program.total_hours_of_effort
@@ -152,7 +153,7 @@ class IssuanceLine(TimeStampedModel):
                 course_count=self.program.course_runs.count(),
                 effort_info=effort_portion,
             )
-        elif self.credential_content_type == "coursecertificate":
+        elif self.credential_content_type == CredentialsType.COURSE:
             description = _("{credential_type} is granted on course {course_title} completion offered by {organization}, in collaboration with {platform_name}").format(
                 credential_type=self.credential_verbose_type,
                 course_title=getattr(self.course, "title", ""),
@@ -166,7 +167,7 @@ class IssuanceLine(TimeStampedModel):
         """
         Verifiable credential achievement criteria narrative.
         """
-        if self.credential_content_type == "programcertificate":
+        if self.credential_content_type == CredentialsType.PROGRAM:
             narrative = _(
                 "{recipient_fullname} successfully completed all courses and received passing grades for a Professional Certificate in {program_title} a program offered by {organizations}, in collaboration with {platform_name}."  # pylint: disable=line-too-long
             ).format(
@@ -175,7 +176,7 @@ class IssuanceLine(TimeStampedModel):
                 organizations=", ".join(list(self.program.authoring_organizations.values_list("name", flat=True))),
                 platform_name=self.platform_name,
             )
-        elif self.credential_content_type == "coursecertificate":
+        elif self.credential_content_type == CredentialsType.COURSE:
             narrative = _(
                 "{recipient_fullname} successfully completed a course and received a passing grade for a Course Certificate in {course_title} a course offered by {organization}, in collaboration with {platform_name}. "  # pylint: disable=line-too-long
             ).format(
