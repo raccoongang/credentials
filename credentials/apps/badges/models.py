@@ -15,6 +15,7 @@ from model_utils import Choices
 from model_utils.fields import StatusField
 from openedx_events.learning.data import BadgeData, BadgeTemplateData, UserData, UserPersonalData
 
+from credentials.apps.badges.accredible.utils import get_accredible_base_url
 from credentials.apps.badges.credly.utils import get_credly_base_url
 from credentials.apps.badges.signals.signals import (
     notify_progress_complete,
@@ -88,11 +89,12 @@ class BadgeTemplate(AbstractCredential):
     uuid = models.UUIDField(unique=True, default=uuid.uuid4, help_text=_("Unique badge template ID."))
     name = models.CharField(max_length=255, help_text=_("Badge template name."))
     description = models.TextField(null=True, blank=True, help_text=_("Badge template description."))
-    icon = models.ImageField(upload_to="badge_templates/icons", null=True, blank=True)
+    icon = models.ImageField(upload_to="badge_templates/icons", null=True, blank=True, max_length=255)
     origin = models.CharField(max_length=128, null=True, blank=True, help_text=_("Badge template type."))
     state = StatusField(
         choices_name="STATES",
         help_text=_("Credly badge template state (auto-managed)."),
+        null=True,
     )
 
     def __str__(self):
@@ -675,3 +677,78 @@ class CredlyBadge(UserCredential):
         """
 
         return self.external_uuid and (self.state in self.ISSUING_STATES)
+
+
+class AccredibleAPIConfig(TimeStampedModel):
+    """
+    Accredible API configuration.
+    """
+
+    name = models.CharField(max_length=255, help_text=_("Accredible API configuration name."), null=True, blank=True)
+    api_key = models.CharField(max_length=255, help_text=_("Accredible API key."))
+
+    @classmethod
+    def get_all_api_config_ids(cls):
+        """
+        Get all api config IDs.
+        """
+        return list(cls.objects.values_list("id", flat=True))
+
+class AccredibleGroup(BadgeTemplate):
+    """
+    Accredible badge group credential type.
+
+    Accredible groups should not be created manually, instead they are pulled from the Accredible service.
+    """
+
+    ORIGIN = "accredible"
+    uuid = None
+
+    api_config = models.ForeignKey(
+        AccredibleAPIConfig,
+        on_delete=models.CASCADE,
+        help_text=_("Accredible API configuration."),
+    )
+
+    @property
+    def management_url(self):
+        """
+        Build external Credly dashboard URL.
+        """
+        accredible_host_base_url = get_accredible_base_url(settings)
+        return urljoin(
+            accredible_host_base_url, f"issuer/dashboard/group/{self.id}/information-and-appearance"
+        )
+
+
+class AccredibleBadge(UserCredential):
+    """
+    Earned Accredible badge (Badge template credential) for user.
+
+    - tracks distributed (external Accredible service) state for Accredible badge.
+    """
+
+    STATES = Choices(
+        "created",
+        "no_response",
+        "error",
+        "accepted",
+        "expired",
+    )
+    ISSUING_STATES = {
+        STATES.accepted,
+        STATES.expired,
+    }
+
+    state = StatusField(
+        choices_name="STATES",
+        help_text=_("Accredible badge issuing state"),
+        default=STATES.created,
+    )
+
+    external_id = models.IntegerField(
+        blank=True,
+        null=True,
+        unique=True,
+        help_text=_("Accredible service badge identifier"),
+    )
