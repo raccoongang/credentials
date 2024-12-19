@@ -19,6 +19,8 @@ from credentials.apps.badges.models import (
     DataRule,
     Fulfillment,
     PenaltyDataRule,
+    AccredibleGroup,
+    AccredibleAPIConfig,
 )
 from credentials.apps.core.models import User
 
@@ -734,3 +736,39 @@ class PenaltyDataruleIsActiveTestCase(TestCase):
 
         self.requirement.template.is_active = False
         self.assertFalse(self.rule.is_active)
+
+
+class AccredibleGroupTestCase(TestCase):
+    def setUp(self):
+        self.api_config = AccredibleAPIConfig.objects.create(
+            api_key="test-api-key", name="test_config"
+        )
+        self.site = Site.objects.create(domain="test_domain", name="test_name")
+        self.group = AccredibleGroup.objects.create(
+            api_config=self.api_config,
+            id=55,
+            name="test_group",
+            site=self.site,
+        )
+
+    def test_management_url(self):
+        credly_host_base_url = "https://example.com/"
+        with patch("credentials.apps.badges.models.get_accredible_base_url") as mock_get_accredible_base_url:
+            mock_get_accredible_base_url.return_value = credly_host_base_url
+            expected_url = (
+                f"{credly_host_base_url}issuer/dashboard/group/{self.group.id}/information-and-appearance"
+            )
+            self.assertEqual(self.group.management_url, expected_url)
+            mock_get_accredible_base_url.assert_called_with(settings)
+
+
+class AccredibleAPIConfigTestCase(TestCase):
+    def setUp(self):
+        self.api_config = AccredibleAPIConfig.objects.create(
+            api_key="test-api-key",
+            name="test_config",
+        )
+
+    def test_get_all_api_config_ids(self):
+        organization_ids = [id for id in AccredibleAPIConfig.get_all_api_config_ids()]
+        self.assertEqual(organization_ids, [self.api_config.id])
