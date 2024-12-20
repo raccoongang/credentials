@@ -18,7 +18,7 @@ class AccredibleAPIClientTestCase(TestCase):
             api_key="test-api-key",
             name="test_config",
         )
-        self.api_client = AccredibleAPIClient(self.api_config)
+        self.api_client = AccredibleAPIClient(self.api_config.id)
         self.badge_data = AccredibleBadgeData(
             credential=AccredibleCredential(
                 recipient=AccredibleRecipient(name="Test name", email="test_name@test.com"),
@@ -67,6 +67,14 @@ class AccredibleAPIClientTestCase(TestCase):
             self.assertEqual(result, {"badge": "revoked"})
 
     def test_sync_groups(self):
+        AccredibleGroup.objects.create(
+            id=777,
+            api_config=self.api_config,
+            name="old_name",
+            description="old_desc",
+            icon="old_icon",
+            site_id=1,
+        )
         with mock.patch.object(AccredibleAPIClient, "fetch_all_groups") as mock_fetch_all_groups, \
              mock.patch.object(AccredibleAPIClient, "fetch_design_image") as mock_fetch_design_image:
             mock_fetch_all_groups.return_value = {
@@ -74,6 +82,7 @@ class AccredibleAPIClientTestCase(TestCase):
             }
             mock_fetch_design_image.return_value = "url"
 
+            self.assertEqual(AccredibleGroup.objects.filter(id=777).exists(), True)
             result = self.api_client.sync_groups(1)
             mock_fetch_all_groups.assert_called_once()
             mock_fetch_design_image.assert_called_once_with(123)
@@ -83,3 +92,4 @@ class AccredibleAPIClientTestCase(TestCase):
             self.assertEqual(AccredibleGroup.objects.first().description, "desc")
             self.assertEqual(AccredibleGroup.objects.first().icon, "url")
             self.assertEqual(AccredibleGroup.objects.first().api_config, self.api_config)
+            self.assertEqual(AccredibleGroup.objects.filter(id=777).exists(), False)

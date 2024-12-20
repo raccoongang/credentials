@@ -1,3 +1,7 @@
+"""
+Accredible utility functions.
+"""
+
 def get_accredible_api_base_url(settings) -> str:
     """
     Determines the base URL for the Accredible service based on application settings.

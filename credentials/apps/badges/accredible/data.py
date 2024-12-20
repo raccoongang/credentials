@@ -11,6 +11,7 @@ class AccredibleRecipient:
         name (str): The recipient's name.
         email (str): The recipient's email address.
     """
+
     name: str
     email: str
 
@@ -40,6 +41,7 @@ class AccredibleExpiredCredential:
     """
     Represents the data required to expire a credential.
     """
+
     expired_on: datetime
 
 @attr.s(auto_attribs=True, frozen=True)
@@ -47,6 +49,7 @@ class AccredibleBadgeData:
     """
     Represents the data required to issue a badge.
     """
+
     credential: AccredibleCredential
 
 @attr.s(auto_attribs=True, frozen=True)
@@ -54,4 +57,5 @@ class AccredibleExpireBadgeData:
     """
     Represents the data required to expire a badge.
     """
+
     credential: AccredibleExpiredCredential
