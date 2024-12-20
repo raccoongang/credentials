@@ -39,11 +39,11 @@ class TestSyncAccredibleGroupsCommand(TestCase):
     @mock.patch("credentials.apps.badges.management.commands.sync_accredible_groups.AccredibleAPIClient")
     def test_handle_no_arguments(self, mock_accredible_api_client):
         call_command("sync_accredible_groups")
-        self.assertEqual(mock_accredible_api_client.call_count, 6)
-        self.assertEqual(mock_accredible_api_client.return_value.sync_groups.call_count, 6)
+        self.assertEqual(mock_accredible_api_client.call_count, AccredibleAPIConfig.objects.all().count())
+        self.assertEqual(mock_accredible_api_client.return_value.sync_groups.call_count, AccredibleAPIConfig.objects.all().count())
 
     @mock.patch("credentials.apps.badges.management.commands.sync_accredible_groups.AccredibleAPIClient")
     def test_handle_with_api_config_id(self, mock_accredible_api_client):
-        call_command("sync_accredible_groups", "--api_config_id", 1)
+        call_command("sync_accredible_groups", "--api_config_id", self.api_config.id)
         mock_accredible_api_client.assert_called_once_with(1)
         mock_accredible_api_client.return_value.sync_groups.assert_called_once_with(1)

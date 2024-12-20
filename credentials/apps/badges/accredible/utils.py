@@ -15,7 +15,6 @@ def get_accredible_api_base_url(settings) -> str:
             set to a truthy value in the configuration;
             otherwise, it will be the production environment's URL.
     """
-
     accredible_config = settings.BADGES_CONFIG["accredible"]
 
     if accredible_config.get("USE_SANDBOX"):
@@ -37,7 +36,6 @@ def get_accredible_base_url(settings) -> str:
             set to a truthy value in the configuration;
             otherwise, it will be the production environment's URL.
     """
-
     credly_config = settings.BADGES_CONFIG["accredible"]
 
     if credly_config.get("USE_SANDBOX"):

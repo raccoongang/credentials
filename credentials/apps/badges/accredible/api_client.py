@@ -38,8 +38,7 @@ class AccredibleAPIClient(BaseBadgeProviderClient):
         Returns the API configuration object for the Accredible API.
         """
         try:
-            api_config = AccredibleAPIConfig.objects.get(id=self.api_config_id)
-            return api_config
+            return AccredibleAPIConfig.objects.get(id=self.api_config_id)
         except AccredibleAPIConfig.DoesNotExist:
             raise AccredibleError(f"AccredibleAPIConfig with the id {self.api_config_id} does not exist!")
 
@@ -50,7 +49,6 @@ class AccredibleAPIClient(BaseBadgeProviderClient):
         """
         Returns the headers for making API requests to Accredible.
         """
-
         return {
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -61,14 +59,12 @@ class AccredibleAPIClient(BaseBadgeProviderClient):
         """
         Fetch all groups.
         """
-
         return self.perform_request("get", "issuer/all_groups")
 
     def fetch_design_image(self, design_id: int) -> str:
         """
         Fetches the design and return the URL of image.
         """
-
         design_raw = self.perform_request("get", f"designs/{design_id}")
         return design_raw.get("design", {}).get("rasterized_content_url")
 
@@ -79,7 +75,6 @@ class AccredibleAPIClient(BaseBadgeProviderClient):
         Args:
             issue_badge_data (IssueBadgeData): Data required to issue the badge.
         """
-
         return self.perform_request("post", "credentials", asdict(issue_badge_data))
 
     def revoke_badge(self, badge_id, data: AccredibleExpireBadgeData) -> dict:
@@ -90,7 +85,6 @@ class AccredibleAPIClient(BaseBadgeProviderClient):
             badge_id (str): ID of the badge to revoke.
             data (dict): Additional data for the revocation.
         """
-
         return self.perform_request("patch", f"credentials/{badge_id}", asdict(data))
 
     def sync_groups(self, site_id: int) -> int:
@@ -103,7 +97,6 @@ class AccredibleAPIClient(BaseBadgeProviderClient):
         Returns:
             int | None: processed items.
         """
-
         try:
             site = Site.objects.get(id=site_id)
         except Site.DoesNotExist:
