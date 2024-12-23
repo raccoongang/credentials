@@ -538,7 +538,7 @@ class BadgeProgress(models.Model):
 
         return {
             group: BadgeRequirement.is_group_fulfilled(group=group, template=self.template, username=self.username)
-            for group in self.template.groups
+            for group in getattr(self.template, "groups", [])
         }
 
     @property
@@ -553,15 +553,14 @@ class BadgeProgress(models.Model):
         """
         Notify about the progress.
         """
-
-        notify_progress_complete(self, self.username, self.template.id)
+        notify_progress_complete(self, self.username, self.template.id, self.template.origin)
 
     def regress(self):
         """
         Notify about the regression.
         """
 
-        notify_progress_incomplete(self, self.username, self.template.id)
+        notify_progress_incomplete(self, self.username, self.template.id, self.template.origin)
 
     def reset(self):
         """
@@ -684,7 +683,7 @@ class AccredibleAPIConfig(TimeStampedModel):
     Accredible API configuration.
     """
 
-    name = models.CharField(max_length=255, help_text=_("Accredible API configuration name."), null=True, blank=True)
+    name = models.CharField(max_length=255, help_text=_("Accredible API configuration name."), null=True, blank=False)
     api_key = models.CharField(max_length=255, help_text=_("Accredible API key."))
 
     @classmethod
@@ -693,6 +692,7 @@ class AccredibleAPIConfig(TimeStampedModel):
         Get all api config IDs.
         """
         return list(cls.objects.values_list("id", flat=True))
+
 
 class AccredibleGroup(BadgeTemplate):
     """
@@ -752,3 +752,42 @@ class AccredibleBadge(UserCredential):
         unique=True,
         help_text=_("Accredible service badge identifier"),
     )
+
+
+    def as_badge_data(self) -> BadgeData:
+        """
+        Represents itself as a BadgeData instance.
+        """
+
+        user = get_user_by_username(self.username)
+        group = self.credential
+
+        badge_data = BadgeData(
+            uuid=str(self.uuid),
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.username,
+                    email=user.email,
+                    name=user.get_full_name(),
+                ),
+                id=user.lms_user_id,
+                is_active=user.is_active,
+            ),
+            template=BadgeTemplateData(
+                uuid=str(group.uuid),
+                origin=group.origin,
+                name=group.name,
+                description=group.description,
+                image_url=str(group.icon),
+            ),
+        )
+
+        return badge_data
+
+    @property
+    def propagated(self):
+        """
+        Checks if this user credential already has issued (external) Accredible badge.
+        """
+
+        return self.external_id and (self.state in self.ISSUING_STATES)
