@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _
 from credentials.apps.badges.credly.api_client import CredlyAPIClient
 from credentials.apps.badges.credly.data import CredlyBadgeData
 from credentials.apps.badges.credly.exceptions import CredlyAPIError
+from credentials.apps.badges.exceptions import BadgeProviderError
 from credentials.apps.badges.models import BadgeTemplate, CredlyBadge, CredlyBadgeTemplate, UserCredential
 from credentials.apps.badges.signals.signals import notify_badge_awarded, notify_badge_revoked
 from credentials.apps.core.api import get_user_by_username
@@ -133,7 +134,7 @@ class CredlyBadgeTemplateIssuer(BadgeTemplateIssuer):
         try:
             credly_api = CredlyAPIClient(badge_template.organization.uuid)
             response = credly_api.issue_badge(credly_badge_data)
-        except CredlyAPIError:
+        except BadgeProviderError:
             user_credential.state = "error"
             user_credential.save()
             raise
