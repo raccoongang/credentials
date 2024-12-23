@@ -118,6 +118,8 @@ class AccredibleAPIClient(BaseBadgeProviderClient):
                     "name": raw_group.get("course_name"),
                     "description": raw_group.get("course_description"),
                     "icon": self.fetch_design_image(raw_group.get("primary_design_id")),
+                    "created": raw_group.get("created_at"),
+                    "state": AccredibleGroup.STATES.active,
                 },
             )
 

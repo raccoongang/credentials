@@ -24,7 +24,6 @@ class AccredibleCredential:
         recipient (RecipientData): Information about the recipient.
         group_id (int): ID of the credential group.
         name (str): Title of the credential.
-        description (str): Description of the credential.
         issued_on (datetime): Date when the credential was issued.
         complete (bool): Whether the credential process is complete.
     """
@@ -32,7 +31,6 @@ class AccredibleCredential:
     recipient: AccredibleRecipient
     group_id: int
     name: str
-    description: str
     issued_on: datetime
     complete: bool
 

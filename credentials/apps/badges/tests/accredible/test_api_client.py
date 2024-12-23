@@ -24,7 +24,6 @@ class AccredibleAPIClientTestCase(TestCase):
                 recipient=AccredibleRecipient(name="Test name", email="test_name@test.com"),
                 group_id=123,
                 name="Test Badge",
-                description="Test Badge Description",
                 issued_on="2021-01-01 00:00:00 +0000",
                 complete=True,
             )
