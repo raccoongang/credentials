@@ -50,6 +50,15 @@ The feature has its configuration:
             "CREDLY_SANDBOX_API_BASE_URL": "https://sandbox-api.credly.com/v1/",
             "USE_SANDBOX": False,
         },
+        # Accredible integration:
+        "accredible": {
+            "ACCREDIBLE_BASE_URL": "https://dashboard.accredible.com/",
+            "ACCREDIBLE_API_BASE_URL": "https://api.accredible.com/v1/",
+            "ACCREDIBLE_SANDBOX_BASE_URL": "https://sandbox.dashboard.accredible.com/",
+            "ACCREDIBLE_SANDBOX_API_BASE_URL": "https://sandbox.api.accredible.com/v1/",
+            "USE_SANDBOX": False,
+        },
+
         # requirements data rules:
         "rules": {
             "ignored_keypaths": [
@@ -75,6 +84,12 @@ Credly integration
 - CREDLY_SANDBOX_BASE_URL - Credly sandbox host URL;
 - CREDLY_SANDBOX_API_BASE_URL - Credly sandbox API host URL;
 
+Accredible integration
+~~~~~~~~~~~~~~~~~~~~~~
+- USE_SANDBOX - enables Accredible sandbox usage (development, testing);
+- ACCREDIBLE_BASE_URL - Accredible service host URL;
+- ACCREDIBLE_API_BASE_URL - Accredible API host URL;
+- ACCREDIBLE_SANDBOX_BASE_URL - Accredible sandbox host URL;
 
 Event bus settings
 ------------------
