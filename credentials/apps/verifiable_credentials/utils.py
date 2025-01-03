@@ -7,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from credentials.apps.credentials.api import get_user_credentials_by_content_type
 from credentials.apps.credentials.data import UserCredentialStatus
+from credentials.apps.catalog.models import CourseRun
 
 
 def get_user_credentials_data(username, model):
@@ -39,8 +40,10 @@ def get_user_credentials_data(username, model):
                 credential.credential.program.authoring_organizations.values_list("name", flat=True)
             )
         elif model == "coursecertificate":
+            course_run = CourseRun.objects.filter(key=credential.credential.course_id).first()
+            course = getattr(course_run, "course", None)
             credential_uuid = credential.credential.course_id
-            credential_title = credential.credential.title
+            credential_title = credential.credential.title or getattr(course, "title", "")
             credential_org = credential.credential.course_key.org
 
         data.append({
