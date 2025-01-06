@@ -22,6 +22,9 @@ from credentials.apps.badges.admin_forms import (
     PenaltyDataRuleFormSet,
 )
 from credentials.apps.badges.models import (
+    AccredibleAPIConfig,
+    AccredibleBadge,
+    AccredibleGroup,
     BadgePenalty,
     BadgeProgress,
     BadgeRequirement,
@@ -31,12 +34,14 @@ from credentials.apps.badges.models import (
     DataRule,
     Fulfillment,
     PenaltyDataRule,
-    AccredibleAPIConfig,
-    AccredibleBadge,
-    AccredibleGroup,
 )
 from credentials.apps.badges.toggles import is_badges_enabled
 
+
+ADMIN_CHANGE_VIEW_REVERSE_NAMES = {
+    CredlyBadgeTemplate.ORIGIN: "admin:badges_credlybadgetemplate_change",
+    AccredibleGroup.ORIGIN: "admin:badges_accrediblegroup_change",
+}
 
 class BadgeRequirementInline(admin.TabularInline):
     """
@@ -388,14 +393,19 @@ class BadgeRequirementAdmin(admin.ModelAdmin):
         """
         Interactive link to parent (badge template).
         """
-        url = reverse("admin:badges_credlybadgetemplate_change", args=[instance.template.pk])
+        reverse_name = ADMIN_CHANGE_VIEW_REVERSE_NAMES.get(instance.template.origin, "admin:index")
+        reverse_args = [] if reverse_name == "admin:index" else [instance.template.pk]
+
+        url = reverse(reverse_name, args=reverse_args)
         return format_html('<a href="{}">{}</a>', url, instance.template)
 
     template_link.short_description = _("badge template")
 
     def response_change(self, request, obj):
         if "_save" in request.POST:
-            return HttpResponseRedirect(reverse("admin:badges_credlybadgetemplate_change", args=[obj.template.pk]))
+            reverse_name = ADMIN_CHANGE_VIEW_REVERSE_NAMES.get(obj.template.origin, "admin:index")
+            reverse_args = [] if reverse_name == "admin:index" else [obj.template.pk]
+            return HttpResponseRedirect(reverse(reverse_name, args=reverse_args))
         return super().response_change(request, obj)
 
 
@@ -712,6 +722,7 @@ class AccredibleGroupAdmin(admin.ModelAdmin):
         if obj.icon:
             return format_html('<img src="{}" width="50" height="auto" />', obj.icon)
         return None
+
 
 # register admin configurations with respect to the feature flag
 if is_badges_enabled():
