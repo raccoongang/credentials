@@ -32,6 +32,11 @@ from credentials.apps.credentials.constants import UserCredentialStatus
 from credentials.apps.credentials.issuers import AbstractCredentialIssuer
 
 
+REVOCATION_STATES = {
+    CredlyBadge: CredlyBadge.STATES.revoked,
+    AccredibleBadge: AccredibleBadge.STATES.expired,
+}
+
 class BadgeTemplateIssuer(AbstractCredentialIssuer):
     """
     Issues BadgeTemplate credentials to users.
@@ -75,7 +80,7 @@ class BadgeTemplateIssuer(AbstractCredentialIssuer):
             UserCredential
         """
 
-        user_credential, __ = self.issued_user_credential_type.objects.update_or_create(
+        user_credential, __ = self.issued_user_credential_type.objects.get_or_create(
             username=username,
             credential_content_type=ContentType.objects.get_for_model(credential),
             credential_id=credential.id,
@@ -83,6 +88,9 @@ class BadgeTemplateIssuer(AbstractCredentialIssuer):
                 "status": status,
             },
         )
+        if not user_credential.state == REVOCATION_STATES.get(self.issued_user_credential_type):
+            user_credential.status = status
+            user_credential.save()
 
         self.set_credential_attributes(user_credential, attributes)
         self.set_credential_date_override(user_credential, date_override)
@@ -212,7 +220,6 @@ class CredlyBadgeTemplateIssuer(BadgeTemplateIssuer):
         if user_credential.propagated:
             self.revoke_credly_badge(credential_id, user_credential)
         return user_credential
-
 
 
 class AccredibleBadgeTemplateIssuer(BadgeTemplateIssuer):
