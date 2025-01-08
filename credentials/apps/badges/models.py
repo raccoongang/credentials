@@ -624,6 +624,7 @@ class CredlyBadge(UserCredential):
         STATES.pending,
         STATES.accepted,
         STATES.rejected,
+        STATES.revoked,
     }
 
     state = StatusField(
