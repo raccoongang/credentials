@@ -8,7 +8,7 @@ Quick Start
 Currently Open edX supports two badge services: Credly and Accredible.
 
 0. Prerequisites – service account
----------------------------------
+----------------------------------
 
 To start using this feature a Credly or Accredible account is necessary.
 

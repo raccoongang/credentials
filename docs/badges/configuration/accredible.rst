@@ -11,7 +11,7 @@ The Badges feature is configured in the Credentials admin panel.
         :alt: Badges administration
 
 Accredible API Configurations
---------------------
+-----------------------------
 
 Multiple Accredible API Configurations can be configured.
 

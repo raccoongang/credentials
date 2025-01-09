@@ -11,6 +11,10 @@ Badges feature settings allow configuration:
 2. event bus public signals subset for badges;
 3. the Credly service integration details (URLs, sandbox usage, etc.);
 
+You can use tutor plugin to setup all needed configurations:
+
+https://github.com/raccoongang/tutor-contrib-badges
+
 
 Feature switch
 --------------
