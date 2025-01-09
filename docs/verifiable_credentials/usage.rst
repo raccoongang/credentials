@@ -14,8 +14,8 @@ Verifiable credential includes data about:
     - student's unique decentralized identifier (DID);
     - student's arbitrary personal data (optional);
 - what exactly was achieved (credential)
-    - type (program certificate);
-    - title (program name, possibly courses list);
+    - type (program or course certificate);
+    - title (program or course name, possibly courses list);
 - when it happened (timestamp)
     - date and time verifiable credential was created (issued);
     - expiration moment (optionally);
