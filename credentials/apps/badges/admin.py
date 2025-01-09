@@ -455,7 +455,9 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
         """
         Interactive link to parent (badge template).
         """
-        url = reverse("admin:badges_credlybadgetemplate_change", args=[instance.template.pk])
+        reverse_name = ADMIN_CHANGE_VIEW_REVERSE_NAMES.get(instance.template.origin, "admin:index")
+        reverse_args = [] if reverse_name == "admin:index" else [instance.template.pk]
+        url = reverse(reverse_name, args=reverse_args)
         return format_html('<a href="{}">{}</a>', url, instance.template)
 
     template_link.short_description = _("badge template")
@@ -470,7 +472,9 @@ class BadgePenaltyAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj):
         if "_save" in request.POST:
-            return HttpResponseRedirect(reverse("admin:badges_credlybadgetemplate_change", args=[obj.template.pk]))
+            reverse_name = ADMIN_CHANGE_VIEW_REVERSE_NAMES.get(obj.template.origin, "admin:index")
+            reverse_args = [] if reverse_name == "admin:index" else [obj.template.pk]
+            return HttpResponseRedirect(reverse(reverse_name, args=reverse_args))
         return super().response_change(request, obj)
 
 
