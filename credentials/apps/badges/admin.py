@@ -11,6 +11,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from credentials.apps.badges.exceptions import BadgeProviderError
 from credentials.apps.badges.admin_forms import (
     BadgePenaltyForm,
     BadgeRequirementForm,
@@ -576,11 +577,15 @@ class AccredibleAPIConfigAdmin(admin.ModelAdmin):
         """
         site = get_current_site(request)
         for api_config in queryset:
-            call_command(
-                "sync_accredible_groups",
-                api_config_id=api_config.id,
-                site_id=site.id,
-            )
+            try:
+                call_command(
+                    "sync_accredible_groups",
+                    api_config_id=api_config.id,
+                    site_id=site.id,
+                )
+            except BadgeProviderError as exc:
+                messages.set_level(request, messages.ERROR)
+                messages.error(request, _("Failed to sync groups for API config: {}. {}").format(api_config.name, exc))
 
         messages.success(request, _("Accredible groups were successfully updated."))
 
