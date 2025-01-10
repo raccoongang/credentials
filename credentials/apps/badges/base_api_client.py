@@ -60,8 +60,8 @@ class BaseBadgeProviderClient(ABC):
         try:
             response.raise_for_status()
         except HTTPError:
-            logger.error(f"Error while processing request: {response.status_code} - {response.text}")
-            raise BadgeProviderError(f"{self.PROVIDER_NAME} API:{response.text}({response.status_code})")
+            logger.error(f"Error while processing {self.PROVIDER_NAME} request: {response.status_code} - {response.text}")
+            raise BadgeProviderError(f"{response.text} Status({response.status_code})")
 
     @property
     def base_api_url(self):
