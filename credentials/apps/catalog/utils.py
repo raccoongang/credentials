@@ -239,7 +239,11 @@ class CatalogDataSynchronizer:
         program.course_runs.clear()
         for course_data in data["courses"]:
             for course_run_data in course_data["course_runs"]:
-                course_run = CourseRun.objects.get(course__uuid=course_data["uuid"], uuid=course_run_data["uuid"])
+                course_run = CourseRun.objects.get(
+                    course__site=self.site,
+                    course__uuid=course_data["uuid"],
+                    uuid=course_run_data["uuid"],
+                )
                 program.course_runs.add(course_run)
 
         return program
